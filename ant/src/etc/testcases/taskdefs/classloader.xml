@@ -1,0 +1,119 @@
+<project name="classloader-test" default="test-system2prop" basedir=".">
+
+  <target name="test.system2prop">
+    <classloader loader="system" property="test.cl.system2prop" />
+    <condition property="test.system2prop">
+    	<isset property="test.cl.system2prop"/>
+    </condition>
+  </target>
+  
+  <target name="test.report">
+    <classloader report="true"/>
+  </target>
+
+  <target name="test.system2prop">
+    <classloader loader="system" property="test.cl.system2prop" />
+    <condition property="test.system2prop">
+    	<isset property="test.cl.system2prop"/>
+    </condition>
+  </target>
+
+  <target name="test.createURL">
+    <classloader loader="test.cl.createURL">
+      <classpath>
+         <urlpathelement location="http://my.domain/my.1st.jar"/>
+         <urlpathelement path="http://my.domain/my.2nd.jar;http://my.domain/my.3rd.jar"/>
+      </classpath>
+    </classloader>
+    <classloader loader="test.cl.createURL" property="test.cl.createURL"/>
+    <condition property="test.createURL">
+    	<equals arg1="http://my.domain/my.1st.jar;http://my.domain/my.2nd.jar;http://my.domain/my.3rd.jar" 
+    	        arg2="${test.cl.createURL}"/>
+    </condition>
+    
+  </target>
+
+  <target name="test.updateURL">
+    <classloader loader="test.cl.updateURL">
+      <classpath>
+         <urlpathelement location="http://my.domain/my.1st.jar"/>
+      </classpath>
+    </classloader>
+    <classloader loader="test.cl.updateURL" property="test.cl.updateURL">
+      <classpath>
+         <urlpathelement location="http://my.domain/my.2nd.jar"/>
+      </classpath>
+    </classloader>
+    <condition property="test.updateURL">
+    	<equals arg1="http://my.domain/my.1st.jar;http://my.domain/my.2nd.jar" 
+    	        arg2="${test.cl.updateURL}"/>
+    </condition>
+    
+  </target>
+
+  <target name="test.createAnt">
+    <classloader loader="test.cl.createAnt">
+      <classpath>
+         <pathelement location="classloader/path1"/>
+      </classpath>
+     <antparameters/>
+    </classloader>
+    <classloader loader="test.cl.createAnt" property="test.cl.createAnt"/>
+    <condition property="test.createAnt">
+    	<equals arg1="${basedir}${file.separator}classloader${file.separator}path1" 
+    	        arg2="${test.cl.createAnt}"/>
+    </condition>
+  </target>
+
+  <target name="test.updateAnt">
+    <classloader loader="test.cl.updateAnt">
+      <classpath>
+         <pathelement location="classloader/path1"/>
+      </classpath>
+     <antparameters/>
+    </classloader>
+    <classloader loader="test.cl.updateAnt" property="test.cl.updateAnt">
+      <classpath>
+         <pathelement location="classloader/path2"/>
+      </classpath>
+    </classloader>
+    <condition property="test.updateAnt">
+    	<equals arg1="${basedir}${file.separator}classloader${file.separator}path1${path.separator}${basedir}${file.separator}classloader${file.separator}path2" 
+    	        arg2="${test.cl.updateAnt}"/>
+    </condition>
+  </target>
+
+  <target name="test.updateSystem">
+    <condition property="test.updateSystem.previous">
+        <not>
+    		<available resource="classloadertest.properties"/>
+        </not>
+    </condition>
+    <classloader loader="system">
+      <classpath>
+         <pathelement location="classloader/path1"/>
+      </classpath>
+     <antparameters/>
+    </classloader>
+    <condition property="test.updateSystem">
+        <and>
+	   	  <available resource="classloadertest.properties"/>
+	   	  <equals arg1="${test.updateSystem.previous}" arg2="true"/>
+	   	</and>
+    </condition>
+  </target>
+
+  <target name="test.types" description="just checks whether buildIn types are available">
+    <loaderhandler id="test.types.handler" loader="dummyloader" adapter="dummyadapter"/>
+    <loaderhandlerset id="test.types.handlerset"/>
+    <loaderparameters id="test.types.loaderparameters"/>
+    <antloaderparameters id="test.types.antloaderparameters"/>
+    <loaderref id="test.types.loaderref" loader="project"/>
+    <urlpath id="test.types.urlpath" location="http://ant.apache.org"/>
+    <property name="test.types" value="true"/>
+  </target>
+
+  <!-- future use -->
+  <target name="cleanup">
+  </target>
+</project>
