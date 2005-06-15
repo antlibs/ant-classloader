@@ -11,13 +11,6 @@
     <classloader report="true"/>
   </target>
 
-  <target name="test.system2prop">
-    <classloader loader="system" property="test.cl.system2prop" />
-    <condition property="test.system2prop">
-    	<isset property="test.cl.system2prop"/>
-    </condition>
-  </target>
-
   <target name="test.createURL">
     <classloader loader="test.cl.createURL">
       <classpath>

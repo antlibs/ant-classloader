@@ -1,0 +1,656 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Classloader Task</title>
+</head>
+
+<body>
+<h2><a name="classloader">Classloader</a></h2>
+<h3><a name="classloader-description">Description</a></h3>
+  <p>
+    This task is designed to <ul>
+    <li><b>create</b> a new classloader,</li>
+    <li><b>append</b> a classpath to an existing classloader</li>
+    <li>extract the path of a classloader into a <b>property</b> and</li>
+    <li>write a classloader <b>report</b> for debugging purposes into the log.</li>
+  </ul>
+    The classloader to create, modify and/or get the path from, is referred by the <i>loader</i> attribute.<br/>
+	If the referenced object does not exist (or <i>reset</i> is <code>"true"</code>),
+	a new classloader will be created and the reference will be set. Otherwise the classpath 
+    will appended to the referenced classloader. In this case, the classloader remains untouched 
+    if no classpath is set. If the property <code>build.sysclasspath</code> is set to <code>"only"</code>,
+    create/append actions on the System-, Project- or CoreLoader are omitted with a warning.<br/>
+    If <i>property</i> is set, the classpath of <i>loader</i> is set as value of the specified property.
+    Create/append and property can be executed in one task.<br/>
+    If <i>report</i> is <code>"true"</code>, create/modify and property actions are skipped and a classloader report
+    is written to the log. <i>NOTE: The report format is subject to change in future releases.</i>
+  </p>
+<h4><a name="classloader-description-create">Creating classloaders</a></h4>
+  <ul>
+    <li><i>classpath</i> or <i>classpathRef</i> defines the classpath. (typical use)</li>
+    <li><i>parentLoader</i> defines the parent classloader. (typical use)</li>
+    <li><i>parameters</i> or <i>antparameters</i> defines some additional parameters and 
+        the type of the classloader. (typical use)</li>
+    <li><i>superLoader</i> defines the classloader that is used to load <i>loader</i>. It depends on the
+    type of the classloader wether this parameter is supported or not.(rare use)</li>
+    <li><i>handler</i> defines the type of the classloader (overrides <i>parameters</i>'s default). (used, if working with custom classloaders.)</li>
+  </ul>
+<h4><a name="classloader-description-update">Appending classpathes to existing classloaders</a></h4>
+  <ul>
+    <li><i>classpath</i> or <i>classpathRef</i> defines the classpath to append. (typical use)</li>
+    <li><i>handlerSet</i> defines the possible types of classloaders. (used, if working with custom classloaders.)</li>
+  </ul>
+<p>
+See also: <a href="#classloader-custom">Supporting custom classloaders</a> 
+</p>
+<h4><a name="classloader-description-warning">Usage notes</a></h4>
+  This task is designed to provide more flexibility but it should used with caution.
+  <ul>
+  <li>
+  Appending classpathes to existing loaders may lead to violation of loader constraints and 
+  mysterious failures if it results in a situation where one class is load by more than one 
+  classloader in a delegation hierarchy. 
+  It is highly recommended, not to use implicitely classloader creation via the <i>classpath</i>
+  attribute in tasks like <code>&lt;taskdef&gt;</code> and <code>&lt;typedef&gt;</code> and
+  modification of existing classloaders in the same build script. 
+  </li>
+  <li>
+  Take care if you use this task in IDEs that do not have a separate jvm for a run of ant.
+  The classpath will be retained by the IDE and used in the next ant build run. It can effect
+  the IDE itself if you modify the system classloader or any other classloader that is used
+  by the IDE.
+  </li>
+  <li>
+    Using URLs as classpath entries might lead to serious security loopholes. You should 
+    only use URLs that refers to trusted adresses (typically in an intranet) but not
+    URLs that refers to adresses in the internet.
+  </li>
+  </ul>
+
+
+<h3>Parameters</h3>
+<table border="1" cellpadding="2" cellspacing="0">
+  <tr>
+    <td valign="top"><b>Attribute</b></td>
+    <td valign="top"><b>Description</b></td>
+    <td align="center" valign="top"><b>Required</b></td>
+  </tr>
+  <tr>
+    <td valign="top">loader</td>
+    <td valign="top">Id or <a href="#classloader-nested-loader-symbolic">symbolic name</a> of the classloader to create, manipulate or get the path from.
+      See <a href="#classloader-nested-loader">nested element's description</a> for further information.
+      </td>
+    <td valign="top" align="center">Yes, unless nested <i>loader</i>
+    element is specified or <i>report</i> is <code>"true"</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">classpath</td>
+    <td valign="top">The classpath to create or append to <i>loader</i>.</td>
+    <td valign="top" align="center">No</td>
+  </tr>
+  <tr>
+    <td valign="top">classpathRef</td>
+    <td valign="top">Id of the classpath to create or append to <i>loader</i>. 
+    It can be a reference to a <code>Fileset</code>, <code>Filelist</code>, 
+    <code>Dirset</code>, <code>Path</code> or <code>Urlpath</code>.</td>
+    <td valign="top" align="center">No</td>
+  </tr>
+  <tr>
+    <td valign="top">duplicateEntry</td>
+    <td valign="top">Handling of duplicate entries in the classpath. 
+	One of "ignore" (don't check), "warn" (log warning but add entry)
+	or "omit" (omit entry and log in verbose mode). 
+    </td>
+    <td valign="top" align="center">No, defaults to "omit".</td>
+  </tr>
+  <tr>
+    <td valign="top">property</td>
+    <td valign="top">Name of the property to put <i>loader</i>s classpath in.</td>
+    <td valign="top" align="center">No</td>
+  </tr>
+  <tr>
+    <td valign="top">report</td>
+    <td valign="top">If <code>"true"</code>, create a classloader report.</td>
+    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">reportpackages</td>
+    <td valign="top">If <code>"true"</code>, report also the defined packages as get from <code>ClassLoader.getPackages()</code>.
+    Ignored if <i>report</i> is <code>"false"</code>.</td>
+    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">reset</td>
+    <td valign="top">If <code>"true"</code>, reset <i>loader</i> if it already exists. I.e. a new classloader will
+      be created and the reference to the old one will be replaced.
+      (It is not possible to remove paths from a loader). <i>NOTE: Use this option with care, as it
+      may deliver unexpected results.</i></td>
+    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">parameters</td>
+    <td valign="top">Id of the <code>Loaderparameters</code> to use when creating a new classloader.
+      See <a href="#classloader-nested-parameters">nested element's description</a> for further information.
+    </td>
+    <td valign="top" align="center">No, defaults to an empty <a href="#classloader-nested-parameters"><code>Loaderparameters</code></a>.</td>
+  </tr>
+  <tr>
+    <td valign="top">handler</td>
+    <td valign="top">Id of the <code>Loaderhandler</code> to use when creating a new classloader. Overwrites
+      the default <code>Loaderhandler</code> of <i>parameters</i>.
+      See <a href="#classloader-custom-handler">"Supporting custom classloaders"</a> for further information.
+    </td>
+    <td valign="top" align="center">No, defaults to <i>parameters</i>'s default <code>Loaderhandler</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">handlerSet</td>
+    <td valign="top">Id of the <code>LoaderhandlerSet</code> to use when modifying an existing classloader or getting it's classpath.
+      See <a href="#classloader-custom-handlerset">"Supporting custom classloaders"</a> for further information.
+    </td>
+    <td valign="top" align="center">No, defaults to a generic <code>LoaderhandlerSet</code> 
+    containing the <a href="#classloader-custom-handler-predefined">predefined Loaderhandlers</a> and <i>handler</i>.</td>
+  </tr>
+  <tr>
+    <td valign="top">failonerror</td>
+    <td valign="top">Stop the build process if an error occurs.</td>
+    <td valign="top" align="center">No, defaults to <code>"true"</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">parentLoader</td>
+    <td valign="top">Id or <a href="#classloader-nested-loader-symbolic">symbolic name</a> of a classloader to use as the parent of a newly created classloader.
+      See <a href="#classloader-nested-loader">nested element's description</a> for further information.
+    </td>
+    <td valign="top" align="center">No, defaults to <code>"none"</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">superLoader</td>
+    <td valign="top">Id or <a href="#classloader-nested-loader-symbolic">symbolic name</a> of a classloader to use as the classloader of a newly created classloader.
+      See <a href="#classloader-nested-loader">nested element's description</a> for further information.
+    </td>
+    <td valign="top" align="center">No, defaults to <code>"current"</code>.</td>
+  </tr>
+</table>
+  <h3><a name="classloader-nested">Parameters specified as nested elements</a></h3>
+
+  <h4><a name="classloader-nested-loader">&lt;loader&gt;, &lt;parentLoader&gt; and &lt;superLoader&gt;</a></h4>
+  <p>
+  <i>loader</i> specifies the classloader to create, modify or get the path from.<br/>
+  <i>parentLoader</i> specifies the classloader to use as parent of a newly created classloader.<br/>
+  <i>superLoader</i> specifies the classloader to use as classloader of a newly created classloader. It depends 
+  on the particular adapter, whether or not this parameter is supported.</p>
+  <p>
+  To specify classloaders, <code>Classloader</code> uses <code>Loaderref</code> types.
+  <code>Classloader</code>'s <i>loader</i>, <i>parentLoader</i> and <i>superLoader</i> attributes are <code>Loaderref</code>s with one of the attributes set
+  due to the following algorithm:
+  <ol>
+  <li>If the attribute's value is found in the reference table of the current project and denotes a <code>LoaderRef</code>,
+       set attribute's value as <i>refid</i>.</li>
+  <li>Else if the attribute's value is found in the reference table of the current project and denotes a classloader,
+       set attribute's value as <i>loaderRef</i>.</li>
+  <li>Else if the attribute's value is found in the reference table of the current project,
+       throw a BuildException.</li>
+  <li>Else if the attribute's value is a <a href="#classloader-nested-loader-symbolic">symbolic classloader name</a>,
+       set attribute's value as <i>loader</i>.</li>
+  <li>Else set attribute's value as <i>loaderRef</i>.</li>
+  </ol>
+  To explicitely set a <code>Loaderref</code>'s attribute, you can can define one via a nested <i>loader</i>, <i>parentLoader</i> resp. <i>superLoader</i> element.
+  </p>
+  <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">loader</td>
+        <td valign="top"><a href="#classloader-nested-loader-symbolic">Symbolic name</a> of a classloader.</td>
+        <td valign="top" align="center" rowspan="3">Exactly one of these.</td>
+      </tr>
+      <tr>
+        <td valign="top">loaderref</td>
+        <td valign="top">Refers to the id of a classloader defined elsewhere.</td>
+      </tr>
+      <tr>
+        <td valign="top">refid</td>
+        <td valign="top">Makes this <code>Loaderref</code> a reference to a <code>Loaderref</code> defined somewhere else.</td>
+      </tr>
+    </table>
+   
+  <h5><a name="classloader-nested-loader-symbolic">Symbolic classloader names</a></h5>
+  <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Symbolic Name</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td valign="top"><b><i>reset</i><code>="true"</code></b></td>
+      </tr>
+      <tr>
+        <td valign="top">core</td>
+        <td valign="top">The result of <code>getProject().getCoreLoader()</code>.</td>
+        <td valign="top">Calls <code>getProject().setCoreLoader</code> and updates the current Project reference id "ant.coreLoader".</td>
+      </tr>
+      <tr>
+        <td valign="top">current</td>
+        <td valign="top">The result of <code>this.getClass().getClassLoader()</code>.</td>
+        <td valign="top">Error</td>
+      </tr>
+      <tr>
+        <td valign="top">none</td>
+        <td valign="top">Explicitely no classloader. Can not be used as <code>Classloader</code>'s <i>loader</i>.</td>
+        <td valign="top">Error</td>
+      </tr>
+      <tr>
+        <td valign="top">project</td>
+        <td valign="top">The result of <code>getProject().getClass().getClassLoader()</code>.</td>
+        <td valign="top">Error</td>
+      </tr>
+      <tr>
+        <td valign="top">system</td>
+        <td valign="top">The result of <code>ClassLoader.getSystemClassLoader().</td>
+        <td valign="top">Error</td>
+      </tr>
+      <tr>
+        <td valign="top">thread</td>
+        <td valign="top">The result of <code>Thread.currentThread().getContextClassLoader()</code>.</td>
+        <td valign="top">Calls <code>Thread.currentThread().setContextClassLoader</code>.</td>
+      </tr>
+    </table>
+  
+  <h4><a name="classloader-nested-classpath">&lt;classpath&gt;</a></h4>
+  <p><code>Classloader</code>'s <i>classpathRef</i> attribute is a reference to an extended 
+    <a href="../using.html#path">PATH like structure</a> and can also be set via a nested
+    <i>classpath</i> element. The extended path can also be set outside the task via a <code>Urlpath</code> element.
+    In addition to the attributes and nested elements of <code>Path</code>, <code>Urlpath</code> supports
+    the following parameters:
+    </p>
+    <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">urlpath</td>
+        <td valign="top">a ';' separated list of files or directories specified as files or URLs
+        </td>
+        <td valign="top" align="center">No</td>
+      </tr>
+    </table>
+  <h5><a name="classloader-nested-classpath-urlpathelement">Nested element &lt;urlpathelement&gt;</a></h5>
+    <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">location</td>
+        <td valign="top">a single file or directory specified as file or URL
+        </td>
+        <td rowspan="3" valign="top" align="center">Exactly one of those</td>
+      </tr>
+      <tr>
+        <td valign="top">path</td>
+        <td valign="top">a ';' separated list of files or directories specified as files or URLs
+        </td>
+      </tr>
+	</table>
+  <h5><a name="classloader-nested-classpath-urlpathelement">Nested element &lt;urlpath&gt;</a></h5>
+    Specifies another <code>Urlpath</code> as part of the current one.
+  <h5><a name="classloader-nested-classpath-urlpathelement">Nested element &lt;reference&gt;</a></h5>
+  <p>A reference to a <code>Fileset</code>, <code>Filelist</code>, <code>Dirset</code>, <code>Path</code> 
+  or <code>Urlpath</code> defined elsewhere as part of the current <code>Urlpath</code>.</p>
+
+
+  <h4><a name="classloader-nested-parameters">&lt;parameters&gt;</a></h4>
+  <p><code>Classloader</code>'s <i>parameters</i> attribute is a reference to 
+    a <code>Loaderparameters</code> or compatible type defined elsewhere. </p>
+  <p><code>Loaderparameters</code> and compatible types are defining the parameters used to
+    modify a newly created classloader.<br/>
+    Furthermore they are defining a default <a href="#classloader-custom-handler"><code>Loaderhandler</code></a> 
+    used to create a new classloader.<br/>
+    <code>Loaderparameters</code> default <code>Loaderhandler</code> is 
+    <a href="#classloader-custom-handler-predefined"><code>"ant.clhandler.URLClassLoader"</code></a>.<br/>
+    Ant ships with the following compatible types:<br/>
+    - <a href="#classloader-nested-antparameters"><code>Antloaderparameters</code></a>
+    </p>
+  <p>Instead of referring to existing <code>Loaderparameters</code>,
+    you can can define them via a nested <i>parameters</i> element.</p>
+  <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">defaultAssertionStatus</td>
+        <td valign="top">The argument for calling <code>setDefaultAssertionStatus(Boolean)</code> 
+        at the newly created classloader. Will be ignored on Java &lt; 1.4.</td>
+        <td valign="top" align="center">No</td>
+      </tr>
+      <tr>
+        <td valign="top">refid</td>
+        <td valign="top">Makes this <code>Loaderparameters</code> a reference to a <code>Loaderparameters</code> or compatible type defined somewhere else.</td>
+        <td valign="top" align="center">No</td>
+      </tr>
+    </table>
+    <h5><a name="classloader-nested-parameters-classassertion">Nested Element &lt;classAssertionStatus&gt;</a></h5>
+    <p>Describes the arguments for a call of <code>setClassAssertionStatus</code> at a classloader.
+       Will be ignored on Java &lt; 1.4.
+    </p>
+  <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">class</td>
+        <td valign="top">Classname.</td>
+        <td valign="top" align="center">Yes</td>
+      </tr>
+      <tr>
+        <td valign="top">status</td>
+        <td valign="top">Desired assertion status for the class.</td>
+        <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+      </tr>
+    </table>
+    <h5><a name="classloader-nested-parameters-packageassertion">Nested Element &lt;packageAssertionStatus&gt;</a></h5>
+    <p>Describes the arguments for a call of <code>setPackageAssertionStatus</code> at a classloader.
+       Will be ignored on Java &lt; 1.4.
+    </p>
+  <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">package</td>
+        <td valign="top">Package name.</td>
+        <td valign="top" align="center">Yes</td>
+      </tr>
+      <tr>
+        <td valign="top">status</td>
+        <td valign="top">Desired assertion status for the package.</td>
+        <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+      </tr>
+    </table>
+  
+  <h4><a name="classloader-nested-antparameters">&lt;antparameters&gt;</a></h4>
+   <code>Antloaderparameters</code> is a <a href="#classloader-nested-parameters"><code>Loaderparameters</code>-compatible type</a>
+   that defines the parameters of an AntClassLoader. 
+    Instead of referring to existing <code>Antloaderparameters</code>,
+    you can can define them via a nested <i>antparameters</i> element.</p>    
+  <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">addJavaLibraries</td>
+        <td valign="top">If <code>"true"</code>, <code>addJavaLibraries</code> will called
+        at the newly created AntClassLoader.</td>
+        <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+      </tr>
+      <tr>
+        <td valign="top">defaultAssertionStatus</td>
+        <td valign="top">The argument for calling <code>setDefaultAssertionStatus(Boolean)</code> 
+        at the newly created classloader. Will be ignored on Java &lt; 1.4.</td>
+        <td valign="top" align="center">No</td>
+      </tr>
+      <tr>
+        <td valign="top">isolated</td>
+        <td valign="top">The argument for calling <code>setIsolated(boolean)</code> 
+        at the newly created AntClassLoader.</td>
+        <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+      </tr>
+      <tr>
+        <td valign="top">loaderPackageRoot</td>
+        <td valign="top">';', ':' or ',' separated list of Packagenames used as argument for calling <code>setLoaderPackageRoot(String)</code> 
+        at the newly created AntClassLoader.</td>
+        <td valign="top" align="center">No</td>
+      </tr>
+      <tr>
+        <td valign="top">parentFirst</td>
+        <td valign="top">The argument for calling <code>setParentFirst(boolean)</code> 
+        at the newly created AntClassLoader.</td>
+        <td valign="top" align="center">No, defaults to <code>"true"</code>.</td>
+      </tr>
+      <tr>
+        <td valign="top">systemPackageRoot</td>
+        <td valign="top">';', ':' or ',' separated list of Packagenames used as argument for calling 
+        <code>setSystemPackageRoot(String)</code> at the newly created AntClassLoader.</td>
+        <td valign="top" align="center">No</td>
+      </tr>
+      <tr>
+        <td valign="top">refid</td>
+        <td valign="top">Makes this <code>Antloaderparameters</code> a reference to a <code>Loaderparameters</code> or compatible type defined somewhere else.
+        </td>
+        <td valign="top" align="center">No</td>
+      </tr>
+    </table>
+    <h5><a name="classloader-nested-antparameters-classassertion">Nested Element &lt;classAssertionStatus&gt;</a></h5>
+    <p>See <code>Loaderparameters</code>'s <code><a href="#classloader-nested-parameters-classassertion"><i>classAssertionStatus</i></a></code>.</p>
+    <h5><a name="classloader-nested-antparameters-packageassertion">Nested Element &lt;packageAssertionStatus&gt;</a></h5>
+    <p>See <code>Loaderparameters</code>'s <code><a href="#classloader-nested-parameters-packageassertion"><i>packageAssertionStatus</i></a></code>.</p>
+
+  <h4><a name="classloader-nested-handler">&lt;handler&gt;</a></h4>
+  See <a href="#classloader-custom-handler">Supporting custom classloaders</a>.
+  <h4><a name="classloader-nested-handlerset">&lt;handlerSet&gt;</a></h4>
+  See <a href="#classloader-custom-handlerset">Supporting custom classloaders</a>.
+
+<h3>Examples</h3>
+<p><pre>&lt;classloader report="true"/&gt;</pre>
+  Writes a Classloaderreport for debugging purposes to the log.</p>
+
+<p><pre><font color="#888888">...
+&lt;jar destfile="dist/lib/my.jar" 
+      basedir="build/classes" 
+     includes="mypackage/MyTask.class"/&gt;</font>
+&lt;classloader loader="project" classpath="dist/lib/my.jar"/&gt;
+<font color="#888888">&lt;taskdef name="mytask" classname="mypackage.MyTask"/&gt;
+&lt;mytask .../&gt;</font></pre>
+  Adds the newly created jar ${basedir}/dist/lib/my.jar to the ProjectClassLoader, so that the 
+  following taskdef can load the new task in the same classloader as Ant's Core Tasks.
+  </p>
+
+<p><pre>&lt;classloader loader="my-new-loader" parentloader="system"&gt;
+    &lt;classpath&gt;
+        &lt;pathelement path="dist/lib/my2nd.jar:${junit.dir}/junit.jar"/&gt;
+        &lt;urlpathelement path="http://some.domain.com/lib/remote.jar;dist/lib/my3rd.jar"/&gt;
+    &lt;/classpath&gt;
+&lt;/classloader&gt;</pre>
+  Creates a new <code>java.net.URLClassLoader</code> with the SystemClassLoader as delegating
+  parent and a classpath consisting of ${basedir}/dist/lib/my2nd.jar followed by
+  ${junit.dir}/junit.jar followed by
+  http://some.domain.com/lib/remote.jar followed by
+  ${basedir}/dist/lib/my3rd.jar
+  and adds it to the reference table with id my-new-loader.
+  Ant Tasks in this classloader can not be loaded by the current project as it is not a childloader of the project classloader.
+  </p>
+
+<p><pre>&lt;classloader loader="my-new-antloader" parentloader="project"&gt;
+    &lt;classpath&gt;
+        &lt;pathelement path="dist/lib/my2nd.jar:${junit.dir}/junit.jar"/&gt;
+        &lt;urlpathelement path="dist/lib/my3rd.jar"/&gt;
+    &lt;/classpath&gt;
+    &lt;antparameters/&gt;
+&lt;/classloader&gt;</pre>
+  Creates a new <code>AntClassLoader</code> with the ProjectClassLoader as delegating
+  parent and a classpath consisting of ${basedir}/dist/lib/my2nd.jar followed by
+  ${junit.dir}/junit.jar followed by
+  ${basedir}/dist/lib/my3rd.jar
+  and adds it to the reference table with id my-new-loader.
+  Ant Tasks in this classloader can be loaded by the current project as it is a childloader of the project classloader.
+  </p>
+
+<hr/>
+<h3><a name="classloader-custom">Supporting custom classloaders</a></h3>
+  This task can be extended to work with any arbitrary classloader. 
+
+<h4>Adapter classes</h4>
+  To support your custom classloader, you need to write an adapter class for it.
+  Take a look at the provided adapters in the package <code>org.apache.tools.ant.taskdefs.classloader</code>.
+  Your class should derive from <code>SimpleClassLoaderAdapter</code> or - if it fits - one of the derived classes. 
+  If the supported classloader is not in Java's bootstrap classpath, 
+  you should use reflection for all the object access. (Example: <code>AntClassLoaderAdapter</code>)<br/>
+  To provide this adapter you need to define a <a href="#classloader-custom-handler"><code>&lt;Loaderhandler&gt;</code></a> in or outside the
+  <code>Classloader</code> task and add it to a <a href="#classloader-custom-handlerset"><code>&lt;LoaderhandlerSet&gt;</code></a> via <i>handler</i> or <i>addAll</i>.
+
+  <h4><a name="classloader-custom-handler">&lt;handler&gt;</a></h4>
+  <p>
+    To deal with arbitrary classloaders, <code>Classloader</code> uses adapter classes that are defined 
+    by <code>Loaderhandler</code> types.<br/>
+    <code>Classloader</code>'s <i>handler</i> attribute is a reference to 
+    a <code>Loaderhandler</code> defined elsewhere. Instead of referring to an existing <code>Loaderhandler</code>,
+    you can can define one via a nested <i>handler</i> element.
+  </p>
+    <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">adapter</td>
+        <td valign="top">The classname of the adapter class.
+        </td>
+        <td valign="top" align="center">Yes, unless <i>refid</i> is specified.</td>
+      </tr>
+      <tr>
+        <td valign="top">loader</td>
+        <td valign="top">The class- or interfacename of a classloader to modify or introspect.
+        This class is used to test the assignability of an existing classloader. (The instantiating class
+        is defined in the Adapter.)
+        </td>
+        <td valign="top" align="center">Yes, unless <i>refid</i> is specified.</td>
+      </tr>
+      <tr>
+        <td valign="top">refid</td>
+        <td valign="top">Makes this <code>Loaderhandler</code> a reference to a <code>Loaderhandler</code> defined somewhere else.</td>
+        <td valign="top" align="center">No</td>
+      </tr>
+    </table>
+  <h5><a name="classloader-custom-handler-predefined">predefined Loaderhandlers</a></h5>
+    <p>
+    Ant ships with loaderhandlers and adapters for some widely used classloaders:<br/>
+    <pre>&lt;loaderhandler id="ant.clhandler.URLClassLoader"
+          adapter="org.apache.tools.ant.taskdefs.classloader.URLClassLoaderAdapter"
+           loader="java.net.URLClassLoader"/&gt;</pre>
+    covers Java's most used classloader that is used in Ant as Project- and SystemClassLoader.
+    <pre>&lt;loaderhandler id="ant.clhandler.AntClassLoader"
+          adapter="org.apache.tools.ant.taskdefs.classloader.AntClassLoaderAdapter"
+           loader="org.apache.tools.ant.AntClassLoader"/&gt;</pre>
+    covers Ant's classloader that is implicitely created in <code>Typedef</code> and <code>Taskdef</code>.
+    <pre>&lt;loaderhandler id="ant.clhandler.ClassLoader"
+          adapter="org.apache.tools.ant.taskdefs.classloader.SimpleClassLoaderAdapter"
+           loader="java.lang.ClassLoader"/&gt;</pre>
+    covers trivial reports for any other classloader but doesn't support create, append and property actions.
+  </p>
+
+  <h4><a name="classloader-custom-handlerset">&lt;handlerSet&gt;</a></h4>
+  <p>
+    To find the compatible and best fitting <a href="#classloader-custom-handler"><code>Loaderhandler</code></a> 
+    by reflection, <code>Classloader</code> uses a <code>LoaderhandlerSet</code> type, that 
+    contains all possible <code>Loaderhandler</code>s.<br/>
+    <code>Classloader</code>'s <i>handlerSet</i> attribute is a reference to 
+    a <code>LoaderhandlerSet</code> defined elsewhere. Instead of referring to an existing 
+    <code>LoaderhandlerSet</code>, you can can define one via a nested <i>handlerset</i> element.</p>
+    <table border="1" cellpadding="2" cellspacing="0">
+      <tr>
+        <td valign="top"><b>Attribute</b></td>
+        <td valign="top"><b>Description</b></td>
+        <td align="center" valign="top"><b>Required</b></td>
+      </tr>
+      <tr>
+        <td valign="top">handler</td>
+        <td valign="top">The Id of a <code>LoaderHandler</code> to add to this <code>LoaderhandlerSet</code>.
+        </td>
+        <td valign="top" align="center">No</td>
+      </tr>
+      <tr>
+        <td valign="top">addAll</td>
+        <td valign="top">If <code>"true"</code>, all <code>Loaderhandler</code>s that are specified in Reference table 
+        of the current Project will be added to this <code>LoaderhandlerSet</code>.
+        </td>
+        <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+      </tr>
+      <tr>
+        <td valign="top">addDefault</td>
+        <td valign="top">If <code>"true"</code>, all <a href="#classloader-custom-handler-predefined">predefined Loaderhandlers</a> will be added to the <code>LoaderhandlerSet</code>.
+        </td>
+        <td valign="top" align="center">No, defaults to <code>"true"</code>.</td>
+      </tr>
+      <tr>
+        <td valign="top">refid</td>
+        <td valign="top">Makes this handler a reference to a <code>LoaderhandlerSet</code> defined somewhere else.</td>
+        <td valign="top" align="center">No</td>
+      </tr>
+    </table>
+  <h5><a name="classloader-custom-handlerset-handler">nested Element &lt;handler&gt;</a></h5>
+  You can use nested <i>handler</i> elements to define a <code>Loaderhandler</code> directly and 
+  add multiple <code>Loaderhandler</code>s to the <code>LoaderhandlerSet</code>.
+
+<h4>Additional Parameters</h4>
+  To support additional parameters for your classloader, you need to write a compatible parameter class. This should be
+  derived from <code>org.apache.tools.ant.types.LoaderParameters</code>. (Example: <code>org.apache.tools.ant.types.AntLoaderParameters</code>)
+  Your adapter class needs to handle the parameters. (Example: <code>AntClassLoaderAdapter</code>)<br/>
+  To provide this parameters you have to declare them outside the <code>Classloader</code> task with <code>id="<i>myid</i>"</code> and 
+  refer to them.
+  
+<h4>Contributing to Ant</h4>
+  If your adapter supports a frequently used classloader, feel free to contribute it to Ant.
+  You should make it's handler a predefined one (See: <code>org.apache.tools.ant.types.LoaderHandler.DEFAULT_HANDLERS</code>).
+  If your adapter supports additional parameters, they should be supported as nested element inside 
+  the <code>Classloader</code> task like <i>antparameters</i>. (Example: <code>Classloader.addAntparameters</code>)
+  Don't forget to update this documentation.
+
+
+<h4>Examples</h4>
+<p>
+Assuming you support the classloader <i>mypackage.MyClassLoader</i> with your
+adapter class <i>mypackage.MyClassLoaderAdapter</i>:
+<pre>&lt;loaderhandler id="my.handler" 
+    adapter="mypackage.MyClassLoaderAdapater"
+    loader="mypackage.MyClassLoader"/&gt;
+&lt;classloader
+    classpath="load/with/my/loader"
+    reset="true"
+    loader="my.custom.loader"
+    handler="my.handler"&gt;
+    &lt;handlerset addDefault="true"/&gt;
+&lt;/classloader&gt;</pre>
+This creates a new <i>mypackage.MyClassLoader</i> with the initial classpath ${basedir}/load/with/my/loader
+and makes it referencable with id "my.custom.loader".
+</p>
+<p>
+Assuming your classloader and adapter support custom parameters and you've written
+a loaderparameters class <i>mypackage.MyLoaderParameters</i> that is compatible to <code>Loaderparameters</code>,
+the fragment
+<pre>&lt;loaderhandler id="my.handler" 
+    adapter="mypackage.MyClassLoaderAdapater"
+    loader="myPackage.MyClassLoader"/&gt;
+&lt;typedef name="myloaderparameters" 
+    classname="mypackage.MyLoaderParameters"/&gt;
+&lt;myloaderparameters id="my.parameters" 
+    myargument="myvalue"/&gt;
+&lt;classloader
+    classpath="load/with/my/loader"
+    reset="true"
+    loader="my.custom.loader"
+    handler="my.handler"
+    parameters="my.parameters"&gt;
+    &lt;handlerset addDefault="true"/&gt;
+&lt;/classloader&gt;</pre>
+is the same as above but with support for you custom parameters. The <i>handler</i> attribute may
+be dispensable if your adapter supports the correct default handler.
+</p>
+
+<hr>
+<p align="center">&copy; Copyright 2004 The Apache Software Foundation. All rights Reserved.</p>
+
+</body>
+</html>
+
