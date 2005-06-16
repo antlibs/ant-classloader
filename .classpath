@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="antsrc/ant/src/testcases"/>
 	<classpathentry kind="src" path="ant/src/testcases"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/eclipse-resources/ant/lib/ant.jar"/>
 	<classpathentry sourcepath="/eclipse-resources/junit/src.jar" kind="lib" path="/eclipse-resources/junit/junit.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
