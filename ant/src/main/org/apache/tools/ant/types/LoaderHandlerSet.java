@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Classloader;
+import org.apache.tools.ant.taskdefs.ClassloaderBase;
 
 /**
  * Set of ClassLoaderHandlers.
@@ -85,9 +85,9 @@ public class LoaderHandlerSet extends DataType {
      * @return the best fitting LoaderHandler or null if an error occured.
      */
     public LoaderHandler getHandler(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader loader,
-        Classloader.Action action) {
+        ClassloaderBase.Action action) {
         if (isReference()) {
             LoaderHandlerSet r = (LoaderHandlerSet) getCheckedRef(LoaderHandlerSet.class
                                                                 , "loaderHandlerSet");

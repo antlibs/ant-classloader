@@ -1,5 +1,5 @@
 /*
- * Copyright  2002-2005 The Apache Software Foundation
+ * Copyright  2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Classloader;
+import org.apache.tools.ant.taskdefs.ClassloaderBase;
+import org.apache.tools.ant.taskdefs.ClassloaderTask;
 import org.apache.tools.ant.util.URLUtils;
 
 /**
@@ -36,11 +37,11 @@ import org.apache.tools.ant.util.URLUtils;
 public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
     /**
      * Appends a classpath to an existing classloader instance.
-     * @param task the calling Classloader-task.
+     * @param task the calling ClassloaderBase-task.
      * @param classloader the classloader instance to append the path to.
      * @return The ClassLoader instance or null if an error occured.
      */
-    public boolean appendClasspath(Classloader task, ClassLoader classloader) {
+    public boolean appendClasspath(ClassloaderTask task, ClassLoader classloader) {
 
         URLClassLoader ucl = (URLClassLoader) classloader;
         String loaderId = task.getLoaderName();
@@ -83,14 +84,14 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
     }
     /**
      * returns the actual classpath of a classloader instance.
-     * @param task the calling Classloader-task.
+     * @param task the calling ClassloaderBase-task.
      * @param classloader the classloader instance to get the path from.
      * @param defaultToFile if true, returned url-elements with file protocol
      *         should trim the leading 'file:/' prefix.
      * @return the path or null if an error occured
      */
     public String[] getClasspath(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader classloader,
         boolean defaultToFile) {
         URL[] urls = ((URLClassLoader) classloader).getURLs();
@@ -109,7 +110,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param action the action to check.
      * @return true, if action is supported.
      */
-    public boolean isSupported(Classloader.Action action) {
+    public boolean isSupported(ClassloaderBase.Action action) {
         return true;
     }
     /**
@@ -117,7 +118,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param task the calling classloader task.
      * @return the newly created ClassLoader or null if an error occurs.
      */
-    protected ClassLoader newClassLoader(Classloader task) {
+    protected ClassLoader newClassLoader(ClassloaderTask task) {
         ClassLoader parent = task.getParentLoader();
         String loaderId = task.getLoaderName();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright  2002-2005 The Apache Software Foundation
+ * Copyright  2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,19 +23,23 @@ import java.util.Comparator;
 import java.util.Map;
 
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Classloader;
+import org.apache.tools.ant.taskdefs.ClassloaderBase;
+import org.apache.tools.ant.taskdefs.ClassloaderReport;
+import org.apache.tools.ant.taskdefs.ClassloaderTask;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReporter;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
 
 /**
  * An abstract classloader adapter.
  * @since Ant 1.7
  */
 public class SimpleClassLoaderAdapter
-    implements Classloader.ClassLoaderAdapter {
+    implements ClassloaderBase.ClassLoaderAdapter {
     /**
      * Descriptor definition used by this implementation.
      */
     public static interface Descriptor
-        extends Classloader.ClassLoaderParameters {
+        extends ClassloaderTask.ClassLoaderParameters {
         /**
          * gets the default assertionStatus.
          * @return default assertionStatus or null if not specified.
@@ -55,7 +59,7 @@ public class SimpleClassLoaderAdapter
         String[] getPackageAssertions(boolean status);
     }
     private boolean handleSetClassAssertionStatus(
-        Classloader task,
+        ClassloaderTask task,
         ClassLoader cl,
         String name,
         String[] classes,
@@ -95,7 +99,7 @@ public class SimpleClassLoaderAdapter
         }
     }
     private boolean handleSetPackageAssertionStatus(
-        Classloader task,
+        ClassloaderTask task,
         ClassLoader cl,
         String name,
         String[] pkgs,
@@ -136,9 +140,9 @@ public class SimpleClassLoaderAdapter
     }
 
     private Package[] handleGetPackages(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader cl,
-        String name) {
+        ClassloaderReportHandle name) {
         try {
             Method m = ClassLoader.class.getDeclaredMethod("getPackages", null);
             m.setAccessible(true);
@@ -159,7 +163,7 @@ public class SimpleClassLoaderAdapter
         }
     }
     private boolean handleSetDefaultAssertionStatus(
-        Classloader task,
+        ClassloaderTask task,
         ClassLoader cl,
         String name,
         Boolean onOff) {
@@ -192,7 +196,7 @@ public class SimpleClassLoaderAdapter
      * @param task the calling classloader task.
      * @return the newly created ClassLoader or null if an error occurs.
      */
-    protected ClassLoader newClassLoader(Classloader task) {
+    protected ClassLoader newClassLoader(ClassloaderTask task) {
         task.handleError("new ClassLoader not supported (Adapter error).");
         return null;
     }
@@ -204,9 +208,9 @@ public class SimpleClassLoaderAdapter
      * @return the classloader instance or null if an error occurs.
      */
     protected ClassLoader initClassLoader(
-        Classloader task,
+        ClassloaderTask task,
         ClassLoader classloader) {
-        Classloader.ClassLoaderParameters d = task.getParameters().getParameters();
+        ClassloaderTask.ClassLoaderParameters d = task.getParameters().getParameters();
         if (d instanceof Descriptor) {
             Descriptor dd = (Descriptor) d;
             String loaderId = task.getLoaderName();
@@ -253,7 +257,7 @@ public class SimpleClassLoaderAdapter
      * @param task the calling classloader instance
      * @return the newly created classloader or null if an error occurs.
      */
-    public final ClassLoader createClassLoader(Classloader task) {
+    public final ClassLoader createClassLoader(ClassloaderTask task) {
         ClassLoader cl = newClassLoader(task);
         if (cl == null) {
             return null;
@@ -267,21 +271,21 @@ public class SimpleClassLoaderAdapter
      * @param classloader the classloader to modify.
      * @return true if executed successful, false on error
      */
-    public boolean appendClasspath(Classloader task, ClassLoader classloader) {
+    public boolean appendClasspath(ClassloaderTask task, ClassLoader classloader) {
         task.handleError("append not supported (Adapter error)");
         return false;
     }
 
     /**
      * returns the actual classpath of a classloader instance.
-     * @param task the calling Classloader-task.
+     * @param task the calling ClassloaderBase-task.
      * @param classloader the classloader instance to get the path from.
      * @param defaultToFile if true, returned url-elements with file protocol
      *         should trim the leading 'file:/' prefix.
      * @return the path or null if an error occured
      */
     public String[] getClasspath(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader classloader,
         boolean defaultToFile) {
         task.handleError("getClasspath not supported (Adapter error)");
@@ -291,27 +295,26 @@ public class SimpleClassLoaderAdapter
     /**
      * performs additional reporting.
      * @param to the Reporter Object to report to.
-     * @param task the calling Classloader-task.
+     * @param task the calling ClassloaderBase-task.
      * @param classloader the classloader instance to report about.
      * @param name the name of the classloader instance.
      */
     public void report(
-        Classloader.Reporter to,
-        Classloader task,
+        ClassloaderReporter to,
+        ClassloaderReport task,
         ClassLoader classloader,
-        String name) {
-        if (classloader.getParent()==null)
-            to.report("    implicitely used parent loader is " + getDefaultParentName());
+        ClassloaderReportHandle role) {
         if (task.isReportPackages()) {
-            Package[] pkgs = this.handleGetPackages(task, classloader, name);
+            Package[] pkgs = this.handleGetPackages(task, classloader, role);
             if (pkgs == null) {
-                to.report("    packages: - not investigatable -");
+                to.reportError("packages of " + role + " not investigatable");
             } else {
                 Arrays.sort(pkgs, PackageComparator.SINGLETON);
-                to.report("    packages: " + pkgs.length + " entries");
+                to.beginPackages(pkgs.length);
                 for (int i = 0; i < pkgs.length; i++) {
-                    to.report("            > " + pkgs[i].getName());
+                    to.reportPackage(pkgs[i].getName());
                 }
+                to.endPackages(pkgs.length);
             }
         }
     }
@@ -319,16 +322,16 @@ public class SimpleClassLoaderAdapter
     /**
      * add classloader to the report queue.
      * the adapter should call task.addLoaderToReport to add a loader.
-     * @param task the calling Classloader-task.
+     * @param task the calling ClassloaderBase-task.
      * @param classloader the classloader to analyze.
-     * @param name the name of the classloader instance.
-     * @param loaderStack loaderStack to pass to Classloader.addLoaderToReport.
-     * @param loaderNames loaderNames to pass to Classloader.addLoaderToReport.
+     * @param role the name of the classloader instance.
+     * @param loaderStack loaderStack to pass to ClassloaderBase.addLoaderToReport.
+     * @param loaderNames loaderNames to pass to ClassloaderBase.addLoaderToReport.
      */
     public void addReportable(
-        Classloader task,
+        ClassloaderReport task,
         ClassLoader classloader,
-        String name,
+        ClassloaderReportHandle role,
         Map loaderStack,
         Map loaderNames) {
     }
@@ -338,8 +341,11 @@ public class SimpleClassLoaderAdapter
      * @param action the action to check.
      * @return true, if action is supported.
      */
-    public boolean isSupported(Classloader.Action action) {
-        if (Classloader.Action.REPORT.equals(action)) {
+    public boolean isSupported(ClassloaderBase.Action action) {
+        if (action == null) {
+            return true;
+        }
+        if (ClassloaderBase.Action.REPORT.equals(action)) {
             return true;
         }
         return false;
@@ -374,4 +380,16 @@ public class SimpleClassLoaderAdapter
     protected String getDefaultParentName() {
         return "Bootstrap";
     }
+    /**
+     * Gets the parent classloader. 
+     * Necessary, because AntClassLoader's <code>getParent()</code> method
+     * returns an invalid result.
+     * This implementation returns the result of <code>classLoader.getParent()</code>. 
+     * @param classLoader The classloader to get the parent from.
+     * @return The classloader explicitely used as parent loader or <code>null</code>.
+     */
+    public ClassLoader getParent(ClassLoader classLoader) {
+        return classLoader.getParent();
+    }
+
 }

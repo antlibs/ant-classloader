@@ -1,4 +1,4 @@
-<project name="classloader-test" default="test-system2prop" basedir=".">
+<project name="classloader-test" default="test.system2prop" basedir=".">
 
   <target name="test.system2prop">
     <classloader loader="system" property="test.cl.system2prop" />
@@ -7,10 +7,6 @@
     </condition>
   </target>
   
-  <target name="test.report">
-    <classloader report="true"/>
-  </target>
-
   <target name="test.createURL">
     <classloader loader="test.cl.createURL">
       <classpath>

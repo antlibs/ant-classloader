@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Classloader Task</title>
+</head>
+
+<body>
+<h2><a name="classloader">Classloader</a></h2>
+<h3><a name="classloader-description">Description</a></h3>
+  <p>
+    This task writes a classloader <b>report</b> for debugging purposes into the log or a file.</li>
+    <i>NOTE: The report format is subject to change in future releases.</i>
+  </p>
+<p>
+See also: <a href="#classloader-custom">Supporting custom classloaders</a> 
+</p>
+
+<h3>Parameters</h3>
+<table border="1" cellpadding="2" cellspacing="0">
+  <tr>
+    <td valign="top"><b>Attribute</b></td>
+    <td valign="top"><b>Description</b></td>
+    <td align="center" valign="top"><b>Required</b></td>
+  </tr>
+  <tr>
+    <td valign="top">reportpackages</td>
+    <td valign="top">If <code>"true"</code>, report also the defined packages as get from <code>ClassLoader.getPackages()</code>.
+    Ignored if <i>report</i> is <code>"false"</code>.</td>
+    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+  </tr>
+  <tr>
+    <td valign="top">handlerSet</td>
+    <td valign="top">Id of the <code>LoaderhandlerSet</code> to use when modifying an existing classloader or getting it's classpath.
+      See <a href="#classloader-custom-handlerset">"Supporting custom classloaders"</a> for further information.
+    </td>
+    <td valign="top" align="center">No, defaults to a generic <code>LoaderhandlerSet</code> 
+    containing the <a href="#classloader-custom-handler-predefined">predefined Loaderhandlers</a> and <i>handler</i>.</td>
+  </tr>
+  <tr>
+    <td valign="top">failonerror</td>
+    <td valign="top">Stop the build process if an error occurs.</td>
+    <td valign="top" align="center">No, defaults to <code>"true"</code>.</td>
+  </tr>
+</table>
+  <h3><a name="classloader-nested">Parameters specified as nested elements</a></h3>
+  <h4><a name="classloader-nested-handlerset">&lt;handlerSet&gt;</a></h4>
+  See <a href="#classloader-custom-handlerset">Supporting custom classloaders</a>.
+
+<h3>Examples</h3>
+<p><pre>&lt;classloader report="true"/&gt;</pre>
+  Writes a Classloaderreport for debugging purposes to the log.</p>
+<hr>
+<p align="center">&copy; Copyright 2004-2005 The Apache Software Foundation. All rights Reserved.</p>
+
+</body>
+</html>
+

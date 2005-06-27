@@ -33,7 +33,7 @@ import org.apache.tools.ant.taskdefs.condition.Os;
  */
 
 public final class URLUtils {
-    private static final FileUtils FILEUTILS = FileUtils.newFileUtils();
+    private static final FileUtils FILEUTILS = FileUtils.getFileUtils();
     private static final boolean ON_NETWARE = Os.isFamily("netware");
 
     /**

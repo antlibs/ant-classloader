@@ -24,7 +24,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.classloader.AntClassLoaderAdapter;
 
 /**
- * specifies a Ant Classloader's parameters.
+ * specifies a Ant ClassloaderBase's parameters.
  */
 public class AntLoaderParameters
     extends LoaderParameters

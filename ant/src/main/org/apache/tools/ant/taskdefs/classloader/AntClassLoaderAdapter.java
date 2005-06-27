@@ -18,6 +18,7 @@
 package org.apache.tools.ant.taskdefs.classloader;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,9 +27,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Classloader;
+import org.apache.tools.ant.taskdefs.ClassloaderBase;
+import org.apache.tools.ant.taskdefs.ClassloaderTask;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.URLPath;
 import org.apache.tools.ant.util.URLUtils;
@@ -41,7 +44,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * Descriptor definition used by this implementation.
      */
     public static interface Descriptor
-        extends Classloader.ClassLoaderParameters {
+        extends ClassloaderTask.ClassLoaderParameters {
         /**
          * gets the packagenames for those packages to set as loaderPackageRoot.
          * @return the packagenames or null if not specified.
@@ -72,11 +75,11 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
 
     /**
      * Appends a classpath to an existing classloader instance.
-     * @param task the calling Classloader-task.
+     * @param task the calling ClassloaderBase-task.
      * @param classloader the classloader instance to append the path to.
      * @return The ClassLoader instance or null if an error occured.
      */
-    public boolean appendClasspath(Classloader task, ClassLoader classloader) {
+    public boolean appendClasspath(ClassloaderTask task, ClassLoader classloader) {
         return appendClasspath(
             task,
             classloader,
@@ -84,7 +87,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
     }
 
     private boolean appendClasspath(
-        Classloader task,
+        ClassloaderTask task,
         ClassLoader classloader,
         String[] path) {
         try {
@@ -118,14 +121,14 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
 
     /**
      * returns the actual classpath of a classloader instance.
-     * @param task the calling Classloader-task.
+     * @param task the calling ClassloaderBase-task.
      * @param classloader the classloader instance to get the path from.
      * @param defaultToFile if true, returned url-elements with file protocol
      *         should trim the leading 'file:/' prefix.
      * @return the path or null if an error occured
      */
     public String[] getClasspath(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader classloader,
         boolean defaultToFile) {
         try {
@@ -146,7 +149,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
     }
 
     private boolean handleAddJavaLibraries(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader cl,
         String loaderId,
         boolean onOff) {
@@ -169,7 +172,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleAddLoaderPackageRoot(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader cl,
         String loaderId,
         String[] pkgs) {
@@ -201,7 +204,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleAddSystemPackageRoot(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader cl,
         String loaderId,
         String[] pkgs) {
@@ -233,7 +236,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private ClassLoader handleCreateLoader(
-        Classloader task,
+        ClassloaderTask task,
         ClassLoader superLoader,
         Path path,
         String loaderId) {
@@ -288,7 +291,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleSetIsolated(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader cl,
         String loaderId,
         boolean onOff) {
@@ -313,7 +316,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private void handleSetParent(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader cl,
         ClassLoader parent,
         String loaderId) {
@@ -334,7 +337,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleSetParentFirst(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader cl,
         String loaderId,
         boolean onOff) {
@@ -365,9 +368,9 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @return the classloader instance or null if an error occurs.
      */
     protected ClassLoader initClassLoader(
-        Classloader task,
+        ClassloaderTask task,
         ClassLoader classloader) {
-        Classloader.ClassLoaderParameters d = task.getParameters().getParameters();
+        ClassloaderTask.ClassLoaderParameters d = task.getParameters().getParameters();
         if (d instanceof Descriptor) {
             Descriptor dd = (Descriptor) d;
             String loaderId = task.getLoaderName();
@@ -414,7 +417,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param action the action to check.
      * @return true, if action is supported.
      */
-    public boolean isSupported(Classloader.Action action) {
+    public boolean isSupported(ClassloaderBase.Action action) {
         return true;
     }
     /**
@@ -422,7 +425,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param task the calling classloader task.
      * @return the newly created ClassLoader or null if an error occurs.
      */
-    protected ClassLoader newClassLoader(Classloader task) {
+    protected ClassLoader newClassLoader(ClassloaderTask task) {
         ClassLoader superLoader = task.getSuperLoader();
         ClassLoader parent = task.getParentLoader();
         String loaderId = task.getLoaderName();
@@ -488,5 +491,24 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      */
     protected String getDefaultParentName() {
         return "SystemClassLoader";
+    }
+    /**
+     * Gets the parent classloader. 
+     * Necessary, because AntClassLoader's <code>getParent()</code> method
+     * returns an invalid result.
+     * @param classLoader The classloader to get the parent from.
+     * @return The classloader explicitely used as parent loader or <code>null</code>.
+     */
+    public ClassLoader getParent(ClassLoader classLoader) {
+            try {
+                ClassLoader cl=classLoader.getClass().getClassLoader();
+                if (cl == null)
+                    cl=ClassLoader.getSystemClassLoader();
+                Field field = cl.loadClass(AntClassLoader.class.getName()).getDeclaredField("parent");
+                field.setAccessible(true);
+                return (ClassLoader) field.get(classLoader);
+            } catch (Exception e) {
+                throw new BuildException(e);
+            }
     }
 }

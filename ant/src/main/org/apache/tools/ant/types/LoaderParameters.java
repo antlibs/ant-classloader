@@ -21,16 +21,16 @@ import java.util.HashSet;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Classloader;
+import org.apache.tools.ant.taskdefs.ClassloaderTask;
 import org.apache.tools.ant.taskdefs.classloader.SimpleClassLoaderAdapter;
 
 /**
- * specifies a Classloader's parameters.
+ * specifies a ClassloaderBase's parameters.
  * @since Ant 1.7
  */
 public class LoaderParameters
     extends DataType
-    implements Classloader.ClassLoaderParameters
+    implements ClassloaderTask.ClassLoaderParameters
     , SimpleClassLoaderAdapter.Descriptor {
     /**
      * class for nested packageAssertionStatus and classAssertionStatus elements.
@@ -173,8 +173,8 @@ public class LoaderParameters
      */
     public LoaderHandler getDefaultHandler() {
         if (isReference()) {
-            Classloader.ClassLoaderParameters r = (Classloader.ClassLoaderParameters)
-                getCheckedRef(Classloader.ClassLoaderParameters.class, "loaderDescriptor");
+            ClassloaderTask.ClassLoaderParameters r = (ClassloaderTask.ClassLoaderParameters)
+                getCheckedRef(ClassloaderTask.ClassLoaderParameters.class, "loaderDescriptor");
             return r.getDefaultHandler();
         }
         return (LoaderHandler) getProject().getReference("ant.clhandler.URLClassLoader");
@@ -184,10 +184,10 @@ public class LoaderParameters
      * or a referenced descriptor.
      * @return descriptor.
      */
-    public Classloader.ClassLoaderParameters getParameters() {
+    public ClassloaderTask.ClassLoaderParameters getParameters() {
         if (isReference()) {
-            return (Classloader.ClassLoaderParameters)
-              getCheckedRef(Classloader.ClassLoaderParameters.class
+            return (ClassloaderTask.ClassLoaderParameters)
+              getCheckedRef(ClassloaderTask.ClassLoaderParameters.class
                           , "loaderDescriptor");
         }
         return this;

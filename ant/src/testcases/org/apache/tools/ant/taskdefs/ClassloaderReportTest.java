@@ -20,11 +20,11 @@ package org.apache.tools.ant.taskdefs;
 import org.apache.tools.ant.BuildFileTest;
 
 /**
- * Tests Classloader task.
+ * Tests ClassloaderBase task.
  */
-public class ClassloaderTest extends BuildFileTest {
+public class ClassloaderReportTest extends BuildFileTest {
 
-    public ClassloaderTest(String name) {
+    public ClassloaderReportTest(String name) {
         super(name);
     }
 
@@ -32,30 +32,9 @@ public class ClassloaderTest extends BuildFileTest {
         configureProject("src/etc/testcases/taskdefs/classloader.xml");
     }
 
-    public void testTypes() {
-        expectPropertySet("test.types","test.types");
-    }
-    public void testSystem2Prop() {
-        expectPropertySet("test.system2prop","test.system2prop");
-    }
-    public void testCreateURL() {
-        expectPropertySet("test.createURL","test.createURL");
-    }
-    public void testUpdateURL() {
-        expectPropertySet("test.updateURL","test.updateURL");
-    }
-    public void testCreateAnt() {
-        expectPropertySet("test.createAnt","test.createAnt");
-    }
-    public void testUpdateAnt() {
-        expectPropertySet("test.updateAnt","test.updateAnt");
-    }
-    public void testUpdateSystem() {
-        expectPropertySet("test.updateSystem","test.updateSystem");
-    }
-
     public void testReport() {
-        expectLogContaining("test.report","ClassLoader Report");
+        expectLogContaining("test.report","<classloaderreport>");
+        expectLogContaining("test.report","</classloaderreport>");
     }
 
     public void tearDown() {

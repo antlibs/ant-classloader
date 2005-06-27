@@ -24,7 +24,7 @@ import java.util.Iterator;
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Classloader;
+import org.apache.tools.ant.taskdefs.ClassloaderBase;
 import org.apache.tools.ant.taskdefs.classloader.AntClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.SimpleClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.URLClassLoaderAdapter;
@@ -167,7 +167,7 @@ public final class LoaderHandler extends DataType implements Cloneable {
      * @param task the calling classloader task
      * @return the newly created adapter or null if an error occured
      */
-    public Classloader.ClassLoaderAdapter getAdapter(Classloader task) {
+    public ClassloaderBase.ClassLoaderAdapter getAdapter(ClassloaderBase task) {
         check();
         if (isReference()) {
             LoaderHandler r = (LoaderHandler) getCheckedRef(LoaderHandler.class, "LoaderHandler");
@@ -175,7 +175,7 @@ public final class LoaderHandler extends DataType implements Cloneable {
         }
 
         try {
-            return (Classloader.ClassLoaderAdapter) Class
+            return (ClassloaderBase.ClassLoaderAdapter) Class
                 .forName(adapter)
                 .newInstance();
         } catch (Exception e) {
@@ -208,9 +208,9 @@ public final class LoaderHandler extends DataType implements Cloneable {
      *         and the adapter supports the required action; else null.
      */
     public Class getLoaderClass(
-        Classloader task,
+        ClassloaderBase task,
         ClassLoader assignable,
-        Classloader.Action action) {
+        ClassloaderBase.Action action) {
         check();
         if (isReference()) {
             LoaderHandler r = (LoaderHandler) getCheckedRef(LoaderHandler.class, "LoaderHandler");
@@ -225,8 +225,8 @@ public final class LoaderHandler extends DataType implements Cloneable {
             if (!(result.isAssignableFrom(assignable.getClass()))) {
                 return null;
             }
-            Classloader.ClassLoaderAdapter adapter = getAdapter(task);
-            if (!adapter.isSupported(action)) {
+            ClassloaderBase.ClassLoaderAdapter adapter = getAdapter(task);
+            if ((action != null) && !adapter.isSupported(action)) {
                 return null;
             }
             return result;

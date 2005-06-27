@@ -22,7 +22,7 @@ import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
 
 /**
- * Specifies a Classloader.
+ * Specifies a ClassloaderBase.
  * @since Ant 1.7
  */
 public class LoaderRef extends DataType {
@@ -179,7 +179,7 @@ public class LoaderRef extends DataType {
                 loaderRef = ref;
             }
         } else if (r instanceof LoaderRef) {
-            setRefid(new Reference(ref));
+            setRefid(new Reference(getProject(),ref));
         } else if (r instanceof ClassLoader) {
             loaderRef = ref;
         } else {

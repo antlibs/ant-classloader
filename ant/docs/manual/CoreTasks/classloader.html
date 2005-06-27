@@ -11,9 +11,8 @@
   <p>
     This task is designed to <ul>
     <li><b>create</b> a new classloader,</li>
-    <li><b>append</b> a classpath to an existing classloader</li>
-    <li>extract the path of a classloader into a <b>property</b> and</li>
-    <li>write a classloader <b>report</b> for debugging purposes into the log.</li>
+    <li><b>append</b> a classpath to an existing classloader and </li>
+    <li>extract the path of a classloader into a <b>property</b>.</li>
   </ul>
     The classloader to create, modify and/or get the path from, is referred by the <i>loader</i> attribute.<br/>
 	If the referenced object does not exist (or <i>reset</i> is <code>"true"</code>),
@@ -23,8 +22,6 @@
     create/append actions on the System-, Project- or CoreLoader are omitted with a warning.<br/>
     If <i>property</i> is set, the classpath of <i>loader</i> is set as value of the specified property.
     Create/append and property can be executed in one task.<br/>
-    If <i>report</i> is <code>"true"</code>, create/modify and property actions are skipped and a classloader report
-    is written to the log. <i>NOTE: The report format is subject to change in future releases.</i>
   </p>
 <h4><a name="classloader-description-create">Creating classloaders</a></h4>
   <ul>
@@ -108,17 +105,6 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
     <td valign="top">property</td>
     <td valign="top">Name of the property to put <i>loader</i>s classpath in.</td>
     <td valign="top" align="center">No</td>
-  </tr>
-  <tr>
-    <td valign="top">report</td>
-    <td valign="top">If <code>"true"</code>, create a classloader report.</td>
-    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
-  </tr>
-  <tr>
-    <td valign="top">reportpackages</td>
-    <td valign="top">If <code>"true"</code>, report also the defined packages as get from <code>ClassLoader.getPackages()</code>.
-    Ignored if <i>report</i> is <code>"false"</code>.</td>
-    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
   </tr>
   <tr>
     <td valign="top">reset</td>

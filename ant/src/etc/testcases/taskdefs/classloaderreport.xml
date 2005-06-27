@@ -1,0 +1,10 @@
+<project name="classloader-test" default="test.report" basedir=".">
+
+  <target name="test.report">
+    <classloaderreport/>
+  </target>
+
+  <!-- future use -->
+  <target name="cleanup">
+  </target>
+</project>
