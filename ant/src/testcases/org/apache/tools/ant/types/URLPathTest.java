@@ -264,12 +264,12 @@ public class URLPathTest extends TestCase {
         URLPath p = new URLPath(project);
         FileSet f = new FileSet();
         f.setProject(project);
-        f.setDir(project.resolveFile("."));
-        f.setIncludes("build.xml");
+        f.setDir(project.resolveFile("src/testcases/org/apache/tools/ant/types"));
+        f.setIncludes("URLPathTest.java");
         p.addFileset(f);
         String[] l = p.list();
         assertEquals(1, l.length);
-        assertEquals(project.resolveFile("build.xml").getAbsoluteFile().toURL().toExternalForm(), l[0]);
+        assertEquals(project.resolveFile("src/testcases/org/apache/tools/ant/types/URLPathTest.java").getAbsoluteFile().toURL().toExternalForm(), l[0]);
     }
 
     public void testDirSet()throws Exception {

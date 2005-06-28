@@ -35,15 +35,14 @@ public class URLUtilsTest extends TestCase {
     private String current;
     private String root;
 
-    public static boolean isUnixStyle = File.pathSeparatorChar == ':';
-    public static boolean isNetWare = Os.isFamily("netware");
-    public static boolean isWindows = !(isUnixStyle || isNetWare); 
+    public static final boolean isUnix = Os.isFamily("unix");
+    public static boolean isWindows = Os.isFamily("windows"); 
     public URLUtilsTest(String name) {
         super(name);
     }
 
     public void setUp() {
-        fu = FileUtils.newFileUtils();
+        fu = FileUtils.getFileUtils();
         // Windows adds the drive letter in uppercase, unless you run Cygwin
         current = new File(".").getAbsolutePath();
         root = new File(File.separator).getAbsolutePath().toUpperCase();
@@ -229,12 +228,14 @@ public class URLUtilsTest extends TestCase {
             testNormalize("win"
                          ,convertSlashes("C:/a/b")
                          ,"C:/a/b");
-            testNormalize("unix"
-                         ,convertSlashes("/a/b")
-                         ,"/a/b");
             testNormalize("unc"
                          ,convertSlashes("//a/b")
                          ,"//a/b");
+        }
+        if (isUnix) {
+            testNormalize("unix"
+                         ,convertSlashes("/a/b")
+                         ,"/a/b");
         }
     }
     public void testResolve() throws MalformedURLException{

@@ -29,7 +29,7 @@ public class ClassloaderReportTest extends BuildFileTest {
     }
 
     public void setUp() {
-        configureProject("src/etc/testcases/taskdefs/classloader.xml");
+        configureProject("src/etc/testcases/taskdefs/classloaderreport.xml");
     }
 
     public void testReport() {
