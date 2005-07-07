@@ -1,5 +1,5 @@
 /*
- * Copyright  2004 The Apache Software Foundation
+ * Copyright  2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderURLUtil;
 import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
@@ -32,16 +33,19 @@ import org.apache.tools.ant.taskdefs.condition.Os;
  * @since Ant 1.7
  */
 
-public final class URLUtils {
+public final class URLUtils implements ClassLoaderURLUtil {
     private static final FileUtils FILEUTILS = FileUtils.getFileUtils();
     private static final boolean ON_NETWARE = Os.isFamily("netware");
-
+    private static URLUtils SINGLETON = new URLUtils();
+    public static URLUtils getURLUtils() {
+        return SINGLETON;
+    }
     /**
      * creates a file from a absolute or relative file or url.
      * @param fileOrURL absolute or relative file or url
      * @return a file
      */
-    public static File createFile(String fileOrURL) {
+    public File createFile(String fileOrURL) {
         if (isURL(fileOrURL)) {
             return new File(FILEUTILS.fromURI(fileOrURL));
         }
@@ -53,7 +57,7 @@ public final class URLUtils {
      * @return an URL
      * @throws MalformedURLException if <code>new URL()</code> throws it
      */
-    public static URL createURL(String fileOrURL) throws MalformedURLException {
+    public URL createURL(String fileOrURL) throws MalformedURLException {
         if (isURL(fileOrURL)) {
             return new URL(normalize(fileOrURL));
         }
@@ -65,7 +69,7 @@ public final class URLUtils {
      * @return true if <code>fileOrURL</code> denotes a absolute file or url
      *         , false if it is relative
      */
-    public static boolean isAbsolute(String fileOrURL) {
+    public boolean isAbsolute(String fileOrURL) {
         try {
             if (isURL(fileOrURL)) {
                 URL url = new URL(transformFileSep(fileOrURL));
@@ -86,12 +90,11 @@ public final class URLUtils {
      * @return true if <code>fileOrURL</code> denotes a file or a <code>file:</code> URL
      *         , false otherwise
      */
-    public static boolean isFileOrFileURL(String fileOrURL) {
+    public boolean isFileOrFileURL(String fileOrURL) {
         if (!isURL(fileOrURL)) {
             return true;
-        } else {
-            return fileOrURL.startsWith("file:");
         }
+        return fileOrURL.startsWith("file:");
     }
     /**
      * indicates whether the denoted fileOrURL is an (absolute) url or not.
@@ -99,7 +102,7 @@ public final class URLUtils {
      * @return true if <code>fileOrURL</code> denotes a absolute url
      *         , false otherwise
      */
-    public static boolean isURL(String fileOrURL) {
+    public boolean isURL(String fileOrURL) {
         String x = transformFileSep(fileOrURL);
         if (x.startsWith("/")) {
             return false;
@@ -116,7 +119,7 @@ public final class URLUtils {
      * @param fileOrURL absolute or relative file or url
      * @return normalized file or url
      */
-    public static String normalize(String fileOrURL) {
+    public String normalize(String fileOrURL) {
         if (!isURL(fileOrURL)) {
             return FILEUTILS.normalize(fileOrURL).toString();
         }
@@ -160,9 +163,8 @@ public final class URLUtils {
             } else if ("..".equals(thisToken)) {
                 if (s.size() == 0) {
                     throw new BuildException("Cannot resolve path " + orig);
-                } else {
-                    s.pop();
                 }
+                s.pop();
             } else { // plain component
                 s.push(thisToken);
             }
@@ -192,7 +194,7 @@ public final class URLUtils {
      * @return resolved url
      * @throws MalformedURLException if URL can not created
      */
-    public static String resolve(String fileOrURL, File dir) throws MalformedURLException {
+    public String resolve(String fileOrURL, File dir) throws MalformedURLException {
 
         if (isAbsolute(fileOrURL)) {
             return createURL(fileOrURL).toString();
@@ -211,7 +213,7 @@ public final class URLUtils {
      * @param fileOrURL absolute or relative file or url
      * @return fileOrURL with '/'as fileSeparator
      */
-    public static String transformFileSep(String fileOrURL) {
+    public String transformFileSep(String fileOrURL) {
         return fileOrURL.replace('\\', '/');
     }
 

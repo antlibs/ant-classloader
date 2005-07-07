@@ -1,5 +1,5 @@
 /*
- * Copyright  2002-2004 The Apache Software Foundation
+ * Copyright  2002-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,13 +22,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ClassloaderBase;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandlerSet;
 
 /**
  * Set of ClassLoaderHandlers.
  * @since Ant 1.7
  */
-public class LoaderHandlerSet extends DataType {
+public class LoaderHandlerSet extends DataType implements ClassLoaderHandlerSet {
 
     private static class HandlerHolder {
         private final LoaderHandler handler;
@@ -69,7 +72,7 @@ public class LoaderHandlerSet extends DataType {
      * sets a nested handler element.
      * @param handler the handler to add.
      */
-    public void addConfiguredHandler(LoaderHandler handler) {
+    public void addConfiguredHandler(ClassLoaderHandler handler) {
         checkChildrenAllowed();
         handler.check();
         if (handlerSet.add(handler.getLoader())) {
@@ -84,17 +87,17 @@ public class LoaderHandlerSet extends DataType {
      * @param action the required action.
      * @return the best fitting LoaderHandler or null if an error occured.
      */
-    public LoaderHandler getHandler(
-        ClassloaderBase task,
+    public ClassLoaderHandler getHandler(
+        ClassLoaderAdapterContext task,
         ClassLoader loader,
-        ClassloaderBase.Action action) {
+        ClassLoaderAdapterAction action) {
         if (isReference()) {
             LoaderHandlerSet r = (LoaderHandlerSet) getCheckedRef(LoaderHandlerSet.class
                                                                 , "loaderHandlerSet");
             return r.getHandler(task, loader, action);
         }
         if (addAll) {
-            LoaderHandler[] allHandlers = LoaderHandler.getAllHandlers(getProject());
+            ClassLoaderHandler[] allHandlers = LoaderHandler.getAllHandlers(getProject());
             for (int i = 0; i < allHandlers.length; i++) {
                 addConfiguredHandler(allHandlers[i]);
             }
@@ -102,7 +105,7 @@ public class LoaderHandlerSet extends DataType {
             addDefault = false;
         }
         if (addDefault) {
-            LoaderHandler[] defHandlers = LoaderHandler.getDefaultHandlers(getProject());
+            ClassLoaderHandler[] defHandlers = LoaderHandler.getDefaultHandlers(getProject());
             for (int i = 0; i < defHandlers.length; i++) {
                 addConfiguredHandler(defHandlers[i]);
             }

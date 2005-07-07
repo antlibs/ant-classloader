@@ -29,13 +29,18 @@ import java.util.TreeSet;
 import org.apache.tools.ant.AntTypeDefinition;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ComponentHelper;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassLoaderReportUtil;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderXMLFormatter;
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedAntLoggerReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.TreeBuilderReporter;
 
-public class ClassloaderReport extends ClassloaderBase {
+public class ClassloaderReport extends ClassloaderBase implements ClassLoaderAdapterContext.Report {
 
     private boolean reportPackages = false;
     public ClassloaderReport() {
@@ -137,7 +142,7 @@ public class ClassloaderReport extends ClassloaderBase {
         if (!addSuccess) {
             to.reportError("WARNING: As of missing Loaderhandlers, this report might not be complete.");
         }
-        URL[] urls = getBootstrapClasspathURLs();
+        URL[] urls = ClassloaderUtil.getBootstrapClasspathURLs();
         if (urls==null) {
            to.reportError("WARNING: Unable to determine bootstrap classpath."
                        +"\n         Please report this error to Ant's bugtracking system with information"
@@ -178,15 +183,15 @@ public class ClassloaderReport extends ClassloaderBase {
      */
     public void report(ClassloaderReporter to, ClassLoader cl, ClassloaderReportHandle name, Map handlesByLoader) {
         to.beginClassloader(name);
-        ClassLoaderAdapter adapter = findAdapter(cl, null, to, "parent for "+name, "");
-        if (adapter != null) {
-            ClassLoader parent = adapter.getParent(cl);
+        ClassLoaderAdapter baseAdapter = ClassloaderUtil.findAdapter(this, cl, null, to, "parent for "+name, "");
+        if (baseAdapter != null) {
+            ClassLoader parent = baseAdapter.getParent(cl);
             
             if (parent != null) {
                 SortedSet handles = (SortedSet) handlesByLoader.get(parent); 
                 to.reportExlicitelyParent((ClassloaderReportHandle)handles.first());
             } else {
-                parent = adapter.getDefaultParent();
+                parent = baseAdapter.getDefaultParent();
                 if (parent != null) {
                     SortedSet handles = (SortedSet) handlesByLoader.get(parent);
                     to.reportImplicitelyParent((ClassloaderReportHandle)handles.first());
@@ -200,7 +205,7 @@ public class ClassloaderReport extends ClassloaderBase {
         for (Iterator iRole = roles.iterator(); iRole.hasNext();) {
             to.reportRole((ClassloaderReportHandle)iRole.next());
         }
-        adapter = findAdapter(cl, Action.GETPATH, to, "entries for "+name, "");
+        ClassLoaderAdapter adapter = ClassloaderUtil.findAdapter(this, cl, ClassLoaderAdapterAction.GETPATH, to, "entries for "+name, "");
         if (adapter != null) {
             String[] cp = adapter.getClasspath(this, cl, false);
             if (cp == null) {
@@ -212,7 +217,9 @@ public class ClassloaderReport extends ClassloaderBase {
                 }
             }
         }
-        adapter =  findAdapter(cl, Action.REPORT, to , "additional parameters for " + name, "");
+        if (isReportPackages())
+            ClassLoaderReportUtil.reportPackages(to, this, baseAdapter, cl, name);
+        adapter =  ClassloaderUtil.findAdapter(this, cl, ClassLoaderAdapterAction.REPORT, to , "additional parameters for " + name, "");
         if (adapter != null) {
             adapter.report(to, this, cl, name);
         }
@@ -246,7 +253,7 @@ public class ClassloaderReport extends ClassloaderBase {
             ((Set) old).add(role);
 
             if (isNew) {
-                ClassLoaderAdapter adapter = findAdapter(cl, null, to, role+"->parent", role.getName());
+                ClassLoaderAdapter adapter = ClassloaderUtil.findAdapter(this, cl, null, to, role+"->parent", role.getName());
                 boolean adapterFound = (adapter!= null);
                 if (adapterFound) {
                     ClassLoader parent = adapter.getParent(cl);
@@ -257,7 +264,7 @@ public class ClassloaderReport extends ClassloaderBase {
                         addLoaderToReport(adapter.getParent(cl),new ClassloaderReportHandle(ClassloaderReportHandle.PARENT, role.toString()),handlesByLoader,loaderByHandle,to);
                     }
                 }
-                adapter = findAdapter(cl, Action.REPORT, to, "report for " + role, "");
+                adapter = ClassloaderUtil.findAdapter(this, cl, ClassLoaderAdapterAction.REPORT, to, "report for " + role, "");
                 if (adapter != null) {
                     adapter.addReportable(this, cl, role, handlesByLoader, loaderByHandle);
                 }

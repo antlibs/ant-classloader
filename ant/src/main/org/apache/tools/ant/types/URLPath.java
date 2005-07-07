@@ -69,7 +69,7 @@ public class URLPath extends DataType implements Cloneable {
             }
             for (int i = 0; i < parts.length; i++) {
                 result.createPathElement().setLocation(
-                    URLUtils.createFile(parts[i]));
+                    URLUtils.getURLUtils().createFile(parts[i]));
             }
         }
         /**
@@ -123,7 +123,7 @@ public class URLPath extends DataType implements Cloneable {
     private static String resolveURL(Project project, String relativeName) {
         if (project != null) {
             try {
-                return URLUtils.resolve(relativeName, project.getBaseDir());
+                return URLUtils.getURLUtils().resolve(relativeName, project.getBaseDir());
             } catch (MalformedURLException murlex) {
                 return relativeName;
             }
@@ -323,7 +323,7 @@ public class URLPath extends DataType implements Cloneable {
     private void addUnlessPresent(ArrayList v, Set set, File dir, String[] s) {
         for (int j = 0; j < s.length; j++) {
             try {
-                String absolutePath = URLUtils.resolve(s[j], dir);
+                String absolutePath = URLUtils.getURLUtils().resolve(s[j], dir);
                 addUnlessPresent(v, set, absolutePath);
             } catch (MalformedURLException murlex) {
                 //maybe a non file url
@@ -494,11 +494,10 @@ public class URLPath extends DataType implements Cloneable {
             if (o instanceof DataType) {
                 if (stk.contains(o)) {
                     throw circularReference();
-                } else {
-                    stk.push(o);
-                    ((DataType) o).dieOnCircularReference(stk, p);
-                    stk.pop();
                 }
+                stk.push(o);
+                ((DataType) o).dieOnCircularReference(stk, p);
+                stk.pop();
             }
         }
         setChecked(true);
@@ -677,10 +676,10 @@ public class URLPath extends DataType implements Cloneable {
             return null;
         }
         try {
-            if (!URLUtils.isURL(source)) {
+            if (!URLUtils.getURLUtils().isURL(source)) {
                 source = getProject().resolveFile(source).getAbsolutePath();
             }
-            return URLUtils.resolve(source, getProject().getBaseDir());
+            return URLUtils.getURLUtils().resolve(source, getProject().getBaseDir());
         } catch (MalformedURLException murlex) {
             return source;
         }

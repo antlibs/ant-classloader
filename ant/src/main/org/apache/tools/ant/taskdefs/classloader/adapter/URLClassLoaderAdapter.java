@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.tools.ant.taskdefs.classloader;
+package org.apache.tools.ant.taskdefs.classloader.adapter;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -25,11 +25,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ClassloaderBase;
-import org.apache.tools.ant.taskdefs.ClassloaderTask;
-import org.apache.tools.ant.util.URLUtils;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
 
 /**
  * A ClassLoaderAdapter for a java.net.URLClassLoader
@@ -41,7 +38,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param classloader the classloader instance to append the path to.
      * @return The ClassLoader instance or null if an error occured.
      */
-    public boolean appendClasspath(ClassloaderTask task, ClassLoader classloader) {
+    public boolean appendClasspath(ClassLoaderAdapterContext.CreateModify task, ClassLoader classloader) {
 
         URLClassLoader ucl = (URLClassLoader) classloader;
         String loaderId = task.getLoaderName();
@@ -62,16 +59,16 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
             return false;
         }
         Set localEntries=new HashSet();
-        String[] list = task.getClasspath().list();
+        String[] list = task.getClasspathURLs();
         for (int i = 0; i < list.length; i++) {
             try {
-                URL url = URLUtils.createURL(list[i]);
+                URL url = task.getURLUtil().createURL(list[i]);
                 String sUrl=url.toString();
                 if (localEntries.add(sUrl) && task.handleClasspathEntry(ucl, sUrl)) {
                     meth.invoke(ucl, new Object[] {url });
-                    task.log("URLClassLoader " + loaderId + ": adding path " + url,Project.MSG_DEBUG);
+                    task.handleDebug("URLClassLoader " + loaderId + ": adding path " + url);
                 }
-            } catch (BuildException e) {
+            } catch (MalformedURLException e) {
                 task.handleError("createURL(\"" + list[i] + "\")", e);
             } catch (Exception e) {
                 task.handleError(
@@ -91,14 +88,14 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @return the path or null if an error occured
      */
     public String[] getClasspath(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext task,
         ClassLoader classloader,
         boolean defaultToFile) {
         URL[] urls = ((URLClassLoader) classloader).getURLs();
         String[] result = new String[urls.length];
         for (int i = 0; i < urls.length; i++) {
             if (defaultToFile && ("file".equals(urls[i].getProtocol()))) {
-                result[i] = URLUtils.createFile(urls[i].toString()).toString();
+                result[i] = task.getURLUtil().createFile(urls[i].toString()).toString();
             } else {
                 result[i] = urls[i].toString();
             }
@@ -110,7 +107,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param action the action to check.
      * @return true, if action is supported.
      */
-    public boolean isSupported(ClassloaderBase.Action action) {
+    public boolean isSupported(ClassLoaderAdapterAction action) {
         return true;
     }
     /**
@@ -118,23 +115,21 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param task the calling classloader task.
      * @return the newly created ClassLoader or null if an error occurs.
      */
-    protected ClassLoader newClassLoader(ClassloaderTask task) {
+    protected ClassLoader newClassLoader(ClassLoaderAdapterContext.CreateModify task) {
         ClassLoader parent = task.getParentLoader();
         String loaderId = task.getLoaderName();
 
-        String[] scp = task.getClasspath().list();
+        String[] scp = task.getClasspathURLs();
         ArrayList ucp = new ArrayList(scp.length);
         Set localEntries=new HashSet();
         for (int i = 0; i < scp.length; i++) {
             try {
-                URL url = URLUtils.createURL(scp[i]);
+                URL url = task.getURLUtil().createURL(scp[i]);
                 String sUrl=url.toString();
                 if (localEntries.add(sUrl) && task.handleClasspathEntry(parent, sUrl)) {
                     ucp.add(url);
                 }
-            } catch (BuildException e) {
-                task.handleError("createURL(\"" + scp[i] + "\")", e);
-            } catch (MalformedURLException e) {
+            } catch (Exception e) {
                 task.handleError("createURL(\"" + scp[i] + "\")", e);
             }
         }
@@ -143,20 +138,15 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
         //so we don't need the superLoader
         URL[] urls = (URL[]) ucp.toArray(new URL[ucp.size()]);
         URLClassLoader cl = new URLClassLoader(urls, parent);
-        task.log("URLClassLoader " + loaderId + " created.", Project.MSG_DEBUG);
+        task.handleDebug("URLClassLoader " + loaderId + " created.");
         for (int i = 0; i < urls.length; i++) {
-            task.log(
-                "URLClassLoader " + loaderId + ": adding path " + urls[i],
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "URLClassLoader " + loaderId + ": adding path " + urls[i]);
         }
 
         if (parent != null) {
-            task.log(
-                "URLClassLoader "
-                    + loaderId
-                    + ": setting parent loader "
-                    + parent,
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "URLClassLoader " + loaderId + ": setting parent loader " + parent);
         }
 
         return cl;

@@ -18,6 +18,12 @@ package org.apache.tools.ant.taskdefs;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderParameters;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
 import org.apache.tools.ant.types.AntLoaderParameters;
 import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.apache.tools.ant.types.LoaderHandler;
@@ -27,7 +33,7 @@ import org.apache.tools.ant.types.LoaderRef;
 import org.apache.tools.ant.types.Reference;
 import org.apache.tools.ant.types.URLPath;
 
-public class ClassloaderTask extends ClassloaderBase {
+public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapterContext.CreateModify {
 
     /**
      * Enumeration for the values of duplicateEntry attribute.
@@ -91,23 +97,6 @@ public class ClassloaderTask extends ClassloaderBase {
         }
     }
 
-    /**
-     * Mandatory Interface for ClassLoaderParameters.
-     */
-    public static interface ClassLoaderParameters {
-        /**
-         * returns the default handler for this descriptor.
-         * @return handler.
-         */
-        LoaderHandler getDefaultHandler();
-        /**
-         * returns the valuable parameter object which is either the instance itself
-         * or the resolved referenced parameters.
-         * @return parameters.
-         */
-        ClassLoaderParameters getParameters();
-    }
-
     private LoaderRef loader = null;
     private URLPath classpath = null;
     private ClassloaderTask.DuplicateEntry duplicateEntry = new ClassloaderTask.DuplicateEntry("omit");
@@ -116,12 +105,10 @@ public class ClassloaderTask extends ClassloaderBase {
     private String property = null;
     private String loaderName = null;
     private LoaderRef parentLoader = null;
-    private LoaderHandler handler = null;
-    private ClassloaderTask.ClassLoaderParameters parameters = null;
+    private ClassLoaderHandler handler = null;
+    private ClassLoaderParameters parameters = null;
 
     public ClassloaderTask() {
-        super();
-        // TODO Auto-generated constructor stub
     }
     /**
      * Sets a nested loader element.
@@ -214,9 +201,8 @@ public class ClassloaderTask extends ClassloaderBase {
                 + "found, cp="
                 + this.getClasspath(),
             Project.MSG_DEBUG);
-        LoaderHandlerSet handlerSet = null;
         if (classloader == null) {
-            LoaderHandler handler = getHandler();
+            ClassLoaderHandler handler = getHandler();
             if (handler == null) {
                 throw new BuildException("internal error: handler is null");
             }
@@ -230,20 +216,21 @@ public class ClassloaderTask extends ClassloaderBase {
             }
             loader.setClassLoader(classloader);
         } else if (classPath != null) {
-            handlerSet = getHandlerSet();
-            if (handlerSet == null) {
-                throw new BuildException("internal error: handlerset is null");
-            }
-            LoaderHandler handler =
-                handlerSet.getHandler(this, classloader, Action.APPEND);
             if (handler == null) {
-                log("NO HANDLER", Project.MSG_DEBUG);
-                return false;
             }
-            ClassLoaderAdapter adapter = handler.getAdapter(this);
-            if (adapter == null) {
-                log("NO ADAPTER", Project.MSG_DEBUG);
-                return false;
+            ClassLoaderAdapter adapter;
+            try {
+                adapter = ClassloaderUtil.findAdapter(this, classloader, ClassLoaderAdapterAction.APPEND);
+            } catch (ClassloaderUtil.AdapterException e) {
+                switch (e.getReason()) {
+                case ClassloaderUtil.AdapterException.NO_HANDLER:
+                    log("NO HANDLER", Project.MSG_DEBUG);
+                    return false;
+                case ClassloaderUtil.AdapterException.NO_ADAPTER:
+                    log("NO ADAPTER", Project.MSG_DEBUG);
+                    return false;
+                }
+                throw new BuildException("unexpected reason "+e.getReason(),e);
             }
             if (!adapter.appendClasspath(this, classloader)) {
                 log("NO APPEND", Project.MSG_DEBUG);
@@ -254,17 +241,10 @@ public class ClassloaderTask extends ClassloaderBase {
     }
     private boolean executeProperty() {
         ClassLoader cl = loader.getClassLoader(null);
-        LoaderHandlerSet handlerSet = getHandlerSet();
-        if (handlerSet == null) {
-            throw new BuildException("internal error: handlerset is null");
-        }
-        LoaderHandler handler =
-            handlerSet.getHandler(this, cl, Action.GETPATH);
-        if (handler == null) {
-            return false;
-        }
-        ClassLoaderAdapter adapter = handler.getAdapter(this);
-        if (adapter == null) {
+        ClassLoaderAdapter adapter;
+        try {
+            adapter = ClassloaderUtil.findAdapter(this, cl, ClassLoaderAdapterAction.GETPATH);
+        } catch (ClassloaderUtil.AdapterException e) {
             return false;
         }
         String[] propPath = adapter.getClasspath(this, cl, true);
@@ -288,11 +268,17 @@ public class ClassloaderTask extends ClassloaderBase {
     public URLPath getClasspath() {
         return classpath;
     }
+    public String[] getClasspathURLs() {
+        return classpath.list();
+    }
+    public String[] getClasspathFiles() {
+        return classpath.toPath().list();
+    }
     /**
      * Gets the parameters for a newly created classloader.
      * @return The parameters
      */
-    public ClassloaderTask.ClassLoaderParameters getParameters() {
+    public ClassLoaderParameters getParameters() {
         if (parameters == null) {
             parameters = new LoaderParameters(getProject());
         }
@@ -302,7 +288,7 @@ public class ClassloaderTask extends ClassloaderBase {
      * Gets the handler to create a new classloader.
      * @return The handler
      */
-    public LoaderHandler getHandler() {
+    public ClassLoaderHandler getHandler() {
         if (handler == null) {
             handler = getParameters().getDefaultHandler();
         }
@@ -354,7 +340,7 @@ public class ClassloaderTask extends ClassloaderBase {
         if (!duplicateEntry.requiresCheck()) {
             return true;
         }
-        if (!containsEntry(cl, entryUrl)) {
+        if (!ClassloaderUtil.containsEntry(this, cl, entryUrl)) {
             return true;
         }
         int logLevel = duplicateEntry.getDuplicateLogLevel();
@@ -464,6 +450,9 @@ public class ClassloaderTask extends ClassloaderBase {
      */
     public void addParameters(LoaderParameters desc) {
         parameters = desc;
+    }
+    public Object getAntProject() {
+        return getProject();
     }
 
 }

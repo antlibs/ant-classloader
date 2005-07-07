@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.tools.ant.taskdefs.classloader;
+package org.apache.tools.ant.taskdefs.classloader.adapter;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -30,11 +30,11 @@ import java.util.StringTokenizer;
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ClassloaderBase;
-import org.apache.tools.ant.taskdefs.ClassloaderTask;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderParameters;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.URLPath;
-import org.apache.tools.ant.util.URLUtils;
 
 /**
  * A ClassLoaderAdapter for an AntClassLoader.
@@ -44,7 +44,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * Descriptor definition used by this implementation.
      */
     public static interface Descriptor
-        extends ClassloaderTask.ClassLoaderParameters {
+        extends ClassLoaderParameters {
         /**
          * gets the packagenames for those packages to set as loaderPackageRoot.
          * @return the packagenames or null if not specified.
@@ -79,15 +79,15 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param classloader the classloader instance to append the path to.
      * @return The ClassLoader instance or null if an error occured.
      */
-    public boolean appendClasspath(ClassloaderTask task, ClassLoader classloader) {
+    public boolean appendClasspath(ClassLoaderAdapterContext.CreateModify task, ClassLoader classloader) {
         return appendClasspath(
             task,
             classloader,
-            task.getClasspath().toPath().list());
+            task.getClasspathFiles());
     }
 
     private boolean appendClasspath(
-        ClassloaderTask task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader classloader,
         String[] path) {
         try {
@@ -98,17 +98,15 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
             for (int i = 0; i < path.length; i++) {
                 File f = new File(path[i]);
                 if (f.exists()) {
-                    String sUrl = URLUtils.createURL(f.getAbsolutePath()).toString();
+                    String sUrl = task.getURLUtil().createURL(f.getAbsolutePath()).toString();
                     if (task.handleClasspathEntry(classloader, sUrl)) {
                         m.invoke(classloader, new Object[] {f.getAbsolutePath()});
-                        task.log("AntClassLoader " + task.getLoaderName()
-                            + ": adding path " + f.getAbsolutePath(),
-                            Project.MSG_DEBUG);
+                        task.handleDebug("AntClassLoader " + task.getLoaderName()
+                            + ": adding path " + f.getAbsolutePath());
                     }
                 } else {
-                    task.log("AntClassLoader " + task.getLoaderName()
-                            + ": ignoring nonexistent path " + f.getAbsolutePath(),
-                        Project.MSG_WARN);
+                    task.handleWarning("AntClassLoader " + task.getLoaderName()
+                            + ": ignoring nonexistent path " + f.getAbsolutePath());
                 }
 
             }
@@ -128,7 +126,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @return the path or null if an error occured
      */
     public String[] getClasspath(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext task,
         ClassLoader classloader,
         boolean defaultToFile) {
         try {
@@ -149,7 +147,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
     }
 
     private boolean handleAddJavaLibraries(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String loaderId,
         boolean onOff) {
@@ -160,9 +158,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
             Method m =
                 cl.getClass().getMethod("addJavaLibraries", null);
             m.invoke(cl, null);
-            task.log(
-                "Loader " + loaderId + ": calling addJavaLibraries",
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "Loader " + loaderId + ": calling addJavaLibraries");
             return true;
         } catch (Exception e) {
             task.handleError(
@@ -172,7 +169,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleAddLoaderPackageRoot(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String loaderId,
         String[] pkgs) {
@@ -186,13 +183,12 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
                     new Class[] {String.class });
             for (int i = 0; i < pkgs.length; i++) {
                 m.invoke(cl, new Object[] {pkgs[i] });
-                task.log(
+                task.handleDebug(
                     "Loader "
                         + loaderId
                         + ": calling addLoaderPackageRoot(\""
                         + pkgs[i]
-                        + "\")",
-                    Project.MSG_DEBUG);
+                        + "\")");
             }
             return true;
         } catch (Exception e) {
@@ -204,7 +200,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleAddSystemPackageRoot(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String loaderId,
         String[] pkgs) {
@@ -218,13 +214,12 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
                     new Class[] {String.class });
             for (int i = 0; i < pkgs.length; i++) {
                 m.invoke(cl, new Object[] {pkgs[i] });
-                task.log(
+                task.handleDebug(
                     "Loader "
                         + loaderId
                         + ": calling addSystemPackageRoot(\""
                         + pkgs[i]
-                        + "\")",
-                    Project.MSG_DEBUG);
+                        + "\")");
             }
             return true;
         } catch (Exception e) {
@@ -236,7 +231,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private ClassLoader handleCreateLoader(
-        ClassloaderTask task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader superLoader,
         Path path,
         String loaderId) {
@@ -249,9 +244,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
                         true,
                         superLoader)
                     .newInstance();
-            task.log(
-                "AntClassLoader " + loaderId + " created",
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "AntClassLoader " + loaderId + " created");
             //check whether Project classes are compatible
             Class osl =
                 Class.forName(
@@ -262,19 +256,18 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
                 Class.forName(
                     "org.apache.tools.ant.Project",
                     true,
-                    task.getProject().getClass().getClassLoader());
+                    task.getAntProject().getClass().getClassLoader());
             if (osl == psl) {
                 loader.getClass().getMethod(
                     "setProject",
                     new Class[] {osl }).invoke(
                     loader,
-                    new Object[] {task.getProject()});
+                    new Object[] {task.getAntProject()});
             } else {
-                task.log(
+                task.handleWarning(
                     "can not set project for AntClassLoader "
                         + loaderId
-                        + ": Project classes are not compatible",
-                    Project.MSG_WARN);
+                        + ": Project classes are not compatible");
             }
             if (!appendClasspath(task, loader, path.list())) {
                 return null;
@@ -291,7 +284,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleSetIsolated(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String loaderId,
         boolean onOff) {
@@ -304,9 +297,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
                     "setIsolated",
                     new Class[] {Boolean.TYPE });
             m.invoke(cl, new Object[] {Boolean.TRUE });
-            task.log(
-                "Loader " + loaderId + ": setting isolated=true",
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "Loader " + loaderId + ": setting isolated=true");
             return true;
         } catch (Exception e) {
             task.handleError(
@@ -316,7 +308,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private void handleSetParent(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         ClassLoader parent,
         String loaderId) {
@@ -329,15 +321,14 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
                     "setParent",
                     new Class[] {ClassLoader.class });
             m.invoke(cl, new Object[] {parent });
-            task.log(
-                "Loader " + loaderId + ": setting parentLoader",
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "Loader " + loaderId + ": setting parentLoader");
         } catch (Exception e) {
             throw new BuildException(e);
         }
     }
     private boolean handleSetParentFirst(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String loaderId,
         boolean onOff) {
@@ -350,9 +341,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
                     "setParentFirst",
                     new Class[] {Boolean.TYPE });
             m.invoke(cl, new Object[] {Boolean.FALSE });
-            task.log(
-                "Loader " + loaderId + ": setting parentFirst=false",
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "Loader " + loaderId + ": setting parentFirst=false");
             return true;
         } catch (Exception e) {
             task.handleError(
@@ -368,9 +358,9 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @return the classloader instance or null if an error occurs.
      */
     protected ClassLoader initClassLoader(
-        ClassloaderTask task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader classloader) {
-        ClassloaderTask.ClassLoaderParameters d = task.getParameters().getParameters();
+        ClassLoaderParameters d = task.getParameters().getParameters();
         if (d instanceof Descriptor) {
             Descriptor dd = (Descriptor) d;
             String loaderId = task.getLoaderName();
@@ -417,7 +407,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param action the action to check.
      * @return true, if action is supported.
      */
-    public boolean isSupported(ClassloaderBase.Action action) {
+    public boolean isSupported(ClassLoaderAdapterAction action) {
         return true;
     }
     /**
@@ -425,43 +415,42 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @param task the calling classloader task.
      * @return the newly created ClassLoader or null if an error occurs.
      */
-    protected ClassLoader newClassLoader(ClassloaderTask task) {
+    protected ClassLoader newClassLoader(ClassLoaderAdapterContext.CreateModify task) {
         ClassLoader superLoader = task.getSuperLoader();
         ClassLoader parent = task.getParentLoader();
         String loaderId = task.getLoaderName();
-        URLPath path = task.getClasspath();
+        String[] path = task.getClasspathURLs();
+        URLPath newPath=null;
         if (path!=null) {
             ClassLoader explParent = parent;
             if (explParent == null) {
                 explParent = getDefaultParent();
             }
-            String[] list=path.list();
             Set localEntries=new HashSet();
-            URLPath newPath = new URLPath(path.getProject());
-            for (int i = 0; i < list.length; i++) {
+            newPath = new URLPath((Project)task.getAntProject());
+            for (int i = 0; i < path.length; i++) {
                 try {
-                    URL url = URLUtils.createURL(list[i]);
+                    URL url = task.getURLUtil().createURL(path[i]);
                     String sUrl=url.toString();
                     if (localEntries.add(sUrl) && task.handleClasspathEntry(explParent, sUrl)) {
                         newPath.addURLPath(new URLPath(newPath.getProject(),sUrl));
                     }
                 } catch (MalformedURLException e) {
-                    task.handleError("createURL(\"" + list[i] + "\")", e);
+                    task.handleError("createURL(\"" + path[i] + "\")", e);
                 }
             }
-            path = newPath;
         }
         ClassLoader result;
         if (superLoader == null) {
             result =
-                task.getProject().createClassLoader(
-                    (path == null) ? null : path.toPath());
+                ((Project)task.getAntProject()).createClassLoader(
+                    (newPath == null) ? null : newPath.toPath());
         } else {
             result =
                 handleCreateLoader(
                     task,
                     superLoader,
-                    (path == null) ? null : path.toPath(),
+                    (newPath == null) ? null : newPath.toPath(),
                     loaderId);
             if (result == null) {
                 return null;

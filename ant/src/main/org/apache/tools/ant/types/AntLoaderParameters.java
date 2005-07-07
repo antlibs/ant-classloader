@@ -21,7 +21,8 @@ import java.util.HashSet;
 import java.util.StringTokenizer;
 
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.classloader.AntClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
+import org.apache.tools.ant.taskdefs.classloader.adapter.AntClassLoaderAdapter;
 
 /**
  * specifies a Ant ClassloaderBase's parameters.
@@ -54,11 +55,11 @@ public class AntLoaderParameters
      * gets the default Handler.
      * @return the handler referred by "ant.clhandler.AntClassLoader".
      */
-    public LoaderHandler getDefaultHandler() {
+    public ClassLoaderHandler getDefaultHandler() {
         if (isReference()) {
             return super.getDefaultHandler();
         }
-        return (LoaderHandler) getProject().getReference("ant.clhandler.AntClassLoader");
+        return (ClassLoaderHandler) getProject().getReference("ant.clhandler.AntClassLoader");
     }
     /**
      * gets the packagenames for those packages to set as loaderPackageRoot.

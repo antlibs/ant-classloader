@@ -1,5 +1,5 @@
 /*
- * Copyright  2004 The Apache Software Foundation
+ * Copyright  2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,16 +21,17 @@ import java.util.HashSet;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ClassloaderTask;
-import org.apache.tools.ant.taskdefs.classloader.SimpleClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderParameters;
+import org.apache.tools.ant.taskdefs.classloader.adapter.SimpleClassLoaderAdapter;
 
 /**
- * specifies a ClassloaderBase's parameters.
+ * specifies a Classloader's parameters.
  * @since Ant 1.7
  */
 public class LoaderParameters
     extends DataType
-    implements ClassloaderTask.ClassLoaderParameters
+    implements ClassLoaderParameters
     , SimpleClassLoaderAdapter.Descriptor {
     /**
      * class for nested packageAssertionStatus and classAssertionStatus elements.
@@ -171,23 +172,23 @@ public class LoaderParameters
      * returns the default handler for this parameters.
      * @return the handler referred by "ant.clhandler.AntClassLoader".
      */
-    public LoaderHandler getDefaultHandler() {
+    public ClassLoaderHandler getDefaultHandler() {
         if (isReference()) {
-            ClassloaderTask.ClassLoaderParameters r = (ClassloaderTask.ClassLoaderParameters)
-                getCheckedRef(ClassloaderTask.ClassLoaderParameters.class, "loaderDescriptor");
+            ClassLoaderParameters r = (ClassLoaderParameters)
+                getCheckedRef(ClassLoaderParameters.class, "loaderDescriptor");
             return r.getDefaultHandler();
         }
-        return (LoaderHandler) getProject().getReference("ant.clhandler.URLClassLoader");
+        return (ClassLoaderHandler) getProject().getReference("ant.clhandler.URLClassLoader");
     }
     /**
      * returns the descriptor which is either the instance itself
      * or a referenced descriptor.
      * @return descriptor.
      */
-    public ClassloaderTask.ClassLoaderParameters getParameters() {
+    public ClassLoaderParameters getParameters() {
         if (isReference()) {
-            return (ClassloaderTask.ClassLoaderParameters)
-              getCheckedRef(ClassloaderTask.ClassLoaderParameters.class
+            return (ClassLoaderParameters)
+              getCheckedRef(ClassLoaderParameters.class
                           , "loaderDescriptor");
         }
         return this;

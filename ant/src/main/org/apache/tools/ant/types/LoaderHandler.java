@@ -1,5 +1,5 @@
 /*
- * Copyright  2004 The Apache Software Foundation
+ * Copyright  2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -24,16 +24,19 @@ import java.util.Iterator;
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ClassloaderBase;
-import org.apache.tools.ant.taskdefs.classloader.AntClassLoaderAdapter;
-import org.apache.tools.ant.taskdefs.classloader.SimpleClassLoaderAdapter;
-import org.apache.tools.ant.taskdefs.classloader.URLClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
+import org.apache.tools.ant.taskdefs.classloader.adapter.AntClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.adapter.SimpleClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.adapter.URLClassLoaderAdapter;
 
 /**
  * ClassLoaderHandler.
  * @since Ant 1.7
  */
-public final class LoaderHandler extends DataType implements Cloneable {
+public final class LoaderHandler extends DataType implements ClassLoaderHandler, Cloneable {
 
     private static final LoaderHandler[] DEFAULT_HANDLERS = {
         new LoaderHandler("ant.clhandler.URLClassLoader"
@@ -60,7 +63,7 @@ public final class LoaderHandler extends DataType implements Cloneable {
      * @param project current project
      * @return array of the predefined handlers
      */
-    public static LoaderHandler[] getDefaultHandlers(Project project) {
+    public static ClassLoaderHandler[] getDefaultHandlers(Project project) {
         addPredefined(project);
         ArrayList list = new ArrayList(DEFAULT_HANDLERS.length);
         for (int i = 0; i < DEFAULT_HANDLERS.length; i++) {
@@ -69,14 +72,14 @@ public final class LoaderHandler extends DataType implements Cloneable {
                 list.add(o);
             }
         }
-        return (LoaderHandler[]) list.toArray(new LoaderHandler[list.size()]);
+        return (ClassLoaderHandler[]) list.toArray(new ClassLoaderHandler[list.size()]);
     }
     /**
      * gets all defined Loaderhandlers of a project
      * @param project current project
      * @return array of the defined handlers
      */
-    public static LoaderHandler[] getAllHandlers(Project project) {
+    public static ClassLoaderHandler[] getAllHandlers(Project project) {
         addPredefined(project);
         ArrayList list = new ArrayList(DEFAULT_HANDLERS.length);
         for (Iterator i = project.getReferences().keySet().iterator(); i.hasNext();) {
@@ -85,7 +88,7 @@ public final class LoaderHandler extends DataType implements Cloneable {
                 list.add(o);
             }
         }
-        return (LoaderHandler[]) list.toArray(new LoaderHandler[list.size()]);
+        return (ClassLoaderHandler[]) list.toArray(new ClassLoaderHandler[list.size()]);
     }
     private String adapter = null;
     private String desiredId = null;
@@ -167,7 +170,7 @@ public final class LoaderHandler extends DataType implements Cloneable {
      * @param task the calling classloader task
      * @return the newly created adapter or null if an error occured
      */
-    public ClassloaderBase.ClassLoaderAdapter getAdapter(ClassloaderBase task) {
+    public ClassLoaderAdapter getAdapter(ClassLoaderAdapterContext task) {
         check();
         if (isReference()) {
             LoaderHandler r = (LoaderHandler) getCheckedRef(LoaderHandler.class, "LoaderHandler");
@@ -175,7 +178,7 @@ public final class LoaderHandler extends DataType implements Cloneable {
         }
 
         try {
-            return (ClassloaderBase.ClassLoaderAdapter) Class
+            return (ClassLoaderAdapter) Class
                 .forName(adapter)
                 .newInstance();
         } catch (Exception e) {
@@ -208,9 +211,9 @@ public final class LoaderHandler extends DataType implements Cloneable {
      *         and the adapter supports the required action; else null.
      */
     public Class getLoaderClass(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext task,
         ClassLoader assignable,
-        ClassloaderBase.Action action) {
+        ClassLoaderAdapterAction action) {
         check();
         if (isReference()) {
             LoaderHandler r = (LoaderHandler) getCheckedRef(LoaderHandler.class, "LoaderHandler");
@@ -225,7 +228,7 @@ public final class LoaderHandler extends DataType implements Cloneable {
             if (!(result.isAssignableFrom(assignable.getClass()))) {
                 return null;
             }
-            ClassloaderBase.ClassLoaderAdapter adapter = getAdapter(task);
+            ClassLoaderAdapter adapter = getAdapter(task);
             if ((action != null) && !adapter.isSupported(action)) {
                 return null;
             }

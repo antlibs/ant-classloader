@@ -15,17 +15,15 @@
  *
  */
 
-package org.apache.tools.ant.taskdefs.classloader;
+package org.apache.tools.ant.taskdefs.classloader.adapter;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ClassloaderBase;
-import org.apache.tools.ant.taskdefs.ClassloaderReport;
-import org.apache.tools.ant.taskdefs.ClassloaderTask;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassLoaderParameters;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
 
@@ -34,12 +32,12 @@ import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
  * @since Ant 1.7
  */
 public class SimpleClassLoaderAdapter
-    implements ClassloaderBase.ClassLoaderAdapter {
+    implements ClassLoaderAdapter {
     /**
      * Descriptor definition used by this implementation.
      */
     public static interface Descriptor
-        extends ClassloaderTask.ClassLoaderParameters {
+        extends ClassLoaderParameters {
         /**
          * gets the default assertionStatus.
          * @return default assertionStatus or null if not specified.
@@ -59,7 +57,7 @@ public class SimpleClassLoaderAdapter
         String[] getPackageAssertions(boolean status);
     }
     private boolean handleSetClassAssertionStatus(
-        ClassloaderTask task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String name,
         String[] classes,
@@ -78,20 +76,13 @@ public class SimpleClassLoaderAdapter
                     new Object[] {
                         classes[i],
                         onOff ? Boolean.TRUE : Boolean.FALSE });
-                task.log(
-                    "Loader "
-                        + name
+                task.handleDebug("Loader " + name
                         + ": setting ClassAssertionStatus for "
-                        + classes[i]
-                        + "="
-                        + onOff,
-                    Project.MSG_DEBUG);
+                        + classes[i] + "=" + onOff);
             }
             return true;
         } catch (NoSuchMethodException e) {
-            task.log(
-                "Loader " + name + ": ClassAssertionStatus not supported.",
-                Project.MSG_WARN);
+            task.handleWarning("Loader " + name + ": ClassAssertionStatus not supported.");
             return true;
         } catch (Exception e) {
             task.handleError(e.getMessage(), e);
@@ -99,7 +90,7 @@ public class SimpleClassLoaderAdapter
         }
     }
     private boolean handleSetPackageAssertionStatus(
-        ClassloaderTask task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String name,
         String[] pkgs,
@@ -113,25 +104,15 @@ public class SimpleClassLoaderAdapter
                     "setPackageAssertionStatus",
                     new Class[] {String.class, Boolean.TYPE });
             for (int i = 0; i < pkgs.length; i++) {
-                m.invoke(
-                    cl,
-                    new Object[] {
-                        pkgs[i],
-                        onOff ? Boolean.TRUE : Boolean.FALSE });
-                task.log(
-                    "Loader "
-                        + name
+                m.invoke(cl,
+                    new Object[] {pkgs[i], onOff ? Boolean.TRUE : Boolean.FALSE });
+                task.handleDebug("Loader " + name
                         + ": setting PackageAssertionStatus for "
-                        + pkgs[i]
-                        + "="
-                        + onOff,
-                    Project.MSG_DEBUG);
+                        + pkgs[i] + "=" + onOff);
             }
             return true;
         } catch (NoSuchMethodException e) {
-            task.log(
-                "Loader " + name + ": PackageAssertionStatus not supported.",
-                Project.MSG_WARN);
+            task.handleWarning("Loader " + name + ": PackageAssertionStatus not supported.");
             return true;
         } catch (Exception e) {
             task.handleError(e.getMessage(), e);
@@ -139,8 +120,8 @@ public class SimpleClassLoaderAdapter
         }
     }
 
-    private Package[] handleGetPackages(
-        ClassloaderBase task,
+    public Package[] getPackages(
+        ClassLoaderAdapterContext.Report task,
         ClassLoader cl,
         ClassloaderReportHandle name) {
         try {
@@ -148,9 +129,8 @@ public class SimpleClassLoaderAdapter
             m.setAccessible(true);
             return (Package[]) m.invoke(cl, null);
         } catch (NoSuchMethodException e) {
-            task.log(
-                "Loader " + name + ": oops, getPackages not supported (java < 1.2 ?).",
-                Project.MSG_WARN);
+            task.handleWarning(
+                "Loader " + name + ": oops, getPackages not supported (java < 1.2 ?).");
             return null;
         } catch (SecurityException e) {
             task.handleError(
@@ -163,7 +143,7 @@ public class SimpleClassLoaderAdapter
         }
     }
     private boolean handleSetDefaultAssertionStatus(
-        ClassloaderTask task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader cl,
         String name,
         Boolean onOff) {
@@ -176,14 +156,12 @@ public class SimpleClassLoaderAdapter
                     "setDefaultAssertionStatus",
                     new Class[] {Boolean.TYPE });
             m.invoke(cl, new Object[] {onOff });
-            task.log(
-                "Loader " + name + ": setting DefaultAssertionStatus=" + onOff,
-                Project.MSG_DEBUG);
+            task.handleDebug(
+                "Loader " + name + ": setting DefaultAssertionStatus=" + onOff);
             return true;
         } catch (NoSuchMethodException e) {
-            task.log(
-                "Loader " + name + ": PackageAssertionStatus not supported.",
-                Project.MSG_WARN);
+            task.handleWarning(
+                "Loader " + name + ": PackageAssertionStatus not supported.");
             return true;
         } catch (Exception e) {
             task.handleError(e.getMessage(), e);
@@ -196,7 +174,7 @@ public class SimpleClassLoaderAdapter
      * @param task the calling classloader task.
      * @return the newly created ClassLoader or null if an error occurs.
      */
-    protected ClassLoader newClassLoader(ClassloaderTask task) {
+    protected ClassLoader newClassLoader(ClassLoaderAdapterContext.CreateModify task) {
         task.handleError("new ClassLoader not supported (Adapter error).");
         return null;
     }
@@ -208,9 +186,9 @@ public class SimpleClassLoaderAdapter
      * @return the classloader instance or null if an error occurs.
      */
     protected ClassLoader initClassLoader(
-        ClassloaderTask task,
+        ClassLoaderAdapterContext.CreateModify task,
         ClassLoader classloader) {
-        ClassloaderTask.ClassLoaderParameters d = task.getParameters().getParameters();
+        ClassLoaderParameters d = task.getParameters().getParameters();
         if (d instanceof Descriptor) {
             Descriptor dd = (Descriptor) d;
             String loaderId = task.getLoaderName();
@@ -257,7 +235,7 @@ public class SimpleClassLoaderAdapter
      * @param task the calling classloader instance
      * @return the newly created classloader or null if an error occurs.
      */
-    public final ClassLoader createClassLoader(ClassloaderTask task) {
+    public final ClassLoader createClassLoader(ClassLoaderAdapterContext.CreateModify task) {
         ClassLoader cl = newClassLoader(task);
         if (cl == null) {
             return null;
@@ -271,7 +249,7 @@ public class SimpleClassLoaderAdapter
      * @param classloader the classloader to modify.
      * @return true if executed successful, false on error
      */
-    public boolean appendClasspath(ClassloaderTask task, ClassLoader classloader) {
+    public boolean appendClasspath(ClassLoaderAdapterContext.CreateModify task, ClassLoader classloader) {
         task.handleError("append not supported (Adapter error)");
         return false;
     }
@@ -285,7 +263,7 @@ public class SimpleClassLoaderAdapter
      * @return the path or null if an error occured
      */
     public String[] getClasspath(
-        ClassloaderBase task,
+        ClassLoaderAdapterContext task,
         ClassLoader classloader,
         boolean defaultToFile) {
         task.handleError("getClasspath not supported (Adapter error)");
@@ -301,22 +279,9 @@ public class SimpleClassLoaderAdapter
      */
     public void report(
         ClassloaderReporter to,
-        ClassloaderReport task,
+        ClassLoaderAdapterContext.Report task,
         ClassLoader classloader,
         ClassloaderReportHandle role) {
-        if (task.isReportPackages()) {
-            Package[] pkgs = this.handleGetPackages(task, classloader, role);
-            if (pkgs == null) {
-                to.reportError("packages of " + role + " not investigatable");
-            } else {
-                Arrays.sort(pkgs, PackageComparator.SINGLETON);
-                to.beginPackages(pkgs.length);
-                for (int i = 0; i < pkgs.length; i++) {
-                    to.reportPackage(pkgs[i].getName());
-                }
-                to.endPackages(pkgs.length);
-            }
-        }
     }
 
     /**
@@ -329,7 +294,7 @@ public class SimpleClassLoaderAdapter
      * @param loaderNames loaderNames to pass to ClassloaderBase.addLoaderToReport.
      */
     public void addReportable(
-        ClassloaderReport task,
+        ClassLoaderAdapterContext.Report task,
         ClassLoader classloader,
         ClassloaderReportHandle role,
         Map loaderStack,
@@ -341,22 +306,14 @@ public class SimpleClassLoaderAdapter
      * @param action the action to check.
      * @return true, if action is supported.
      */
-    public boolean isSupported(ClassloaderBase.Action action) {
+    public boolean isSupported(ClassLoaderAdapterAction action) {
         if (action == null) {
             return true;
         }
-        if (ClassloaderBase.Action.REPORT.equals(action)) {
+        if (ClassLoaderAdapterAction.REPORT.equals(action)) {
             return true;
         }
         return false;
-    }
-    private static final class PackageComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            return ((Package) o1).getName().compareTo(((Package) o2).getName());
-        }
-        private PackageComparator() {
-        }
-        public static final Comparator SINGLETON = new PackageComparator();
     }
     /**
      * Gets the default parent classloader in the case, this classloader's
