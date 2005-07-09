@@ -63,8 +63,8 @@ public class URLPathTest extends TestCase {
     }
 
     public void testSetLocation() throws MalformedURLException {
-        String rootUrl = URLUtils.createURL(root).toString();
-        String currentUrl = URLUtils.createURL(current).toString();
+        String rootUrl = URLUtils.getURLUtils().createURL(root).toString();
+        String currentUrl = URLUtils.getURLUtils().createURL(current).toString();
         URLPath p = new URLPath(project);
         p.setLocation(new File(File.separatorChar+"a").toString());
         String[] l = p.list();

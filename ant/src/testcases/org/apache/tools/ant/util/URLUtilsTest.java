@@ -55,65 +55,69 @@ public class URLUtilsTest extends TestCase {
     }
 
     public void testCreateURL(String test,String expected,String fileOrURL) throws MalformedURLException {
-        assertEquals(test,expected,URLUtils.createURL(fileOrURL).toString());
+        assertEquals(test,expected,URLUtils.getURLUtils().createURL(fileOrURL).toString());
     }
     public void testNormalize(String test,String expected,String fileOrURL) {
-        assertEquals(test,expected,URLUtils.normalize(fileOrURL));
+        assertEquals(test,expected,URLUtils.getURLUtils().normalize(fileOrURL));
     }
     public void testResolve(String test,String expected,String fileOrURL,File dir) throws MalformedURLException {
-        assertEquals(test,expected,URLUtils.resolve(fileOrURL, dir));
+        assertEquals(test,expected,URLUtils.getURLUtils().resolve(fileOrURL, dir));
     }
 
     public void testIsURL() {
-        assertEquals(true,URLUtils.isURL("http://ant.apache.org"));
-        assertEquals(true,URLUtils.isURL("file:/a/b"));
-        assertEquals(true,URLUtils.isURL("file://a/b"));
-        assertEquals(true,URLUtils.isURL("file:///a/b"));
-        assertEquals(true,URLUtils.isURL("file:////a/b"));
-        assertEquals(true,URLUtils.isURL("file:/C:/a/b"));
-        assertEquals(true,URLUtils.isURL("file://C:/a/b"));
-        assertEquals(true,URLUtils.isURL("file:///C:/a/b"));
-        assertEquals(false,URLUtils.isURL("C:/a/b"));
-        assertEquals(false,URLUtils.isURL("/a/b"));
-        assertEquals(false,URLUtils.isURL("a/b"));
-        assertEquals(false,URLUtils.isURL("//a/b"));
-        assertEquals(false,URLUtils.isURL("///a/b"));
-        assertEquals(false,URLUtils.isURL("."));
+        URLUtils utils=URLUtils.getURLUtils();
+        assertEquals(true,utils.isURL("http://ant.apache.org"));
+        assertEquals(true,utils.isURL("file:/a/b"));
+        assertEquals(true,utils.isURL("file://a/b"));
+        assertEquals(true,utils.isURL("file:///a/b"));
+        assertEquals(true,utils.isURL("file:////a/b"));
+        assertEquals(true,utils.isURL("file:/C:/a/b"));
+        assertEquals(true,utils.isURL("file://C:/a/b"));
+        assertEquals(true,utils.isURL("file:///C:/a/b"));
+        assertEquals(false,utils.isURL("C:/a/b"));
+        assertEquals(false,utils.isURL("/a/b"));
+        assertEquals(false,utils.isURL("a/b"));
+        assertEquals(false,utils.isURL("//a/b"));
+        assertEquals(false,utils.isURL("///a/b"));
+        assertEquals(false,utils.isURL("."));
     }
     public void testIsFileOrFileURL() {
-        assertEquals(false,URLUtils.isFileOrFileURL("http://ant.apache.org"));
-        assertEquals(true,URLUtils.isFileOrFileURL("file:/a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("file://a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("file:///a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("file:////a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("file:/C:/a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("file://C:/a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("file:///C:/a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("C:/a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("/a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("//a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("///a/b"));
-        assertEquals(true,URLUtils.isFileOrFileURL("."));
+        URLUtils utils=URLUtils.getURLUtils();
+        assertEquals(false,utils.isFileOrFileURL("http://ant.apache.org"));
+        assertEquals(true,utils.isFileOrFileURL("file:/a/b"));
+        assertEquals(true,utils.isFileOrFileURL("file://a/b"));
+        assertEquals(true,utils.isFileOrFileURL("file:///a/b"));
+        assertEquals(true,utils.isFileOrFileURL("file:////a/b"));
+        assertEquals(true,utils.isFileOrFileURL("file:/C:/a/b"));
+        assertEquals(true,utils.isFileOrFileURL("file://C:/a/b"));
+        assertEquals(true,utils.isFileOrFileURL("file:///C:/a/b"));
+        assertEquals(true,utils.isFileOrFileURL("C:/a/b"));
+        assertEquals(true,utils.isFileOrFileURL("/a/b"));
+        assertEquals(true,utils.isFileOrFileURL("a/b"));
+        assertEquals(true,utils.isFileOrFileURL("//a/b"));
+        assertEquals(true,utils.isFileOrFileURL("///a/b"));
+        assertEquals(true,utils.isFileOrFileURL("."));
     }
     public void testIsAbsolute() {
-        assertEquals("2",true,URLUtils.isAbsolute("file:/a/b"));
-        assertEquals("3",true,URLUtils.isAbsolute("file://a/b"));
-        assertEquals("4",true,URLUtils.isAbsolute("file:///a/b"));
-        assertEquals("5",true,URLUtils.isAbsolute("file:////a/b"));
-        assertEquals("6",true,URLUtils.isAbsolute("file:/C:/a/b"));
-        assertEquals("7",true,URLUtils.isAbsolute("file://C:/a/b"));
-        assertEquals("8",true,URLUtils.isAbsolute("file:///C:/a/b"));
-        assertEquals("9",true,URLUtils.isAbsolute("C:/a/b"));
-        assertEquals("10",File.separatorChar == '/',URLUtils.isAbsolute("/a/b"));
-        assertEquals("11",false,URLUtils.isAbsolute("a/b"));
-        assertEquals("12",true,URLUtils.isAbsolute("//a/b"));
-        assertEquals("13",true,URLUtils.isAbsolute("///a/b"));
-        assertEquals("14",false,URLUtils.isAbsolute("."));
+        URLUtils utils=URLUtils.getURLUtils();
+        assertEquals("2",true,utils.isAbsolute("file:/a/b"));
+        assertEquals("3",true,utils.isAbsolute("file://a/b"));
+        assertEquals("4",true,utils.isAbsolute("file:///a/b"));
+        assertEquals("5",true,utils.isAbsolute("file:////a/b"));
+        assertEquals("6",true,utils.isAbsolute("file:/C:/a/b"));
+        assertEquals("7",true,utils.isAbsolute("file://C:/a/b"));
+        assertEquals("8",true,utils.isAbsolute("file:///C:/a/b"));
+        assertEquals("9",true,utils.isAbsolute("C:/a/b"));
+        assertEquals("10",File.separatorChar == '/',utils.isAbsolute("/a/b"));
+        assertEquals("11",false,utils.isAbsolute("a/b"));
+        assertEquals("12",true,utils.isAbsolute("//a/b"));
+        assertEquals("13",true,utils.isAbsolute("///a/b"));
+        assertEquals("14",false,utils.isAbsolute("."));
     }
     public void testCreateURL() throws MalformedURLException{
-        String rootUrl = URLUtils.createURL(root).toString();
-        String currentUrl = URLUtils.createURL(current).toString();
+        URLUtils utils=URLUtils.getURLUtils();
+        String rootUrl = utils.createURL(root).toString();
+        String currentUrl = utils.createURL(current).toString();
 
         testCreateURL("http"
                      , "http://ant.apache.org"
@@ -164,8 +168,8 @@ public class URLUtilsTest extends TestCase {
         return x.replace('/', File.separatorChar);
     }
     public void testNormalize() throws MalformedURLException{
-        String rootUrl = URLUtils.createURL(root).toString();
-        String currentUrl = URLUtils.createURL(current).toString();
+        String rootUrl = URLUtils.getURLUtils().createURL(root).toString();
+        String currentUrl = URLUtils.getURLUtils().createURL(current).toString();
 
         testNormalize("http"
                      , "http://ant.apache.org"
@@ -239,11 +243,11 @@ public class URLUtilsTest extends TestCase {
         }
     }
     public void testResolve() throws MalformedURLException{
-        String rootUrl = URLUtils.createURL(root).toString();
-        String currentUrl = URLUtils.createURL(current).toString();
+        String rootUrl = URLUtils.getURLUtils().createURL(root).toString();
+        String currentUrl = URLUtils.getURLUtils().createURL(current).toString();
 
         File dir = new File("C:/a");
-        String dirUrl = URLUtils.createURL(dir.getAbsolutePath()).toString();
+        String dirUrl = URLUtils.getURLUtils().createURL(dir.getAbsolutePath()).toString();
          
         testResolve("http"
                      , "http://ant.apache.org"
