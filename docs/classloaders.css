@@ -1,0 +1,89 @@
+#enitsys {color:#a00000; font-style:normal; font-family:Arial,sans-serif; font-weight:bold; }
+#tools {color:#0000c0; font-style:italic; font-family:Arial,sans-serif; font-weight:bold; }
+#keyword {font-style:italic; font-weight:bold; }
+#code {font-family:"Courier New",monospace; color:#0F0F0F;  font-style:bold; background-color:#c0c0c0;}
+#console {font-family:"Courier New",monospace; color:#FFFFFF;  font-style:bold; background-color:#000000;}
+#tag {font-family:"Courier New",monospace; color:#CC0000; font-style:normal; font-weight:bold;}
+#tagjsp {font-family:"Courier New",monospace; color:#008800; font-style:normal; font-weight:bold;}
+#tagsystem {font-family:"Courier New",monospace; color:#666666; font-style:normal; font-weight:bold;}
+#macro {font-family:"Courier New",monospace; color:#CC00CC; font-weight:bold;}
+#def {font-family:"Courier New",monospace; color:#0000FF; }
+#matters {font-style:italic; font-weight:normal; font-family:Arial,sans-serif; color:#FF0000; }
+#comment {font-style:italic; font-weight:normal; color:#0F0F0F; }
+
+pre.code {font-family:"Courier New",monospace; color:#0F0F0F;  font-style:bold;}
+
+body {font-family:Arial,sans-serif; font-size:10pt; background-color:#FFFFFF;}
+
+table {text-align:left; vertical-align:top; font-size:10pt; width=100%;}
+tr {text-align:left; vertical-align:top; font-size:10pt; }
+th,td {text-align:left; vertical-align:top; font-size:10pt; }
+td.header1 {text-align:left; vertical-align:top; font-size:12pt; }
+td.header2 {text-align:left; vertical-align:top; font-size:12pt; font-style:italic;}
+td.header3 {text-align:left; vertical-align:top; font-size:10pt; font-weight:bold;}
+td.smaller {text-align:left; vertical-align:top; font-size:8pt; }
+
+.example-template {font-family:"Courier New",monospace; color:#0F0F0F; background-color:#c0c0c0;}
+
+dt.join {font-size:12pt; font-style:italic; font-weight:bold;}
+
+.spruch         {text-align:center; vertical-align:middle; font-family:"Comic Sans MS",cursive; font-size:24pt; font-style:italic; color:#FF0000;}
+
+.spruchsmall    {text-align:left; vertical-align:middle; font-family:"Comic Sans MS",cursive; font-size:12pt; font-style:italic; color:#FF0000;}
+
+a.head          {text-align:center; vertical-align:middle; font-weight:bold; text-decoration:none; font-size:11pt; 
+                 color:#F0F0F0; background-color:#7070ff; border-color:#0000ff; 
+                 padding-left:3px; padding-right:3px; border-width:3px; border-style:inset;}
+
+td.navbar  {text-align:left; vertical-align:middle; font-size:10pt; font-weight:bold; border-bottom:1px solid white;}
+
+td.navheader {text-align:left; vertical-align:top; font-size:12pt; font-weight:bold;}
+td.navfolder {text-align:left; vertical-align:top; font-size:10pt; font-weight:bold;}
+td.navitem {text-align:left; vertical-align:top; font-size:10pt; font-weight:bold;}
+
+#navparent  {font-size:10pt; font-weight:bold; vertical-align:middle; color:#a0a0a0;}
+#navcurrent {font-size:16pt; font-weight:bold; vertical-align:middle; color:#7070ff;}
+
+#xtplf_txt  {font-family:"Courier New",monospace; vertical-align:top; text-align:left; color:#000000; background-color:#ffffa0; white-space:pre;}
+#xtplc_code {font-family:"Courier New",monospace; vertical-align:top; text-align:left; color:#0F0F0F; background-color:#c0c0c0; white-space:pre;}
+#xtplo_txt  {font-family:"Courier New",monospace; vertical-align:top; text-align:left; color:#000000; background-color:#a0ffa0; white-space:pre;}
+
+#logo       { width:50px;  height:18px; background-image:url(JTools_12.gif); background-repeat:no-repeat; background-position:left;}
+#logohead   { width:134px;  height:57px; background-image:url(JTools_48.gif); background-repeat:no-repeat; background-position:center;}
+
+#logonavfolder { width:16px;  height:13px; background-image:url(dir.gif); background-repeat:no-repeat; background-position:0px 1px;}
+#logonavopenfolder { width:16px;  height:13px; background-image:url(opendir.gif); background-repeat:no-repeat; background-position:0px 1px;vertical-align:top;}
+
+#logonavdoc { width:16px;  height:13px; background-image:url(doc.gif); background-repeat:no-repeat; background-position:0px 4px;}
+#logonavitem { width:16px;  height:13px; background-image:url(item.gif); background-repeat:no-repeat; background-position:0px 0px;}
+
+
+/* Headings */
+h1 { font-size: 14pt; font-weight:bold;}
+h2 { font-size: 12pt; font-weight:bold;}
+h3 { font-size: 12pt; font-weight:bold; font-style:italic;}
+
+#api-ov-header          {font-size:16pt; font-weight:normal; vertical-align:middle;}
+#api-version            {font-size:12pt; font-weight:normal; font-family:"Courier New",monospace;}
+#api-groupversion       {font-size:10pt; font-weight:normal; font-family:"Courier New",monospace;}
+#api-groupheader        {font-size:12pt; font-weight:bold;}
+#api-groupdesc          {font-size:10pt; font-weight:normal; font-style:normal;}
+
+/* Table colors */
+.TableHeadingColor     { background: #CCCCFF; } /* Dark mauve */
+.TableSubHeadingColor  { background: #EEEEFF; } /* Light mauve */
+.TableRowColor         { background: #F0F0F0; font-size:+1;} /* White */
+
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 100%; font-family: Helvetica, Arial, sans-serif }
+.FrameHeadingFont { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+.FrameItemFont    { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#EEEEFF;} /* Light mauve */
+.NavBarCell1Rev { background-color:#00008B;} /* Dark Blue */
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#000000;}
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#FFFFFF;}
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#F0F0F0;}
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#F0F0F0;}
