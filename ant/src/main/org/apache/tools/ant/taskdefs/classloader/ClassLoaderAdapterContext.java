@@ -1,5 +1,5 @@
 /*
-/*
+ /*
  * Copyright  2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +18,23 @@
 package org.apache.tools.ant.taskdefs.classloader;
 
 public interface ClassLoaderAdapterContext {
+    public static interface CreateModify extends ClassLoaderAdapterContext {
+        Object getAntProject();
+        String[] getClasspathFiles();
+        String[] getClasspathURLs();
+        String getLoaderName();
+        ClassLoaderParameters getParameters();
+        ClassLoader getParentLoader();
+        ClassLoader getSuperLoader();
+        boolean handleClasspathEntry(ClassLoader cl, String entryUrl);
+    }
     public static interface Report extends ClassLoaderAdapterContext {
         boolean isReportPackages();
     }
-    public static interface CreateModify extends ClassLoaderAdapterContext {
-        String getLoaderName();
-        ClassLoaderParameters getParameters();
-        String[] getClasspathURLs();
-        String[] getClasspathFiles();
-        boolean handleClasspathEntry(ClassLoader cl, String entryUrl);
-        ClassLoader getParentLoader();
-        ClassLoader getSuperLoader();
-        Object getAntProject();
-    }
+    ClassLoaderHandlerSet getHandlerSet();
+    ClassLoaderURLUtil getURLUtil();
     void handleDebug(String msg);
-    void handleWarning(String msg);
     void handleError(String msg);
     void handleError(String msg, Throwable ex);
-    ClassLoaderURLUtil getURLUtil();
-    ClassLoaderHandlerSet getHandlerSet();
+    void handleWarning(String msg);
 }

@@ -32,54 +32,42 @@ import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
 
 public class ClassLoaderReportUtil {
     private static final class PackageComparator implements Comparator {
+        public static final Comparator SINGLETON = new PackageComparator();
+        private PackageComparator() {
+        }
         public int compare(Object o1, Object o2) {
             return ((Package) o1).getName().compareTo(((Package) o2).getName());
         }
-        private PackageComparator() {
-        }
-        public static final Comparator SINGLETON = new PackageComparator();
     }
-    protected static ClassLoaderReportUtil SINGLETON=new ClassLoaderReportUtil();
+    protected static ClassLoaderReportUtil SINGLETON = new ClassLoaderReportUtil();
     public static ClassLoaderReportUtil getReportUtil() {
         return SINGLETON;
     }
     protected ClassLoaderReportUtil() {
     }
-    protected void reportPackages(
-            ClassLoaderAdapterContext.Report task,
-            ClassloaderReporter to,
-            ClassLoaderAdapter adapter,
-            ClassLoader classloader,
-            ClassloaderReportHandle role) {
-                Package[] pkgs = adapter.getPackages(task, classloader, role);
-                if (pkgs == null) {
-                    to.reportError("packages of " + role + " not investigatable");
-                } else {
-                    Arrays.sort(pkgs, PackageComparator.SINGLETON);
-                    to.beginPackages(pkgs.length);
-                    for (int i = 0; i < pkgs.length; i++) {
-                        to.reportPackage(pkgs[i].getName());
-                    }
-                    to.endPackages(pkgs.length);
-                }
-        }
     /**
      * Callback method to add classloaders to the list of loaders to report.
-     * @param context The context.
-     * @param cl The classloader instance to add.
-     * @param role The name of the classloader instance.
-     * @param handlesByLoader A list of loader names by instance.
-     * @param loaderByHandle A list of loader instances by name.
-     * @param to The reporter to report errors against.
-     * @return <code>true</code>, if successfully executed, <code>false</code> otherwise.
+     *
+     * @param context
+     *            The context.
+     * @param cl
+     *            The classloader instance to add.
+     * @param role
+     *            The name of the classloader instance.
+     * @param handlesByLoader
+     *            A list of loader names by instance.
+     * @param loaderByHandle
+     *            A list of loader instances by name.
+     * @param to
+     *            The reporter to report errors against.
+     * @return <code>true</code>, if successfully executed,
+     *         <code>false</code> otherwise.
      */
-    public boolean addLoaderToReport(
-        ClassLoaderAdapterContext.Report context,
-        ClassLoader cl,
-        ClassloaderReportHandle role,
-        Map/*<ClassLoader,SortedSet<ReportHandle>*/ handlesByLoader,
-        Map/*<ReportHandle,ClassLoader>*/ loaderByHandle,
-        ClassloaderReporter to) {
+    public boolean addLoaderToReport(ClassLoaderAdapterContext.Report context,
+            ClassLoader cl, ClassloaderReportHandle role,
+            Map/* <ClassLoader,SortedSet<ReportHandle> */handlesByLoader,
+            Map/* <ReportHandle,ClassLoader> */loaderByHandle,
+            ClassloaderReporter to) {
         Object old = loaderByHandle.put(role, cl);
         if (old != null) {
             throw new RuntimeException("duplicate classloader " + role);
@@ -94,20 +82,29 @@ public class ClassLoaderReportUtil {
             ((Set) old).add(role);
 
             if (isNew) {
-                ClassLoaderAdapter adapter = ClassloaderUtil.findAdapter(context, cl, null, to, role+"->parent", role.getName());
-                boolean adapterFound = (adapter!= null);
+                ClassLoaderAdapter adapter = ClassloaderUtil.findAdapter(
+                        context, cl, null, to, role + "->parent", role
+                                .getName());
+                boolean adapterFound = (adapter != null);
                 if (adapterFound) {
                     ClassLoader parent = adapter.getParent(cl);
                     if (parent == null) {
                         parent = adapter.getDefaultParent();
                     }
                     if (parent != null) {
-                        addLoaderToReport(context,adapter.getParent(cl),new ClassloaderReportHandle(ClassloaderReportHandle.PARENT, role.toString()),handlesByLoader,loaderByHandle,to);
+                        addLoaderToReport(context, adapter.getParent(cl),
+                                new ClassloaderReportHandle(
+                                        ClassloaderReportHandle.PARENT, role
+                                                .toString()), handlesByLoader,
+                                loaderByHandle, to);
                     }
                 }
-                adapter = ClassloaderUtil.findAdapter(context, cl, ClassLoaderAdapterAction.REPORT, to, "report for " + role, "");
+                adapter = ClassloaderUtil.findAdapter(context, cl,
+                        ClassLoaderAdapterAction.REPORT, to, "report for "
+                                + role, "");
                 if (adapter != null) {
-                    adapter.addReportable(context, cl, role, handlesByLoader, loaderByHandle);
+                    adapter.addReportable(context, cl, role, handlesByLoader,
+                            loaderByHandle);
                 }
                 return adapterFound && (adapter != null);
             }
@@ -116,43 +113,53 @@ public class ClassLoaderReportUtil {
     }
     /**
      * handle the report for a single classloader
-     * @param to Reporter to report
-     * @param cl ClassloaderBase instance to report
-     * @param name name of the classloader instance.
+     *
+     * @param to
+     *            Reporter to report
+     * @param cl
+     *            ClassloaderBase instance to report
+     * @param name
+     *            name of the classloader instance.
      */
     public void report(ClassLoaderAdapterContext.Report context,
-            ClassloaderReporter to,
-            ClassLoader cl,
-            ClassloaderReportHandle name,
-            Map handlesByLoader) {
+            ClassloaderReporter to, ClassLoader cl,
+            ClassloaderReportHandle name, Map handlesByLoader) {
         to.beginClassloader(name);
-        ClassLoaderAdapter baseAdapter = ClassloaderUtil.findAdapter(context, cl, null, to, "parent for "+name, "");
+        ClassLoaderAdapter baseAdapter = ClassloaderUtil.findAdapter(context,
+                cl, null, to, "parent for " + name, "");
         if (baseAdapter != null) {
             ClassLoader parent = baseAdapter.getParent(cl);
-            
+
             if (parent != null) {
-                SortedSet handles = (SortedSet) handlesByLoader.get(parent); 
-                to.reportExlicitelyParent((ClassloaderReportHandle)handles.first());
+                SortedSet handles = (SortedSet) handlesByLoader.get(parent);
+                to.reportExlicitelyParent((ClassloaderReportHandle) handles
+                        .first());
             } else {
                 parent = baseAdapter.getDefaultParent();
                 if (parent != null) {
                     SortedSet handles = (SortedSet) handlesByLoader.get(parent);
-                    to.reportImplicitelyParent((ClassloaderReportHandle)handles.first());
+                    to
+                            .reportImplicitelyParent((ClassloaderReportHandle) handles
+                                    .first());
                 } else {
-                    to.reportImplicitelyParent(ClassloaderReportHandle.BOOTSTRAPHANDLE);
+                    to
+                            .reportImplicitelyParent(ClassloaderReportHandle.BOOTSTRAPHANDLE);
                 }
             }
         }
         to.reportClass(cl.getClass());
         SortedSet roles = (SortedSet) handlesByLoader.get(cl);
         for (Iterator iRole = roles.iterator(); iRole.hasNext();) {
-            to.reportRole((ClassloaderReportHandle)iRole.next());
+            to.reportRole((ClassloaderReportHandle) iRole.next());
         }
-        ClassLoaderAdapter adapter = ClassloaderUtil.findAdapter(context, cl, ClassLoaderAdapterAction.GETPATH, to, "entries for "+name, "");
+        ClassLoaderAdapter adapter = ClassloaderUtil
+                .findAdapter(context, cl, ClassLoaderAdapterAction.GETPATH, to,
+                        "entries for " + name, "");
         if (adapter != null) {
             String[] cp = adapter.getClasspath(context, cl, false);
             if (cp == null) {
-                to.reportError("entries for "+name+" not investigatable (adapter retrieves no path)");
+                to.reportError("entries for " + name
+                        + " not investigatable (adapter retrieves no path)");
             } else {
                 to.beginEntries(cp.length);
                 for (int i = 0; i < cp.length; i++) {
@@ -162,7 +169,9 @@ public class ClassLoaderReportUtil {
         }
         if (context.isReportPackages())
             reportPackages(context, to, baseAdapter, cl, name);
-        adapter =  ClassloaderUtil.findAdapter(context, cl, ClassLoaderAdapterAction.REPORT, to , "additional parameters for " + name, "");
+        adapter = ClassloaderUtil.findAdapter(context, cl,
+                ClassLoaderAdapterAction.REPORT, to,
+                "additional parameters for " + name, "");
         if (adapter != null) {
             adapter.report(to, context, cl, name);
         }
@@ -171,20 +180,21 @@ public class ClassLoaderReportUtil {
      * handle the report.
      */
     public void report(ClassLoaderAdapterContext.Report context,
-            Map/*<ClassLoader,SortedSet<ReportHandle>*/ handlesByLoader,
-            Map/*<ReportHandle,ClassLoader>*/ loaderByHandle,
-            ClassloaderReporter to, 
-            boolean allHandlersFound) {
+            Map/* <ClassLoader,SortedSet<ReportHandle> */handlesByLoader,
+            Map/* <ReportHandle,ClassLoader> */loaderByHandle,
+            ClassloaderReporter to, boolean allHandlersFound) {
 
         to.beginReport();
         if (!allHandlersFound) {
-            to.reportError("WARNING: As of missing Loaderhandlers, this report might not be complete.");
+            to
+                    .reportError("WARNING: As of missing Loaderhandlers, this report might not be complete.");
         }
         URL[] urls = ClassloaderUtil.getBootstrapClasspathURLs();
-        if (urls==null) {
-           to.reportError("WARNING: Unable to determine bootstrap classpath."
-                       +"\n         Please report this error to Ant's bugtracking system with information"
-                       +"\n         about your environment (JVM-Vendor, JVM-Version, OS, application context).");
+        if (urls == null) {
+            to
+                    .reportError("WARNING: Unable to determine bootstrap classpath."
+                            + "\n         Please report this error to Ant's bugtracking system with information"
+                            + "\n         about your environment (JVM-Vendor, JVM-Version, OS, application context).");
         } else {
             to.beginClassloader(ClassloaderReportHandle.BOOTSTRAPHANDLE);
             to.beginEntries(urls.length);
@@ -194,8 +204,10 @@ public class ClassLoaderReportUtil {
             to.endEntries(urls.length);
             to.endClassloader(ClassloaderReportHandle.BOOTSTRAPHANDLE);
         }
-        for (Iterator iRole = loaderByHandle.keySet().iterator(); iRole.hasNext();) {
-            ClassloaderReportHandle role = (ClassloaderReportHandle) iRole.next();
+        for (Iterator iRole = loaderByHandle.keySet().iterator(); iRole
+                .hasNext();) {
+            ClassloaderReportHandle role = (ClassloaderReportHandle) iRole
+                    .next();
             ClassLoader cl = (ClassLoader) loaderByHandle.get(role);
             if (cl == null) {
                 if (role.isPopular()) {
@@ -209,6 +221,21 @@ public class ClassLoaderReportUtil {
             }
         }
         to.endReport();
+    }
+    protected void reportPackages(ClassLoaderAdapterContext.Report task,
+            ClassloaderReporter to, ClassLoaderAdapter adapter,
+            ClassLoader classloader, ClassloaderReportHandle role) {
+        Package[] pkgs = adapter.getPackages(task, classloader, role);
+        if (pkgs == null) {
+            to.reportError("packages of " + role + " not investigatable");
+        } else {
+            Arrays.sort(pkgs, PackageComparator.SINGLETON);
+            to.beginPackages(pkgs.length);
+            for (int i = 0; i < pkgs.length; i++) {
+                to.reportPackage(pkgs[i].getName());
+            }
+            to.endPackages(pkgs.length);
+        }
     }
 
 }

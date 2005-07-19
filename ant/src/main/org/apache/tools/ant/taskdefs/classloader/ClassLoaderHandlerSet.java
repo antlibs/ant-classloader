@@ -18,16 +18,18 @@ package org.apache.tools.ant.taskdefs.classloader;
 
 public interface ClassLoaderHandlerSet {
     /**
-     * Gets the best fitting LoaderHandler for a classloader
-     * and a required action.
-     * @param context The calling classloader task.
-     * @param loader The ClassLoader to find a handler for.
-     * @param action The required action.
+     * Gets the best fitting LoaderHandler for a classloader and a required
+     * action.
+     *
+     * @param context
+     *            The calling classloader task.
+     * @param loader
+     *            The ClassLoader to find a handler for.
+     * @param action
+     *            The required action.
      * @return The best fitting LoaderHandler or null if an error occured.
      */
-    ClassLoaderHandler getHandler(
-        ClassLoaderAdapterContext context,
-        ClassLoader loader,
-        ClassLoaderAdapterAction action);
-    
+    ClassLoaderHandler getHandler(ClassLoaderAdapterContext context,
+            ClassLoader loader, ClassLoaderAdapterAction action);
+
 }

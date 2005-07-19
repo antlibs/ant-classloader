@@ -17,18 +17,22 @@
 package org.apache.tools.ant.taskdefs.classloader.report;
 
 import java.io.PrintStream;
+
 /**
  * makes reporting destination transparent for reporting objects.
  */
 public class FormattedPrintStreamReporter extends AbstractFormattedReporter {
     private final PrintStream stream;
-    public FormattedPrintStreamReporter(ClassloaderReportFormatter fmt, PrintStream stream) {
+    public FormattedPrintStreamReporter(ClassloaderReportFormatter fmt,
+            PrintStream stream) {
         super(fmt);
-        this.stream = (stream==null)?System.out:stream;
+        this.stream = (stream == null) ? System.out : stream;
     }
     /**
      * writes a message line to the reporting dest.
-     * @param s the message line to report.
+     *
+     * @param s
+     *            the message line to report.
      */
     protected void report(String s) {
         stream.println(s);

@@ -24,13 +24,16 @@ import org.apache.tools.ant.taskdefs.ClassloaderBase;
  */
 public class FormattedAntLoggerReporter extends AbstractFormattedReporter {
     private ClassloaderBase task;
-    public FormattedAntLoggerReporter(ClassloaderBase task, ClassloaderReportFormatter fmt) {
+    public FormattedAntLoggerReporter(ClassloaderBase task,
+            ClassloaderReportFormatter fmt) {
         super(fmt);
         this.task = task;
     }
     /**
      * writes a message line to the reporting dest.
-     * @param s the message line to report.
+     *
+     * @param s
+     *            the message line to report.
      */
     protected void report(String s) {
         task.log(s, Project.MSG_INFO);

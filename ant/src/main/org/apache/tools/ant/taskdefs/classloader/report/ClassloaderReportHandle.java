@@ -28,6 +28,20 @@ public final class ClassloaderReportHandle implements Comparable {
     public static final int DEFINED = 8;
     public static final int PARENT = 9;
     public static final int OTHER = 10;
+    public static final ClassloaderReportHandle BOOTSTRAPHANDLE = new ClassloaderReportHandle(
+            BOOTSTRAP, null);
+    public static final ClassloaderReportHandle EXTENSIONHANDLE = new ClassloaderReportHandle(
+            EXTENSION, null);
+    public static final ClassloaderReportHandle SYSTEMHANDLE = new ClassloaderReportHandle(
+            SYSTEM, null);
+    public static final ClassloaderReportHandle PROJECTHANDLE = new ClassloaderReportHandle(
+            PROJECT, null);
+    public static final ClassloaderReportHandle COREHANDLE = new ClassloaderReportHandle(
+            CORE, null);
+    public static final ClassloaderReportHandle THREADHANDLE = new ClassloaderReportHandle(
+            THREAD, null);
+    public static final ClassloaderReportHandle CURRENTHANDLE = new ClassloaderReportHandle(
+            CURRENT, null);
     private static final String[] names = {
         "BootstrapClassloader",
         "ExtensionClassloader",
@@ -39,71 +53,64 @@ public final class ClassloaderReportHandle implements Comparable {
         "Referenced",
         "Defined TaskLoader",
         "Parent of ",
-        "other" };
-    int type;
+        "other"};
     String name;
-    public static final ClassloaderReportHandle CURRENTHANDLE = new ClassloaderReportHandle(CURRENT, null);
-    public static final ClassloaderReportHandle THREADHANDLE = new ClassloaderReportHandle(THREAD, null);
-    public static final ClassloaderReportHandle PROJECTHANDLE = new ClassloaderReportHandle(PROJECT, null);
-    public static final ClassloaderReportHandle COREHANDLE = new ClassloaderReportHandle(CORE, null);
-    public static final ClassloaderReportHandle SYSTEMHANDLE = new ClassloaderReportHandle(SYSTEM, null);
-    public static final ClassloaderReportHandle EXTENSIONHANDLE = new ClassloaderReportHandle(EXTENSION, null);
-    public static final ClassloaderReportHandle BOOTSTRAPHANDLE = new ClassloaderReportHandle(BOOTSTRAP, null);
+    int type;
     public ClassloaderReportHandle(int type, String name) {
-        this.type=type;
-        this.name=name;
+        this.type = type;
+        this.name = name;
+    }
+    public int compareTo(Object to) {
+        if (to == this) {
+            return 0;
+        }
+        ClassloaderReportHandle h = (ClassloaderReportHandle) to;
+        if (type != h.type) {
+            return (type < h.type) ? -1 : 1;
+        }
+        if ((name == null) != (h.name == null)) {
+            return (name == null) ? -1 : 1;
+        }
+        return (name == null) ? 0 : name.compareTo(h.name);
+    }
+    public boolean equals(Object to) {
+        if (to == this) {
+            return true;
+        }
+        if (to == null) {
+            return false;
+        }
+        try {
+            ClassloaderReportHandle h = (ClassloaderReportHandle) to;
+            if (type != h.type) {
+                return false;
+            }
+            if ((name == null) != (h.name == null)) {
+                return false;
+            }
+            return (name == null) ? true : name.equals(h.name);
+        } catch (ClassCastException e) {
+            return false;
+        }
+    }
+    public String getName() {
+        return name;
     }
     public String getType() {
         return names[type];
     }
-    public String getName() {
-        return name;
+    public int hashCode() {
+        if (name == null)
+            return type;
+        return type ^ name.hashCode();
     }
     public boolean isPopular() {
         return type <= CURRENT;
     }
     public String toString() {
-        if(name==null) {
+        if (name == null) {
             return getType();
         }
-        return getType()+"="+getName();
-    }
-    public int hashCode() {
-        if(name==null)
-            return type;
-        return type ^ name.hashCode();
-    }
-    public boolean equals(Object to) {
-        if(to==this) {
-            return true;
-        }
-        if(to==null) {
-            return false;
-        }
-        try {
-            ClassloaderReportHandle h=(ClassloaderReportHandle)to;
-            if (type!=h.type) {
-                return false;
-            }
-            if((name==null)!=(h.name==null)) {
-                return false;
-            }
-            return (name==null)?true:name.equals(h.name);
-        } catch(ClassCastException e) {
-            return false;
-        }
-    }
-    public int compareTo(Object to) {
-        if(to==this) {
-            return 0;
-        }
-        ClassloaderReportHandle h=(ClassloaderReportHandle)to;
-        if (type!=h.type) {
-            return (type<h.type)?-1:1;
-        }
-        if((name==null)!=(h.name==null)) {
-            return (name==null)?-1:1;
-        }
-        return (name==null)?0:name.compareTo(h.name);
+        return getType() + "=" + getName();
     }
 }

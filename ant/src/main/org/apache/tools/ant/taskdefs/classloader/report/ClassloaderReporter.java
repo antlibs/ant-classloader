@@ -18,63 +18,62 @@ package org.apache.tools.ant.taskdefs.classloader.report;
 
 import java.net.URL;
 
-
 public interface ClassloaderReporter {
-
-    void reportClass(Class s);
-
-    void beginReport();
-
-    void endReport();
-
-    void beginClassloader(ClassloaderReportHandle name);
-
-    void endClassloader(ClassloaderReportHandle name);
-
-    void beginEntries(int num);
-
-    void endEntries(int num);
 
     void beginAttributes(int num);
 
-    void endAttributes(int num);
-
     void beginChildLoaders(int num);
 
-    void endChildLoaders(int num);
+    void beginClassloader(ClassloaderReportHandle name);
 
-    void reportEntry(URL url);
-
-    void reportEntry(String type, String entry);
+    void beginEntries(int num);
 
     void beginErrors(int num);
-    
-    void endErrors(int num);
-    
-    void beginUnassignedRoles(int num);
-    
-    void endUnassignedRoles(int num);
 
     void beginPackages(int num);
 
-    void endPackages(int num);
+    void beginReport();
 
     void beginRoles(int num);
 
+    void beginUnassignedRoles(int num);
+
+    void endAttributes(int num);
+
+    void endChildLoaders(int num);
+
+    void endClassloader(ClassloaderReportHandle name);
+
+    void endEntries(int num);
+
+    void endErrors(int num);
+
+    void endPackages(int num);
+
+    void endReport();
+
     void endRoles(int num);
 
-    void reportPackage(String pkg);
+    void endUnassignedRoles(int num);
 
     void reportAttribute(String name, String value);
+
+    void reportClass(Class s);
+
+    void reportEntry(String type, String entry);
+
+    void reportEntry(URL url);
+
+    void reportError(String msg);
 
     void reportExlicitelyParent(ClassloaderReportHandle handle);
 
     void reportImplicitelyParent(ClassloaderReportHandle handle);
 
-    void reportError(String msg);
-
-    void reportUnassignedRole(ClassloaderReportHandle handle);
+    void reportPackage(String pkg);
 
     void reportRole(ClassloaderReportHandle handle);
+
+    void reportUnassignedRole(ClassloaderReportHandle handle);
 
 }

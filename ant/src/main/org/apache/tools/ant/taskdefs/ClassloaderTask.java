@@ -33,16 +33,15 @@ import org.apache.tools.ant.types.LoaderRef;
 import org.apache.tools.ant.types.Reference;
 import org.apache.tools.ant.types.URLPath;
 
-public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapterContext.CreateModify {
+public class ClassloaderTask extends ClassloaderBase implements
+        ClassLoaderAdapterContext.CreateModify {
 
     /**
      * Enumeration for the values of duplicateEntry attribute.
      */
     public static class DuplicateEntry extends EnumeratedAttribute {
         /** Enumerated values */
-        private static final int IGNORE = 0,
-            WARN = 1,
-            OMIT = 2;
+        private static final int IGNORE = 0, WARN = 1, OMIT = 2;
         /**
          * Default Constructor.
          */
@@ -50,40 +49,17 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         }
         /**
          * Value'd Constructor.
-         * @param value One of enumerated values.
+         *
+         * @param value
+         *            One of enumerated values.
          */
         public DuplicateEntry(String value) {
             setValue(value);
         }
         /**
-         * Get the values.
-         * @return An array of the allowed values for this attribute.
-         */
-        public String[] getValues() {
-            return new String[] {
-                "ignore",
-                "warn",
-                "omit" };
-        }
-        /**
-         * Indicates whether duplicate entries needs to be checked.
-         * @return <code>true</code>, if duplicate entries needs to be checked,
-         * <code>false</code> otherwise. 
-         */
-        public boolean requiresCheck() {
-            return (getIndex()!=IGNORE); 
-        }
-        /**
-         * Indicates whether duplicate entries should be omitted.
-         * @return <code>true</code>, if duplicate entries should be omitted,
-         * <code>false</code> otherwise. 
-         */
-        public boolean isOmitDuplicate() {
-            return (getIndex()!=OMIT); 
-        }
-        /**
          * Get the logging level for reporting duplicate entries.
-         * @return Logging level for reporting duplicate entries. 
+         *
+         * @return Logging level for reporting duplicate entries.
          */
         public int getDuplicateLogLevel() {
             switch (getIndex()) {
@@ -95,30 +71,120 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
                 return -1;
             }
         }
+        /**
+         * Get the values.
+         *
+         * @return An array of the allowed values for this attribute.
+         */
+        public String[] getValues() {
+            return new String[] { "ignore", "warn", "omit" };
+        }
+        /**
+         * Indicates whether duplicate entries should be omitted.
+         *
+         * @return <code>true</code>, if duplicate entries should be omitted,
+         *         <code>false</code> otherwise.
+         */
+        public boolean isOmitDuplicate() {
+            return (getIndex() != OMIT);
+        }
+        /**
+         * Indicates whether duplicate entries needs to be checked.
+         *
+         * @return <code>true</code>, if duplicate entries needs to be
+         *         checked, <code>false</code> otherwise.
+         */
+        public boolean requiresCheck() {
+            return (getIndex() != IGNORE);
+        }
     }
 
-    private LoaderRef loader = null;
     private URLPath classpath = null;
-    private ClassloaderTask.DuplicateEntry duplicateEntry = new ClassloaderTask.DuplicateEntry("omit");
-    private LoaderRef superLoader = null;
-    private boolean reset = false;
-    private String property = null;
-    private String loaderName = null;
-    private LoaderRef parentLoader = null;
+    private ClassloaderTask.DuplicateEntry duplicateEntry = new ClassloaderTask.DuplicateEntry(
+            "omit");
     private ClassLoaderHandler handler = null;
+    private LoaderRef loader = null;
+    private String loaderName = null;
     private ClassLoaderParameters parameters = null;
+    private LoaderRef parentLoader = null;
+    private String property = null;
+    private boolean reset = false;
+    private LoaderRef superLoader = null;
 
     public ClassloaderTask() {
     }
     /**
+     * Sets a nested Descriptor element for an AntClassLoader.
+     *
+     * @param desc
+     *            the parameters.
+     */
+    public void addAntParameters(AntLoaderParameters desc) {
+        parameters = desc;
+    }
+    /**
+     * Sets a nested LoaderHandler element.
+     *
+     * @param handler
+     *            the loaderHandler.
+     */
+    public void addConfiguredHandler(LoaderHandler handler) {
+        handler.check();
+        if (this.handler != null) {
+            throw new BuildException(
+                    "nested element handler can only specified once");
+        }
+        this.handler = handler;
+    }
+    /**
      * Sets a nested loader element.
-     * @param loader The loader definition.
+     *
+     * @param loader
+     *            The loader definition.
      */
     public void addLoader(LoaderRef loader) {
         if (loader.isStandardLoader(LoaderRef.LoaderSpec.NONE)) {
             throw new BuildException("nested element loader can not be 'none'");
         }
         this.loader = loader;
+    }
+    /**
+     * Sets a nested ClassLoaderParameters element.
+     *
+     * @param desc
+     *            The parameters.
+     */
+    public void addParameters(LoaderParameters desc) {
+        parameters = desc;
+    }
+    /**
+     * Sets the nested parentLoader element.
+     *
+     * @param loader
+     *            The parentLoader
+     */
+    public void addParentLoader(LoaderRef loader) {
+        this.parentLoader = loader;
+    }
+    /**
+     * Sets the nested superLoader element.
+     *
+     * @param loader
+     *            The superLoader.
+     */
+    public void addSuperLoader(LoaderRef loader) {
+        this.parentLoader = loader;
+    }
+    /**
+     * creates a nested classpath element.
+     *
+     * @return the classpath.
+     */
+    public URLPath createClasspath() {
+        if (this.classpath == null) {
+            this.classpath = new URLPath(getProject());
+        }
+        return this.classpath.createUrlpath();
     }
     /**
      * Executes this task.
@@ -133,30 +199,6 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         if (property != null) {
             this.executeProperty();
         }
-    }
-    /**
-     * Sets the nested parentLoader element.
-     * @param loader The parentLoader
-     */
-    public void addParentLoader(LoaderRef loader) {
-        this.parentLoader = loader;
-    }
-    /**
-     * Sets the nested superLoader element.
-     * @param loader The superLoader.
-     */
-    public void addSuperLoader(LoaderRef loader) {
-        this.parentLoader = loader;
-    }
-    /**
-     * creates a nested classpath element.
-     * @return the classpath.
-     */
-    public URLPath createClasspath() {
-        if (this.classpath == null) {
-            this.classpath = new URLPath(getProject());
-        }
-        return this.classpath.createUrlpath();
     }
     private boolean executeCreateModify() {
         URLPath classPath = getClasspath();
@@ -178,29 +220,25 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
 
         // Gump friendly - don't mess with the core loader if only classpath
         if ("only".equals(getProject().getProperty("build.sysclasspath"))
-         && loader.equalsSysLoader()) {
+                && loader.equalsSysLoader()) {
             log("Changing " + loader.getName() + " is disabled "
-                    + "by build.sysclasspath=only",
-                Project.MSG_WARN);
+                    + "by build.sysclasspath=only", Project.MSG_WARN);
             return true;
         }
 
         if (reset && !loader.isResetPossible()) {
-            this.handleError("reseting " + loader.getName() + " is not possible");
+            this.handleError("reseting " + loader.getName()
+                    + " is not possible");
             return false;
         }
         if (create && !loader.isResetPossible()) {
-            this.handleError("creating " + loader.getName() + " is not possible");
+            this.handleError("creating " + loader.getName()
+                    + " is not possible");
             return false;
         }
-        log(
-            "handling "
-                + this.getLoaderName()
-                + ": "
-                + ((classloader == null) ? "not " : "")
-                + "found, cp="
-                + this.getClasspath(),
-            Project.MSG_DEBUG);
+        log("handling " + this.getLoaderName() + ": "
+                + ((classloader == null) ? "not " : "") + "found, cp="
+                + this.getClasspath(), Project.MSG_DEBUG);
         if (classloader == null) {
             ClassLoaderHandler handler = getHandler();
             if (handler == null) {
@@ -220,7 +258,8 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
             }
             ClassLoaderAdapter adapter;
             try {
-                adapter = ClassloaderUtil.findAdapter(this, classloader, ClassLoaderAdapterAction.APPEND);
+                adapter = ClassloaderUtil.findAdapter(this, classloader,
+                        ClassLoaderAdapterAction.APPEND);
             } catch (ClassloaderUtil.AdapterException e) {
                 switch (e.getReason()) {
                 case ClassloaderUtil.AdapterException.NO_HANDLER:
@@ -230,7 +269,8 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
                     log("NO ADAPTER", Project.MSG_DEBUG);
                     return false;
                 }
-                throw new BuildException("unexpected reason "+e.getReason(),e);
+                throw new BuildException("unexpected reason " + e.getReason(),
+                        e);
             }
             if (!adapter.appendClasspath(this, classloader)) {
                 log("NO APPEND", Project.MSG_DEBUG);
@@ -243,7 +283,8 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         ClassLoader cl = loader.getClassLoader(null);
         ClassLoaderAdapter adapter;
         try {
-            adapter = ClassloaderUtil.findAdapter(this, cl, ClassLoaderAdapterAction.GETPATH);
+            adapter = ClassloaderUtil.findAdapter(this, cl,
+                    ClassLoaderAdapterAction.GETPATH);
         } catch (ClassloaderUtil.AdapterException e) {
             return false;
         }
@@ -261,31 +302,27 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         getProject().setProperty(property, propValue.toString());
         return true;
     }
+    public Object getAntProject() {
+        return getProject();
+    }
     /**
      * Gets the classpath to add to a classloader.
+     *
      * @return The classpath.
      */
     public URLPath getClasspath() {
         return classpath;
     }
-    public String[] getClasspathURLs() {
-        return classpath.list();
-    }
     public String[] getClasspathFiles() {
         return classpath.toPath().list();
     }
-    /**
-     * Gets the parameters for a newly created classloader.
-     * @return The parameters
-     */
-    public ClassLoaderParameters getParameters() {
-        if (parameters == null) {
-            parameters = new LoaderParameters(getProject());
-        }
-        return parameters;
+
+    public String[] getClasspathURLs() {
+        return classpath.list();
     }
     /**
      * Gets the handler to create a new classloader.
+     *
      * @return The handler
      */
     public ClassLoaderHandler getHandler() {
@@ -294,14 +331,10 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         }
         return handler;
     }
-    protected LoaderHandlerSet newHandlerSet() {
-        LoaderHandlerSet result= new LoaderHandlerSet(getProject());
-        result.addConfiguredHandler(getHandler());
-        return result;
-    }
-
     /**
-     * Gets the name of the described classloader for logging and report purposes.
+     * Gets the name of the described classloader for logging and report
+     * purposes.
+     *
      * @return The name.
      */
     public String getLoaderName() {
@@ -311,7 +344,19 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         return loaderName;
     }
     /**
+     * Gets the parameters for a newly created classloader.
+     *
+     * @return The parameters
+     */
+    public ClassLoaderParameters getParameters() {
+        if (parameters == null) {
+            parameters = new LoaderParameters(getProject());
+        }
+        return parameters;
+    }
+    /**
      * Gets the parent ClassLoader as defined via the parentLoader attribute.
+     *
      * @return parent ClassLoader or null if not defined.
      */
     public ClassLoader getParentLoader() {
@@ -322,6 +367,7 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
     }
     /**
      * Gets the super classloader to create a new classloader with.
+     *
      * @return the super loader.
      */
     public ClassLoader getSuperLoader() {
@@ -331,10 +377,12 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         return superLoader.getClassLoader(null, failOnError, false);
     }
     /**
-     * Handles a classpath entry. 
-     * @param entry The entry.
-     * @return Indicates, whether the adapter should add the duplicate entry
-     * to the existing classloader or not.
+     * Handles a classpath entry.
+     *
+     * @param entry
+     *            The entry.
+     * @return Indicates, whether the adapter should add the duplicate entry to
+     *         the existing classloader or not.
      */
     public boolean handleClasspathEntry(ClassLoader cl, String entryUrl) {
         if (!duplicateEntry.requiresCheck()) {
@@ -349,10 +397,17 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         }
         return !duplicateEntry.isOmitDuplicate();
     }
+    protected LoaderHandlerSet newHandlerSet() {
+        LoaderHandlerSet result = new LoaderHandlerSet(getProject());
+        result.addConfiguredHandler(getHandler());
+        return result;
+    }
     /**
-     * Specify which path will be used. If the loader already exists
-     * the path will be added to the loader.
-     * @param classpath An Ant Path object containing the classpath.
+     * Specify which path will be used. If the loader already exists the path
+     * will be added to the loader.
+     *
+     * @param classpath
+     *            An Ant Path object containing the classpath.
      */
     public void setClasspath(URLPath classpath) {
         if (this.classpath == null) {
@@ -362,16 +417,30 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
         }
     }
     /**
-     * Specify which path will be used. If the loader already exists
-     * the path will be added to the loader.
-     * @param pathRef Reference to a path defined elsewhere
+     * Specify which path will be used. If the loader already exists the path
+     * will be added to the loader.
+     *
+     * @param pathRef
+     *            Reference to a path defined elsewhere
      */
     public void setClasspathRef(Reference pathRef) {
         createClasspath().addReference(pathRef);
     }
     /**
+     * Sets a nested LoaderHandler element.
+     *
+     * @param handler
+     *            The loaderHandler.
+     */
+    public void setHandler(LoaderHandler handler) {
+        handler.check();
+        this.handler = handler;
+    }
+    /**
      * Sets the loader attribute.
-     * @param loader The loader.
+     *
+     * @param loader
+     *            The loader.
      */
     public void setLoader(LoaderRef loader) {
         if (loader.isStandardLoader(LoaderRef.LoaderSpec.NONE)) {
@@ -381,78 +450,50 @@ public class ClassloaderTask extends ClassloaderBase implements ClassLoaderAdapt
     }
     /**
      * Sets the parameters attribute.
-     * @param desc The parameters.
+     *
+     * @param desc
+     *            The parameters.
      */
     public void setParameters(LoaderParameters desc) {
         parameters = desc;
     }
     /**
      * Sets the parentLoader attribute.
-     * @param loader The parent loader.
+     *
+     * @param loader
+     *            The parent loader.
      */
     public void setParentLoader(LoaderRef loader) {
         this.parentLoader = loader;
     }
     /**
      * Sets the property to put the ClassLoader's path into.
-     * @param property Name of the property.
+     *
+     * @param property
+     *            Name of the property.
      */
     public void setProperty(String property) {
         this.property = property;
     }
     /**
-     * Reset the classloader, if it already exists. A new loader will
-     * be created and all the references to the old one will be removed.
-     * (it is not possible to remove paths from a loader). The new
-     * path will be used.
+     * Reset the classloader, if it already exists. A new loader will be created
+     * and all the references to the old one will be removed. (it is not
+     * possible to remove paths from a loader). The new path will be used.
      *
-     * @param onOff <code>false</code> if the loader is to be reset.
+     * @param onOff
+     *            <code>false</code> if the loader is to be reset.
      */
     public void setReset(boolean onOff) {
         this.reset = onOff;
     }
     /**
      * Sets the superLoader attribute.
-     * @param loader The superLoader.
+     *
+     * @param loader
+     *            The superLoader.
      */
     public void setSuperLoader(LoaderRef loader) {
         this.parentLoader = loader;
-    }
-    /**
-     * Sets a nested LoaderHandler element.
-     * @param handler the loaderHandler.
-     */
-    public void addConfiguredHandler(LoaderHandler handler) {
-        handler.check();
-        if (this.handler != null) {
-            throw new BuildException("nested element handler can only specified once");
-        }
-        this.handler = handler;
-    }
-    /**
-     * Sets a nested LoaderHandler element.
-     * @param handler The loaderHandler.
-     */
-    public void setHandler(LoaderHandler handler) {
-        handler.check();
-        this.handler = handler;
-    }
-    /**
-     * Sets a nested Descriptor element for an AntClassLoader.
-     * @param desc the parameters.
-     */
-    public void addAntParameters(AntLoaderParameters desc) {
-        parameters = desc;
-    }
-    /**
-     * Sets a nested ClassLoaderParameters element.
-     * @param desc The parameters.
-     */
-    public void addParameters(LoaderParameters desc) {
-        parameters = desc;
-    }
-    public Object getAntProject() {
-        return getProject();
     }
 
 }

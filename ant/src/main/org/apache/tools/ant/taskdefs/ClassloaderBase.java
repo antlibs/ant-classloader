@@ -32,20 +32,22 @@ import org.apache.tools.ant.util.URLUtils;
  *
  * The classpath is a regular path.
  *
- * Taskdef and typedef can use the loader you create with the loaderRef attribute.
+ * Taskdef and typedef can use the loader you create with the loaderRef
+ * attribute.
  *
- * This tasks will not modify the core loader, the project loader
- * or the system loader if "build.sysclasspath=only"
+ * This tasks will not modify the core loader, the project loader or the system
+ * loader if "build.sysclasspath=only"
  *
  * The typical use is:
- * <pre>
- *  &lt;path id="ant.deps" &gt;
- *     &lt;fileset dir="myDir" &gt;
- *        &lt;include name="junit.jar, bsf.jar, js.jar, etc"/&gt;
- *     &lt;/fileset&gt;
- *  &lt;/path&gt;
  *
- *  &lt;classloader loader="project" classpathRef="ant.deps" /&gt;
+ * <pre>
+ *   &lt;path id=&quot;ant.deps&quot; &gt;
+ *      &lt;fileset dir=&quot;myDir&quot; &gt;
+ *         &lt;include name=&quot;junit.jar, bsf.jar, js.jar, etc&quot;/&gt;
+ *      &lt;/fileset&gt;
+ *   &lt;/path&gt;
+ *
+ *   &lt;classloader loader=&quot;project&quot; classpathRef=&quot;ant.deps&quot; /&gt;
  *
  * </pre>
  *
@@ -61,35 +63,36 @@ public class ClassloaderBase extends Task implements ClassLoaderAdapterContext {
     }
     /**
      * Sets a nested HandlerSet element.
-     * @param handlerSet The handlerSet
+     *
+     * @param handlerSet
+     *            The handlerSet
      */
     public void addHandlerSet(LoaderHandlerSet handlerSet) {
         if (this.handlerSet != null) {
-            throw new BuildException("nested element handlerSet may only specified once");
+            throw new BuildException(
+                    "nested element handlerSet may only specified once");
         }
         this.handlerSet = handlerSet;
     }
     /**
      * Sets a HandlerSet ref.
-     * @param handlerSet The handlerSet
+     *
+     * @param handlerSet
+     *            The handlerSet
      */
     public void setHandlerSet(LoaderHandlerSet handlerSet) {
         this.handlerSet = handlerSet;
     }
     /*
-    private String formatIndex(int i) {
-        String x = String.valueOf(i + 1);
-        if (x.length() == 1) {
-            return " " + x;
-        }
-        return x;
-    }
-    */
+     * private String formatIndex(int i) { String x = String.valueOf(i + 1); if
+     * (x.length() == 1) { return " " + x; } return x; }
+     */
     protected LoaderHandlerSet newHandlerSet() {
         return new LoaderHandlerSet(getProject());
     }
     /**
      * Gets the handlerset to analyze a given classloader with.
+     *
      * @return The handlerset.
      */
     public ClassLoaderHandlerSet getHandlerSet() {
@@ -99,32 +102,41 @@ public class ClassloaderBase extends Task implements ClassLoaderAdapterContext {
         return handlerSet;
     }
     public void handleWarning(String msg) {
-        log(msg,Project.MSG_WARN);
+        log(msg, Project.MSG_WARN);
     }
     public void handleDebug(String msg) {
-        log(msg,Project.MSG_DEBUG);
+        log(msg, Project.MSG_DEBUG);
     }
 
     /**
      * Handles an error with respect to the failonerror attribute.
-     * @param msg Error message.
+     *
+     * @param msg
+     *            Error message.
      */
     public void handleError(String msg) {
         handleError(msg, null, null);
     }
     /**
      * Handles an error with respect to the failonerror attribute.
-     * @param msg Error message.
-     * @param ex Causing exception.
+     *
+     * @param msg
+     *            Error message.
+     * @param ex
+     *            Causing exception.
      */
     public void handleError(String msg, Throwable ex) {
         handleError(msg, ex, null);
     }
     /**
      * Handles an error with respect to the failonerror attribute.
-     * @param msg Error message.
-     * @param ex Causing exception.
-     * @param loc Location.
+     *
+     * @param msg
+     *            Error message.
+     * @param ex
+     *            Causing exception.
+     * @param loc
+     *            Location.
      */
     public void handleError(String msg, Throwable ex, Location loc) {
         if (loc == null) {
@@ -141,7 +153,9 @@ public class ClassloaderBase extends Task implements ClassLoaderAdapterContext {
 
     /**
      * Sets the failonerror attribute.
-     * @param onOff Value.
+     *
+     * @param onOff
+     *            Value.
      */
     public void setFailonerror(boolean onOff) {
         this.failOnError = onOff;

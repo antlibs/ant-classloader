@@ -22,16 +22,21 @@ import java.net.URL;
 
 public interface ClassLoaderURLUtil {
     /**
-     * Creates a URL from a absolute or relative file or url.
-     * @param fileOrURL Absolute or relative file or url.
-     * @return An URL.
-     * @throws MalformedURLException If <code>new URL()</code> throws it.
-     */
-    URL createURL(String fileOrURL) throws MalformedURLException;
-    /**
      * Creates a file from a absolute or relative file or url.
-     * @param fileOrURL Absolute or relative file or url.
+     *
+     * @param fileOrURL
+     *            Absolute or relative file or url.
      * @return A file.
      */
     File createFile(String fileOrURL);
+    /**
+     * Creates a URL from a absolute or relative file or url.
+     *
+     * @param fileOrURL
+     *            Absolute or relative file or url.
+     * @return An URL.
+     * @throws MalformedURLException
+     *             If <code>new URL()</code> throws it.
+     */
+    URL createURL(String fileOrURL) throws MalformedURLException;
 }

@@ -31,7 +31,8 @@ import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderXMLFormatter;
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedAntLoggerReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.TreeBuilderReporter;
 
-public class ClassloaderReport extends ClassloaderBase implements ClassLoaderAdapterContext.Report {
+public class ClassloaderReport extends ClassloaderBase implements
+        ClassLoaderAdapterContext.Report {
 
     private boolean reportPackages = false;
     public ClassloaderReport() {
@@ -41,72 +42,61 @@ public class ClassloaderReport extends ClassloaderBase implements ClassLoaderAda
      * handle the report.
      */
     public void execute() {
-        //let's hope, that no classloader implementation overrides
+        // let's hope, that no classloader implementation overrides
         // equals/hashCode
-        //for 1.4 IdentityHashMap should be used for handlesByLoader
+        // for 1.4 IdentityHashMap should be used for handlesByLoader
         HashMap handlesByLoader = new HashMap();
         TreeMap loaderByHandle = new TreeMap();
-        //fileoutput and xml-format to be implemented.
+        // fileoutput and xml-format to be implemented.
         TreeBuilderReporter to = new TreeBuilderReporter();
         boolean addSuccess = true;
-        ClassLoader extCl=ClassLoader.getSystemClassLoader().getParent();
-        ClassLoaderReportUtil reportUtil=ClassLoaderReportUtil.getReportUtil();
-        if((extCl!=null)&&(extCl.getClass().getName().equals("sun.misc.Launcher$ExtClassLoader"))) {
-            if (!reportUtil.addLoaderToReport(this,
-               extCl,
-                    ClassloaderReportHandle.EXTENSIONHANDLE,
-                    handlesByLoader,
+        ClassLoader extCl = ClassLoader.getSystemClassLoader().getParent();
+        ClassLoaderReportUtil reportUtil = ClassLoaderReportUtil
+                .getReportUtil();
+        if ((extCl != null)
+                && (extCl.getClass().getName()
+                        .equals("sun.misc.Launcher$ExtClassLoader"))) {
+            if (!reportUtil.addLoaderToReport(this, extCl,
+                    ClassloaderReportHandle.EXTENSIONHANDLE, handlesByLoader,
                     loaderByHandle, to)) {
-                    addSuccess = false;
-                }
+                addSuccess = false;
+            }
         }
-        if (!reportUtil.addLoaderToReport(this,
-            ClassLoader.getSystemClassLoader(),
-            ClassloaderReportHandle.SYSTEMHANDLE,
-            handlesByLoader,
-            loaderByHandle, to)) {
+        if (!reportUtil.addLoaderToReport(this, ClassLoader
+                .getSystemClassLoader(), ClassloaderReportHandle.SYSTEMHANDLE,
+                handlesByLoader, loaderByHandle, to)) {
             addSuccess = false;
         }
-        if (!reportUtil.addLoaderToReport(this,
-            getProject().getClass().getClassLoader(),
-            ClassloaderReportHandle.PROJECTHANDLE,
-            handlesByLoader,
-            loaderByHandle, to)) {
+        if (!reportUtil.addLoaderToReport(this, getProject().getClass()
+                .getClassLoader(), ClassloaderReportHandle.PROJECTHANDLE,
+                handlesByLoader, loaderByHandle, to)) {
             addSuccess = false;
         }
-        if (!reportUtil.addLoaderToReport(this,
-            getClass().getClassLoader(),
-            ClassloaderReportHandle.CURRENTHANDLE,
-            handlesByLoader,
-            loaderByHandle, to)) {
+        if (!reportUtil.addLoaderToReport(this, getClass().getClassLoader(),
+                ClassloaderReportHandle.CURRENTHANDLE, handlesByLoader,
+                loaderByHandle, to)) {
             addSuccess = false;
         }
-        if (!reportUtil.addLoaderToReport(this,
-            Thread.currentThread().getContextClassLoader(),
-            ClassloaderReportHandle.THREADHANDLE,
-            handlesByLoader,
-            loaderByHandle, to)) {
+        if (!reportUtil.addLoaderToReport(this, Thread.currentThread()
+                .getContextClassLoader(), ClassloaderReportHandle.THREADHANDLE,
+                handlesByLoader, loaderByHandle, to)) {
             addSuccess = false;
         }
-        if (!reportUtil.addLoaderToReport(this,
-            getProject().getCoreLoader(),
-            ClassloaderReportHandle.COREHANDLE,
-            handlesByLoader,
-            loaderByHandle, to)) {
+        if (!reportUtil.addLoaderToReport(this, getProject().getCoreLoader(),
+                ClassloaderReportHandle.COREHANDLE, handlesByLoader,
+                loaderByHandle, to)) {
             addSuccess = false;
         }
-        String[] rNames =
-            (String[]) getProject().getReferences().keySet().toArray(
-                new String[getProject().getReferences().size()]);
+        String[] rNames = (String[]) getProject().getReferences().keySet()
+                .toArray(new String[getProject().getReferences().size()]);
         Arrays.sort(rNames);
         for (int i = 0; i < rNames.length; i++) {
             Object val = getProject().getReference(rNames[i]);
             if (val instanceof ClassLoader) {
-                if (!reportUtil.addLoaderToReport(this,
-                    (ClassLoader) val,
-                    new ClassloaderReportHandle(ClassloaderReportHandle.REFERENCED, rNames[i]),
-                    handlesByLoader,
-                    loaderByHandle, to)) {
+                if (!reportUtil.addLoaderToReport(this, (ClassLoader) val,
+                        new ClassloaderReportHandle(
+                                ClassloaderReportHandle.REFERENCED, rNames[i]),
+                        handlesByLoader, loaderByHandle, to)) {
                     addSuccess = false;
                 }
             }
@@ -118,32 +108,37 @@ public class ClassloaderReport extends ClassloaderBase implements ClassLoaderAda
         for (int i = 0; i < rNames.length; i++) {
             AntTypeDefinition val = ch.getDefinition(rNames[i]);
             if (val.getClassLoader() != null) {
-                if (!reportUtil.addLoaderToReport(this,
-                    val.getClassLoader(),
-                    new ClassloaderReportHandle(ClassloaderReportHandle.DEFINED, rNames[i]),
-                    handlesByLoader,
-                    loaderByHandle, to)) {
+                if (!reportUtil.addLoaderToReport(this, val.getClassLoader(),
+                        new ClassloaderReportHandle(
+                                ClassloaderReportHandle.DEFINED, rNames[i]),
+                        handlesByLoader, loaderByHandle, to)) {
                     addSuccess = false;
                 }
             }
         }
         rNames = null;
-        reportUtil.report(this, handlesByLoader, loaderByHandle, to, addSuccess);
-        ClassloaderReporter destReporter = new FormattedAntLoggerReporter(this, new ClassloaderXMLFormatter());
-        to.execute(destReporter);        
+        reportUtil
+                .report(this, handlesByLoader, loaderByHandle, to, addSuccess);
+        ClassloaderReporter destReporter = new FormattedAntLoggerReporter(this,
+                new ClassloaderXMLFormatter());
+        to.execute(destReporter);
 
     }
     /**
      * Indicates whether packages should been reported
-     * @return <code>true</code>, if packages should been reported, else <code>false</code>.
+     *
+     * @return <code>true</code>, if packages should been reported, else
+     *         <code>false</code>.
      */
     public boolean isReportPackages() {
         return reportPackages;
     }
     /**
      * Sets the reportPackages attribute.
-     * @param onOff Indicates whether to include packages in the report or not. 
-     * Defaults to <code>false</code>.
+     *
+     * @param onOff
+     *            Indicates whether to include packages in the report or not.
+     *            Defaults to <code>false</code>.
      */
     public void setReportpackages(boolean onOff) {
         reportPackages = onOff;

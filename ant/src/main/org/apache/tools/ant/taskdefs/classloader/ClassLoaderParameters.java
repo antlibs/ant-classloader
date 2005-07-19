@@ -22,12 +22,14 @@ package org.apache.tools.ant.taskdefs.classloader;
 public interface ClassLoaderParameters {
     /**
      * returns the default handler for this descriptor.
+     *
      * @return handler.
      */
     ClassLoaderHandler getDefaultHandler();
     /**
      * returns the valuable parameter object which is either the instance itself
      * or the resolved referenced parameters.
+     *
      * @return parameters.
      */
     ClassLoaderParameters getParameters();
