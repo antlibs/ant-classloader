@@ -25,7 +25,7 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderURLUtil;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderURLUtil;
 import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
@@ -33,7 +33,7 @@ import org.apache.tools.ant.taskdefs.condition.Os;
  * @since Ant 1.7
  */
 
-public final class URLUtils implements ClassLoaderURLUtil {
+public final class URLUtils implements ClassloaderURLUtil {
     private static final FileUtils FILEUTILS = FileUtils.getFileUtils();
     private static final boolean ON_NETWARE = Os.isFamily("netware");
     private static URLUtils SINGLETON = new URLUtils();

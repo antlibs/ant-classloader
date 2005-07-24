@@ -21,30 +21,39 @@ import java.net.URLClassLoader;
 public class TestCommonClassloaders {
     private static void analyze(URLClassLoader classloader) {
         boolean isParentAssigned = classloader.getParent() != null;
-        System.out.println("  -  parent " + (isParentAssigned?"is":"IS NOT") + " assigned");
-        URL[] urls=classloader.getURLs();
-        if(urls==null)
+        System.out.println("  -  parent "
+                + (isParentAssigned ? "is" : "IS NOT") + " assigned");
+        URL[] urls = classloader.getURLs();
+        if (urls == null)
             System.out.println("  -  urls: null");
         else {
             System.out.println("  -  urls: " + urls.length + " entries");
-            for(int i = 0; i < urls.length; i++)
+            for (int i = 0; i < urls.length; i++)
                 System.out.println("        -> " + urls[i]);
         }
     }
     public static void main(String[] args) {
-        URLClassLoader systemClassloader=(URLClassLoader)ClassLoader.getSystemClassLoader();
-        boolean isSystemClassloader = TestCommonClassloaders.class.getClassLoader() == systemClassloader;
-        System.out.println("Current ClassLoader " + (isSystemClassloader?"is":"IS NOT") + " System Classloader");
+        URLClassLoader systemClassloader = (URLClassLoader) ClassLoader
+                .getSystemClassLoader();
+        boolean isSystemClassloader = TestCommonClassloaders.class
+                .getClassLoader() == systemClassloader;
+        System.out.println("Current ClassLoader "
+                + (isSystemClassloader ? "is" : "IS NOT")
+                + " System Classloader");
         System.out.println("------------------");
-        System.out.println("java.class.path: " + System.getProperty("java.class.path"));
+        System.out.println("java.class.path: "
+                + System.getProperty("java.class.path"));
         System.out.println("System Classloader");
         analyze(systemClassloader);
         System.out.println("------------------");
-        URLClassLoader extensionClassloader=(URLClassLoader)systemClassloader.getParent();
-        System.out.println("java.ext.dirs: " + System.getProperty("java.ext.dirs"));
+        URLClassLoader extensionClassloader = (URLClassLoader) systemClassloader
+                .getParent();
+        System.out.println("java.ext.dirs: "
+                + System.getProperty("java.ext.dirs"));
         System.out.println("Extension ClassLoader");
         analyze(extensionClassloader);
         System.out.println("------------------");
-        System.out.println("sun.boot.class.path: " + System.getProperty("sun.boot.class.path"));
+        System.out.println("sun.boot.class.path: "
+                + System.getProperty("sun.boot.class.path"));
     }
 }

@@ -29,7 +29,7 @@ import java.util.TreeSet;
 /**
  * makes reporting destination transparent for reporting objects.
  */
-public final class TreeBuilderReporter implements ClassloaderReporter {
+public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuilder {
     private static class CL {
         private static class Attr {
             private final String name;

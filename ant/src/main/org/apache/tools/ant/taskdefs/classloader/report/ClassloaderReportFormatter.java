@@ -17,37 +17,293 @@
 package org.apache.tools.ant.taskdefs.classloader.report;
 
 import java.net.URL;
-
+/**
+ * Interface for ClassloaderReportFormatter.
+ * @since Ant1.7
+ */
 public interface ClassloaderReportFormatter {
-    public String beginAttributes(int num, String[] prefix);
-    public String beginChildLoaders(int num, String[] prefix);
-    public String beginClassloader(ClassloaderReportHandle name, String[] prefix);
-    public String beginEntries(int num, String[] prefix);
-    public String beginErrors(int num, String[] prefix);
-    public String beginPackages(int num, String[] prefix);
-    public String beginReport(String[] prefix);
-    public String beginRoles(int num, String[] prefix);
-    public String beginUnassignedRoles(int num, String[] prefix);
-    public String endAttributes(int num, String[] prefix);
-    public String endChildLoaders(int num, String[] prefix);
-    public String endClassloader(ClassloaderReportHandle name, String[] prefix);
-    public String endEntries(int num, String[] prefix);
-    public String endErrors(int num, String[] prefix);
-    public String endPackages(int num, String[] prefix);
-    public String endReport(String[] prefix);
-    public String endRoles(int num, String[] prefix);
-    public String endUnassignedRoles(int num, String[] prefix);
-    public String formatAttribute(String name, String value, String[] prefix);
-    public String formatClass(Class cl, String[] prefix);
-    public String formatEntry(String type, String entry, String[] prefix);
-    public String formatEntry(URL url, String[] prefix);
-    public String formatError(String msg, String[] prefix);
-    public String formatExpliciteParent(ClassloaderReportHandle name,
+    /**
+     * Formats the start of the attributes-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginAttributes(int num, String[] prefix);
+    /**
+     * Formats the start of the childs-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginChildLoaders(int num, String[] prefix);
+    /**
+     * Formats the start of a childloader-section.
+     * @param name Handle of the classloader.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginClassloader(ClassloaderReportHandle name, String[] prefix);
+    /**
+     * Formats the start of the entries-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginEntries(int num, String[] prefix);
+    /**
+     * Formats the start of the errors-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginErrors(int num, String[] prefix);
+    /**
+     * Formats the start of packages-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginPackages(int num, String[] prefix);
+    /**
+     * Formats the start of the report.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginReport(String[] prefix);
+    /**
+     * Formats the start of the roles-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginRoles(int num, String[] prefix);
+    /**
+     * Formats the start of the unassigned-roles-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of (element-) formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String beginUnassignedRoles(int num, String[] prefix);
+    /**
+     * Formats the end of the attributes-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endAttributes(int num, String[] prefix);
+    /**
+     * Formats the end of the childs-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endChildLoaders(int num, String[] prefix);
+    /**
+     * Formats the end of the classloader-section.
+     * @param name Name of the classloader.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endClassloader(ClassloaderReportHandle name, String[] prefix);
+    /**
+     * Formats the end of the entries-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endEntries(int num, String[] prefix);
+    /**
+     * Formats the end of the errors-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endErrors(int num, String[] prefix);
+    /**
+     * Formats the end of the packages-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endPackages(int num, String[] prefix);
+    /**
+     * Formats the end of the report.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endReport(String[] prefix);
+    /**
+     * Formats the end of the roles-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endRoles(int num, String[] prefix);
+    /**
+     * Formats the end of the unassigned-roles-section.
+     * @param num Number of elements.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String endUnassignedRoles(int num, String[] prefix);
+    /**
+     * Formats a single attribute.
+     * @param name Name of the attribute.
+     * @param value Value of the attribute.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatAttribute(String name, String value, String[] prefix);
+    /**
+     * Formats the class of a classloader.
+     * @param cl The class of the classloader.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatClass(Class cl, String[] prefix);
+    /**
+     * Formats a single entry.
+     * @param type Type (protocol) of the entry.
+     * @param entry Value of the entry.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatEntry(String type, String entry, String[] prefix);
+    /**
+     * Formats a single url-entry.
+     * Should be same as formatEntry("url", url.toString, prefix).
+     * @param url Url of the entry.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatEntry(URL url, String[] prefix);
+    /**
+     * Formats a single error message.
+     * @param msg Error message.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatError(String msg, String[] prefix);
+    /**
+     * Formats a classloader's explicite parent classloader.
+     * @param name Handle of the parent classloader.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatExpliciteParent(ClassloaderReportHandle name,
             String[] prefix);
-    public String formatImpliciteParent(ClassloaderReportHandle name,
+    /**
+     * Formats a classloader's implicite parent classloader.
+     * @param name Handle of the parent classloader.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatImpliciteParent(ClassloaderReportHandle name,
             String[] prefix);
-    public String formatPackage(String pkg, String[] prefix);
-    public String formatRole(ClassloaderReportHandle name, String[] prefix);
-    public String formatUnassignedRole(ClassloaderReportHandle name,
+    /**
+     * Formats a single defined package.
+     * @param pkg A defined package.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatPackage(String pkg, String[] prefix);
+    /**
+     * Formats a role.
+     * @param name Role of the classloader.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatRole(ClassloaderReportHandle name, String[] prefix);
+    /**
+     * Formats an unassigned role.
+     * @param name Unassigned role.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatUnassignedRole(ClassloaderReportHandle name,
             String[] prefix);
 }

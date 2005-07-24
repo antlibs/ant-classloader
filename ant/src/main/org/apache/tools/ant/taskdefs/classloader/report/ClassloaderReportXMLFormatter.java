@@ -18,7 +18,7 @@ package org.apache.tools.ant.taskdefs.classloader.report;
 
 import java.net.URL;
 
-public class ClassloaderXMLFormatter implements ClassloaderReportFormatter {
+public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter {
     private String TAB = "  ";
     public String beginAttributes(int num, String[] prefix) {
         String result = prefix[0] + "<attributes count=\"" + num + "\">";

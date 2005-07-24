@@ -29,8 +29,11 @@ import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
-
-public class ClassLoaderReportUtil {
+/**
+ * Utility methods for the classloader report.
+ * @since Ant 1.7
+ */
+public class ClassloaderReportUtil {
     private static final class PackageComparator implements Comparator {
         public static final Comparator SINGLETON = new PackageComparator();
         private PackageComparator() {
@@ -39,11 +42,14 @@ public class ClassLoaderReportUtil {
             return ((Package) o1).getName().compareTo(((Package) o2).getName());
         }
     }
-    protected static ClassLoaderReportUtil SINGLETON = new ClassLoaderReportUtil();
-    public static ClassLoaderReportUtil getReportUtil() {
+    protected static ClassloaderReportUtil SINGLETON = new ClassloaderReportUtil();
+    public static ClassloaderReportUtil getReportUtil() {
         return SINGLETON;
     }
-    protected ClassLoaderReportUtil() {
+    /**
+     * Constructor for derived classes. 
+     */
+    protected ClassloaderReportUtil() {
     }
     /**
      * Callback method to add classloaders to the list of loaders to report.

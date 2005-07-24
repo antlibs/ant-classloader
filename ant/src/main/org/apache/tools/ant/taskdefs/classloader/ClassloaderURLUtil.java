@@ -20,7 +20,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public interface ClassLoaderURLUtil {
+public interface ClassloaderURLUtil {
     /**
      * Creates a file from a absolute or relative file or url.
      *

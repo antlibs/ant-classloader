@@ -32,7 +32,7 @@ public interface ClassLoaderAdapterContext {
         boolean isReportPackages();
     }
     ClassLoaderHandlerSet getHandlerSet();
-    ClassLoaderURLUtil getURLUtil();
+    ClassloaderURLUtil getURLUtil();
     void handleDebug(String msg);
     void handleError(String msg);
     void handleError(String msg, Throwable ex);

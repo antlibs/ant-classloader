@@ -23,7 +23,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandlerSet;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderURLUtil;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderURLUtil;
 import org.apache.tools.ant.types.LoaderHandlerSet;
 import org.apache.tools.ant.util.URLUtils;
 
@@ -160,7 +160,7 @@ public class ClassloaderBase extends Task implements ClassLoaderAdapterContext {
     public void setFailonerror(boolean onOff) {
         this.failOnError = onOff;
     }
-    public ClassLoaderURLUtil getURLUtil() {
+    public ClassloaderURLUtil getURLUtil() {
         return URLUtils.getURLUtils();
     }
 

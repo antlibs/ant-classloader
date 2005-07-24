@@ -24,12 +24,13 @@ import java.util.TreeMap;
 import org.apache.tools.ant.AntTypeDefinition;
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
-import org.apache.tools.ant.taskdefs.classloader.report.ClassLoaderReportUtil;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportUtil;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportBuilder;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReporter;
-import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderXMLFormatter;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportXMLFormatter;
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedAntLoggerReporter;
-import org.apache.tools.ant.taskdefs.classloader.report.TreeBuilderReporter;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportTreeBuilder;
 
 public class ClassloaderReport extends ClassloaderBase implements
         ClassLoaderAdapterContext.Report {
@@ -48,10 +49,10 @@ public class ClassloaderReport extends ClassloaderBase implements
         HashMap handlesByLoader = new HashMap();
         TreeMap loaderByHandle = new TreeMap();
         // fileoutput and xml-format to be implemented.
-        TreeBuilderReporter to = new TreeBuilderReporter();
+        ClassloaderReportBuilder to = new ClassloaderReportTreeBuilder();
         boolean addSuccess = true;
         ClassLoader extCl = ClassLoader.getSystemClassLoader().getParent();
-        ClassLoaderReportUtil reportUtil = ClassLoaderReportUtil
+        ClassloaderReportUtil reportUtil = ClassloaderReportUtil
                 .getReportUtil();
         if ((extCl != null)
                 && (extCl.getClass().getName()
@@ -95,7 +96,7 @@ public class ClassloaderReport extends ClassloaderBase implements
             if (val instanceof ClassLoader) {
                 if (!reportUtil.addLoaderToReport(this, (ClassLoader) val,
                         new ClassloaderReportHandle(
-                                ClassloaderReportHandle.REFERENCED, rNames[i]),
+                                ClassloaderReportHandle.ANT_REFERENCED, rNames[i]),
                         handlesByLoader, loaderByHandle, to)) {
                     addSuccess = false;
                 }
@@ -110,7 +111,7 @@ public class ClassloaderReport extends ClassloaderBase implements
             if (val.getClassLoader() != null) {
                 if (!reportUtil.addLoaderToReport(this, val.getClassLoader(),
                         new ClassloaderReportHandle(
-                                ClassloaderReportHandle.DEFINED, rNames[i]),
+                                ClassloaderReportHandle.ANT_DEFINED, rNames[i]),
                         handlesByLoader, loaderByHandle, to)) {
                     addSuccess = false;
                 }
@@ -120,7 +121,7 @@ public class ClassloaderReport extends ClassloaderBase implements
         reportUtil
                 .report(this, handlesByLoader, loaderByHandle, to, addSuccess);
         ClassloaderReporter destReporter = new FormattedAntLoggerReporter(this,
-                new ClassloaderXMLFormatter());
+                new ClassloaderReportXMLFormatter());
         to.execute(destReporter);
 
     }
