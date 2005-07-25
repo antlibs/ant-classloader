@@ -36,9 +36,13 @@ import org.apache.tools.ant.taskdefs.condition.Os;
 public final class URLUtils implements ClassloaderURLUtil {
     private static final FileUtils FILEUTILS = FileUtils.getFileUtils();
     private static final boolean ON_NETWARE = Os.isFamily("netware");
-    private static URLUtils SINGLETON = new URLUtils();
+    private static URLUtils singleton = new URLUtils();
+    /**
+     * Gets the singleton instance.
+     * @return The singleton instance.
+     */
     public static URLUtils getURLUtils() {
-        return SINGLETON;
+        return singleton;
     }
     /**
      * creates a file from a absolute or relative file or url.

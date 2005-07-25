@@ -29,8 +29,10 @@ import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
+
 /**
  * Utility methods for the classloader report.
+ *
  * @since Ant 1.7
  */
 public class ClassloaderReportUtil {
@@ -42,12 +44,28 @@ public class ClassloaderReportUtil {
             return ((Package) o1).getName().compareTo(((Package) o2).getName());
         }
     }
-    protected static ClassloaderReportUtil SINGLETON = new ClassloaderReportUtil();
+    private static ClassloaderReportUtil singleton = new ClassloaderReportUtil();
+    /**
+     * Gets the singleton report util.
+     *
+     * @return The singleton report util.
+     */
     public static ClassloaderReportUtil getReportUtil() {
-        return SINGLETON;
+        return singleton;
     }
     /**
-     * Constructor for derived classes. 
+     * Sets the singleton report util.
+     *
+     * @param util
+     *            New singleton report util instance.
+     */
+    public static void setReportUtil(ClassloaderReportUtil util) {
+        if (util != null) {
+            singleton = util;
+        }
+    }
+    /**
+     * Constructor for derived classes.
      */
     protected ClassloaderReportUtil() {
     }
@@ -119,13 +137,14 @@ public class ClassloaderReportUtil {
     }
     /**
      * handle the report for a single classloader
-     *
+     * @param context The context.
      * @param to
-     *            Reporter to report
+     *            Reporter to report.
      * @param cl
-     *            ClassloaderBase instance to report
+     *            ClassloaderBase instance to report.
      * @param name
      *            name of the classloader instance.
+     * @param handlesByLoader Handles by loader.
      */
     public void report(ClassLoaderAdapterContext.Report context,
             ClassloaderReporter to, ClassLoader cl,
@@ -173,8 +192,9 @@ public class ClassloaderReportUtil {
                 }
             }
         }
-        if (context.isReportPackages())
+        if (context.isReportPackages()) {
             reportPackages(context, to, baseAdapter, cl, name);
+        }
         adapter = ClassloaderUtil.findAdapter(context, cl,
                 ClassLoaderAdapterAction.REPORT, to,
                 "additional parameters for " + name, "");
@@ -183,24 +203,37 @@ public class ClassloaderReportUtil {
         }
     }
     /**
-     * handle the report.
+     * Handles the report.
+     *
+     * @param context
+     *            The report context.
+     * @param handlesByLoader
+     *            A map.
+     * @param loaderByHandle
+     *            A map.
+     * @param to
+     *            The reporter to report to.
+     * @param allHandlersFound
+     *            a flag indicating whether all handlers for classloaders where
+     *            found.
      */
     public void report(ClassLoaderAdapterContext.Report context,
-            Map/* <ClassLoader,SortedSet<ReportHandle> */handlesByLoader,
+            Map/* <ClassLoader,SortedSet<ReportHandle>> */handlesByLoader,
             Map/* <ReportHandle,ClassLoader> */loaderByHandle,
             ClassloaderReporter to, boolean allHandlersFound) {
 
         to.beginReport();
         if (!allHandlersFound) {
-            to
-                    .reportError("WARNING: As of missing Loaderhandlers, this report might not be complete.");
+            to.reportError("WARNING: As of missing Loaderhandlers,"
+              + " this report might not be complete.");
         }
         URL[] urls = ClassloaderUtil.getBootstrapClasspathURLs();
         if (urls == null) {
-            to
-                    .reportError("WARNING: Unable to determine bootstrap classpath."
-                            + "\n         Please report this error to Ant's bugtracking system with information"
-                            + "\n         about your environment (JVM-Vendor, JVM-Version, OS, application context).");
+            to.reportError("WARNING: Unable to determine bootstrap classpath."
+              + "\n         Please report this error to Ant's bugtracking "
+              + " system with information"
+              + "\n         about your environment "
+              + " (JVM-Vendor, JVM-Version, OS, application context).");
         } else {
             to.beginClassloader(ClassloaderReportHandle.BOOTSTRAPHANDLE);
             to.beginEntries(urls.length);
@@ -228,7 +261,7 @@ public class ClassloaderReportUtil {
         }
         to.endReport();
     }
-    protected void reportPackages(ClassLoaderAdapterContext.Report task,
+    private void reportPackages(ClassLoaderAdapterContext.Report task,
             ClassloaderReporter to, ClassLoaderAdapter adapter,
             ClassLoader classloader, ClassloaderReportHandle role) {
         Package[] pkgs = adapter.getPackages(task, classloader, role);

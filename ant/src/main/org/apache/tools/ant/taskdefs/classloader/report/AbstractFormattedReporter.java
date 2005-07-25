@@ -19,194 +19,217 @@ package org.apache.tools.ant.taskdefs.classloader.report;
 import java.net.URL;
 
 /**
- * makes reporting destination transparent for reporting objects.
+ * Base implementation for formatted reporters.
+ * @since Ant1.7
  */
 public abstract class AbstractFormattedReporter implements ClassloaderReporter {
     private ClassloaderReportFormatter fmt;
-    private String[] prefix = { "" };
-    public AbstractFormattedReporter(ClassloaderReportFormatter fmt) {
+    private String[] prefix = {""};
+    /**
+     * Constructor for derived implementations.
+     * @param fmt The formatter to use.
+     */
+    protected AbstractFormattedReporter(ClassloaderReportFormatter fmt) {
         this.fmt = fmt;
     }
+    /**
+     * Indicates start of attributes-section.
+     * @param num Number of elements.
+     */
     public void beginAttributes(int num) {
         report(fmt.beginAttributes(num, prefix));
-
     }
+    /**
+     * Indicates start of child-section.
+     * @param num Number of elements.
+     */
     public void beginChildLoaders(int num) {
         report(fmt.beginChildLoaders(num, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginClassloader(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Indicates start of classloader reporting.
+     * @param name Handle of the classloader.
      */
     public void beginClassloader(ClassloaderReportHandle name) {
         report(fmt.beginClassloader(name, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginEntries(int)
+    /**
+     * Indicates start of entries-section.
+     * @param num Number of elements.
      */
     public void beginEntries(int num) {
         report(fmt.beginEntries(num, prefix));
     }
+    /**
+     * Indicates start of error-section.
+     * @param num Number of elements.
+     */
     public void beginErrors(int num) {
         report(fmt.beginErrors(num, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginPackages(int)
+    /**
+     * Indicates start of packages-section.
+     * @param num Number of elements.
      */
     public void beginPackages(int num) {
         report(fmt.beginPackages(num, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginReport()
+    /**
+     * Indicates start of report.
      */
     public void beginReport() {
         report(fmt.beginReport(prefix));
     }
+    /**
+     * Indicates start of role-section.
+     * @param num Number of elements.
+     */
     public void beginRoles(int num) {
         report(fmt.beginRoles(num, prefix));
     }
+    /**
+     * Indicates start of unassigned-roles-section.
+     * @param num Number of elements.
+     */
     public void beginUnassignedRoles(int num) {
         report(fmt.beginUnassignedRoles(num, prefix));
     }
+    /**
+     * Indicates end of attributes-section.
+     * @param num Number of elements.
+     */
     public void endAttributes(int num) {
         report(fmt.endAttributes(num, prefix));
     }
+    /**
+     * Indicates end of child-section.
+     * @param num Number of elements.
+     */
     public void endChildLoaders(int num) {
         report(fmt.endChildLoaders(num, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endClassloader(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Indicates end of classloader reporting.
+     * @param name Handle of the classloader.
      */
     public void endClassloader(ClassloaderReportHandle name) {
         report(fmt.endClassloader(name, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endEntries(int)
+    /**
+     * Indicates end of entries-section.
+     * @param num Number of elements.
      */
     public void endEntries(int num) {
         report(fmt.endEntries(num, prefix));
     }
+    /**
+     * Indicates end of errors-section.
+     * @param num Number of elements.
+     */
     public void endErrors(int num) {
         report(fmt.endErrors(num, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endPackages(int)
+    /**
+     * Indicates end of packages-section.
+     * @param num Number of elements.
      */
     public void endPackages(int num) {
         report(fmt.endPackages(num, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endReport()
+    /**
+     * Indicates end of report.
      */
     public void endReport() {
         report(fmt.endReport(prefix));
     }
+    /**
+     * Indicates end of roles-section.
+     * @param num Number of elements.
+     */
     public void endRoles(int num) {
         report(fmt.endRoles(num, prefix));
     }
+    /**
+     * Indicates end of unassigned-roles-section.
+     * @param num Number of elements.
+     */
     public void endUnassignedRoles(int num) {
         report(fmt.endUnassignedRoles(num, prefix));
     }
     /**
-     * writes a message line to the reporting dest.
-     *
-     * @param s
-     *            the message line to report.
+     * Writes a message line to the reporting dest.
+     * @param s The message line to report.
      */
     protected abstract void report(String s);
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportAttribute(java.lang.String,
-     *      java.lang.String)
+    /**
+     * Reports a single attribute.
+     * @param name Name of the attribute.
+     * @param value Value of the attribute.
      */
     public void reportAttribute(String name, String value) {
         report(fmt.formatAttribute(name, value, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportClass(java.lang.Class)
+    /**
+     * Reports the classloader's class.
+     * @param s Class of the classloader.
      */
     public void reportClass(Class s) {
         report(fmt.formatClass(s, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportEntry(java.lang.String,
-     *      java.lang.String)
+    /**
+     * Reports a single entry.
+     * @param type Type of the entry (f.e. url or file).
+     * @param entry The entry.
      */
     public void reportEntry(String type, String entry) {
         report(fmt.formatEntry(type, entry, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportEntry(java.net.URL)
+    /**
+     * Reports a single url entry.
+     * Same as reportEntry("url", url.toString());
+     * @param url The url.
      */
     public void reportEntry(URL url) {
         report(fmt.formatEntry(url, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportError(java.lang.String)
+    /**
+     * Reports an error.
+     * @param msg The error message.
      */
     public void reportError(String msg) {
         report(fmt.formatError(msg, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportExlicitelyParent(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports an explicit parent classloader.
+     * @param handle The parent's handle.
      */
     public void reportExlicitelyParent(ClassloaderReportHandle handle) {
         report(fmt.formatExpliciteParent(handle, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportImplicitelyParent(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports an implicit parent classloader.
+     * @param handle The parent's handle.
      */
     public void reportImplicitelyParent(ClassloaderReportHandle handle) {
         report(fmt.formatImpliciteParent(handle, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportPackage(java.lang.String)
+    /**
+     * Reports a single defined package.
+     * @param pkg The package name.
      */
     public void reportPackage(String pkg) {
         report(fmt.formatPackage(pkg, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportRole(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports a single role.
+     * @param handle The role.
      */
     public void reportRole(ClassloaderReportHandle handle) {
         report(fmt.formatRole(handle, prefix));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportUnassignedPopularLoader(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports a single unassigned role.
+     * @param handle The unassigned role.
      */
     public void reportUnassignedRole(ClassloaderReportHandle handle) {
         report(fmt.formatUnassignedRole(handle, prefix));

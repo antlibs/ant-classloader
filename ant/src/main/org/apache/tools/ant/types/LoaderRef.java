@@ -179,7 +179,7 @@ public class LoaderRef extends DataType {
                 loaderRef = ref;
             }
         } else if (r instanceof LoaderRef) {
-            setRefid(new Reference(getProject(),ref));
+            setRefid(new Reference(getProject(), ref));
         } else if (r instanceof ClassLoader) {
             loaderRef = ref;
         } else {

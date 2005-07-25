@@ -17,23 +17,26 @@
 package org.apache.tools.ant.taskdefs.classloader.report;
 
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ClassloaderBase;
+import org.apache.tools.ant.Task;
 
 /**
- * makes reporting destination transparent for reporting objects.
+ * Reports into the log of a task.
  */
 public class FormattedAntLoggerReporter extends AbstractFormattedReporter {
-    private ClassloaderBase task;
-    public FormattedAntLoggerReporter(ClassloaderBase task,
+    private Task task;
+    /**
+     * public constructor.
+     * @param task The task to log into.
+     * @param fmt The formatter.
+     */
+    public FormattedAntLoggerReporter(Task task,
             ClassloaderReportFormatter fmt) {
         super(fmt);
         this.task = task;
     }
     /**
      * writes a message line to the reporting dest.
-     *
-     * @param s
-     *            the message line to report.
+     * @param s the message line to report.
      */
     protected void report(String s) {
         task.log(s, Project.MSG_INFO);
