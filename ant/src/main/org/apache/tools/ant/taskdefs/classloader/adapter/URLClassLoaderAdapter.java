@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 
 /**
  * A ClassLoaderAdapter for a java.net.URLClassLoader
@@ -41,7 +41,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      *            the classloader instance to append the path to.
      * @return The ClassLoader instance or null if an error occured.
      */
-    public boolean appendClasspath(ClassLoaderAdapterContext.CreateModify task,
+    public boolean appendClasspath(ClassloaderContext.CreateModify task,
             ClassLoader classloader) {
 
         URLClassLoader ucl = (URLClassLoader) classloader;
@@ -93,7 +93,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      *            the leading 'file:/' prefix.
      * @return the path or null if an error occured
      */
-    public String[] getClasspath(ClassLoaderAdapterContext task,
+    public String[] getClasspath(ClassloaderContext task,
             ClassLoader classloader, boolean defaultToFile) {
         URL[] urls = ((URLClassLoader) classloader).getURLs();
         String[] result = new String[urls.length];
@@ -125,7 +125,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @return the newly created ClassLoader or null if an error occurs.
      */
     protected ClassLoader newClassLoader(
-            ClassLoaderAdapterContext.CreateModify task) {
+            ClassloaderContext.CreateModify task) {
         ClassLoader parent = task.getParentLoader();
         String loaderId = task.getLoaderName();
 

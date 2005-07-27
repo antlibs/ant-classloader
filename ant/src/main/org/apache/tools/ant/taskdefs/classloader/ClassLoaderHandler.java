@@ -15,27 +15,28 @@
  *
  */
 package org.apache.tools.ant.taskdefs.classloader;
-
+/**
+ * Handler interface.
+ * @since Ant1.7
+ */
 public interface ClassLoaderHandler {
     /**
      * Checks whether this handler is properly configured.
      *
-     * @throws RuntimeException
-     *             If not properly defined.
+     * @throws RuntimeException If not properly defined.
      */
     void check();
     /**
-     * Gets an adapter instance
+     * Gets an adapter instance.
      *
-     * @param context
-     *            The calling context (f.e.classloader task).
+     * @param context The calling context (f.e.classloader task).
      * @return The newly created adapter or null if an error occured.
      */
-    ClassLoaderAdapter getAdapter(ClassLoaderAdapterContext context);
+    ClassLoaderAdapter getAdapter(ClassloaderContext context);
     /**
-     * gets the classloaders classname
+     * Gets the classloaders classname.
      *
-     * @return the classloader classname
+     * @return The classloader classname.
      */
     String getLoader();
 

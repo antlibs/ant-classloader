@@ -18,16 +18,17 @@ package org.apache.tools.ant.taskdefs.classloader;
 
 /**
  * Mandatory Interface for ClassLoaderParameters.
+ * @since Ant1.7
  */
 public interface ClassLoaderParameters {
     /**
-     * returns the default handler for this descriptor.
+     * Gets the default handler for this descriptor.
      *
      * @return handler.
      */
     ClassLoaderHandler getDefaultHandler();
     /**
-     * returns the valuable parameter object which is either the instance itself
+     * Gets the valuable parameter object which is either the instance itself
      * or the resolved referenced parameters.
      *
      * @return parameters.

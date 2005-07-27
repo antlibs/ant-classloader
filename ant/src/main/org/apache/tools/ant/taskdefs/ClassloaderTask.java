@@ -20,10 +20,10 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderParameters;
-import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderAdapterException;
 import org.apache.tools.ant.types.AntLoaderParameters;
 import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.apache.tools.ant.types.LoaderHandler;
@@ -34,7 +34,7 @@ import org.apache.tools.ant.types.Reference;
 import org.apache.tools.ant.types.URLPath;
 
 public class ClassloaderTask extends ClassloaderBase implements
-        ClassLoaderAdapterContext.CreateModify {
+        ClassloaderContext.CreateModify {
 
     /**
      * Enumeration for the values of duplicateEntry attribute.
@@ -258,14 +258,14 @@ public class ClassloaderTask extends ClassloaderBase implements
             }
             ClassLoaderAdapter adapter;
             try {
-                adapter = ClassloaderUtil.findAdapter(this, classloader,
+                adapter = getUtil().findAdapter(this, classloader,
                         ClassLoaderAdapterAction.APPEND);
-            } catch (ClassloaderUtil.AdapterException e) {
+            } catch (ClassloaderAdapterException e) {
                 switch (e.getReason()) {
-                case ClassloaderUtil.AdapterException.NO_HANDLER:
+                case ClassloaderAdapterException.NO_HANDLER:
                     log("NO HANDLER", Project.MSG_DEBUG);
                     return false;
-                case ClassloaderUtil.AdapterException.NO_ADAPTER:
+                case ClassloaderAdapterException.NO_ADAPTER:
                     log("NO ADAPTER", Project.MSG_DEBUG);
                     return false;
                 }
@@ -283,9 +283,9 @@ public class ClassloaderTask extends ClassloaderBase implements
         ClassLoader cl = loader.getClassLoader(null);
         ClassLoaderAdapter adapter;
         try {
-            adapter = ClassloaderUtil.findAdapter(this, cl,
+            adapter = getUtil().findAdapter(this, cl,
                     ClassLoaderAdapterAction.GETPATH);
-        } catch (ClassloaderUtil.AdapterException e) {
+        } catch (ClassloaderAdapterException e) {
             return false;
         }
         String[] propPath = adapter.getClasspath(this, cl, true);
@@ -388,7 +388,7 @@ public class ClassloaderTask extends ClassloaderBase implements
         if (!duplicateEntry.requiresCheck()) {
             return true;
         }
-        if (!ClassloaderUtil.containsEntry(this, cl, entryUrl)) {
+        if (!getUtil().containsEntry(this, cl, entryUrl)) {
             return true;
         }
         int logLevel = duplicateEntry.getDuplicateLogLevel();

@@ -31,7 +31,7 @@ import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderParameters;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.URLPath;
@@ -87,13 +87,13 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      *            the classloader instance to append the path to.
      * @return The ClassLoader instance or null if an error occured.
      */
-    public boolean appendClasspath(ClassLoaderAdapterContext.CreateModify task,
+    public boolean appendClasspath(ClassloaderContext.CreateModify task,
             ClassLoader classloader) {
         return appendClasspath(task, classloader, task.getClasspathFiles());
     }
 
     private boolean appendClasspath(
-            ClassLoaderAdapterContext.CreateModify task,
+            ClassloaderContext.CreateModify task,
             ClassLoader classloader, String[] path) {
         try {
             Method m = classloader.getClass().getMethod("addPathElement",
@@ -136,7 +136,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      *            the leading 'file:/' prefix.
      * @return the path or null if an error occured
      */
-    public String[] getClasspath(ClassLoaderAdapterContext task,
+    public String[] getClasspath(ClassloaderContext task,
             ClassLoader classloader, boolean defaultToFile) {
         try {
             String cp = (String) classloader.getClass().getMethod(
@@ -202,7 +202,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleAddJavaLibraries(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String loaderId, boolean onOff) {
         if (!onOff) {
             return true;
@@ -221,7 +221,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleAddLoaderPackageRoot(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String loaderId, String[] pkgs) {
         if (pkgs == null) {
             return true;
@@ -245,7 +245,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleAddSystemPackageRoot(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String loaderId, String[] pkgs) {
         if (pkgs == null) {
             return true;
@@ -269,7 +269,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private ClassLoader handleCreateLoader(
-            ClassLoaderAdapterContext.CreateModify task,
+            ClassloaderContext.CreateModify task,
             ClassLoader superLoader, Path path, String loaderId) {
         ClassLoader loader = null;
         try {
@@ -300,7 +300,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleSetIsolated(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String loaderId, boolean onOff) {
         if (!onOff) {
             return true;
@@ -317,7 +317,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
             return false;
         }
     }
-    private void handleSetParent(ClassLoaderAdapterContext.CreateModify task,
+    private void handleSetParent(ClassloaderContext.CreateModify task,
             ClassLoader cl, ClassLoader parent, String loaderId) {
         if (parent == null) {
             return;
@@ -332,7 +332,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
     }
     private boolean handleSetParentFirst(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String loaderId, boolean onOff) {
         if (onOff) {
             return true;
@@ -361,7 +361,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @return the classloader instance or null if an error occurs.
      */
     protected ClassLoader initClassLoader(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader classloader) {
+            ClassloaderContext.CreateModify task, ClassLoader classloader) {
         ClassLoaderParameters d = task.getParameters().getParameters();
         if (d instanceof Descriptor) {
             Descriptor dd = (Descriptor) d;
@@ -406,7 +406,7 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
      * @return the newly created ClassLoader or null if an error occurs.
      */
     protected ClassLoader newClassLoader(
-            ClassLoaderAdapterContext.CreateModify task) {
+            ClassloaderContext.CreateModify task) {
         ClassLoader superLoader = task.getSuperLoader();
         ClassLoader parent = task.getParentLoader();
         String loaderId = task.getLoaderName();

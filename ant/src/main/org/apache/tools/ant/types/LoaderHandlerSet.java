@@ -23,7 +23,7 @@ import java.util.Iterator;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandlerSet;
 
@@ -88,7 +88,7 @@ public class LoaderHandlerSet extends DataType implements ClassLoaderHandlerSet 
      * @return the best fitting LoaderHandler or null if an error occured.
      */
     public ClassLoaderHandler getHandler(
-        ClassLoaderAdapterContext task,
+        ClassloaderContext task,
         ClassLoader loader,
         ClassLoaderAdapterAction action) {
         if (isReference()) {

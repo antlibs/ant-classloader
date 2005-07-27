@@ -40,7 +40,7 @@ public interface ClassLoaderAdapter {
      * @param loaderNames
      *            loaderNames to pass to ClassloaderBase.addLoaderToReport.
      */
-    void addReportable(ClassLoaderAdapterContext.Report task,
+    void addReportable(ClassloaderContext.Report task,
             ClassLoader classloader, ClassloaderReportHandle role,
             Map loaderStack, Map loaderNames);
     /**
@@ -52,7 +52,7 @@ public interface ClassLoaderAdapter {
      *            the classloader instance to append the path to.
      * @return The ClassLoader instance or null if an error occured.
      */
-    boolean appendClasspath(ClassLoaderAdapterContext.CreateModify task,
+    boolean appendClasspath(ClassloaderContext.CreateModify task,
             ClassLoader classloader);
     /**
      * Creates a classloader instance.
@@ -62,7 +62,7 @@ public interface ClassLoaderAdapter {
      * @return the newly created ClassLoader instance or null if an error
      *         occured.
      */
-    ClassLoader createClassLoader(ClassLoaderAdapterContext.CreateModify task);
+    ClassLoader createClassLoader(ClassloaderContext.CreateModify task);
     /**
      * Returns the actual classpath of a classloader instance.
      *
@@ -75,7 +75,7 @@ public interface ClassLoaderAdapter {
      *            the leading 'file:/' prefix.
      * @return the path or null if an error occured
      */
-    String[] getClasspath(ClassLoaderAdapterContext task,
+    String[] getClasspath(ClassloaderContext task,
             ClassLoader classloader, boolean defaultToFile);
     /**
      * Gets the default parent classloader in the case, this classloader's
@@ -97,7 +97,7 @@ public interface ClassLoaderAdapter {
      * @return The packages defined by this classloader or null if an error
      *         occurs.
      */
-    Package[] getPackages(ClassLoaderAdapterContext.Report context,
+    Package[] getPackages(ClassloaderContext.Report context,
             ClassLoader classLoader, ClassloaderReportHandle name);
     /**
      * Gets the parent classloader. Necessary, because AntClassLoader's
@@ -129,6 +129,6 @@ public interface ClassLoaderAdapter {
      * @param name
      *            the name of the classloader instance.
      */
-    void report(ClassloaderReporter to, ClassLoaderAdapterContext.Report task,
+    void report(ClassloaderReporter to, ClassloaderContext.Report task,
             ClassLoader classloader, ClassloaderReportHandle name);
 }

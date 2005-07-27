@@ -15,7 +15,10 @@
  *
  */
 package org.apache.tools.ant.taskdefs.classloader;
-
+/**
+ * Handlerset interface.
+ * @since Ant1.7
+ */
 public interface ClassLoaderHandlerSet {
     /**
      * Gets the best fitting LoaderHandler for a classloader and a required
@@ -29,7 +32,7 @@ public interface ClassLoaderHandlerSet {
      *            The required action.
      * @return The best fitting LoaderHandler or null if an error occured.
      */
-    ClassLoaderHandler getHandler(ClassLoaderAdapterContext context,
+    ClassLoaderHandler getHandler(ClassloaderContext context,
             ClassLoader loader, ClassLoaderAdapterAction action);
 
 }

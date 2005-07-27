@@ -19,7 +19,10 @@ package org.apache.tools.ant.taskdefs.classloader;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-
+/**
+ * Interface for some url related utility methods.
+ * @since Ant1.7
+ */
 public interface ClassloaderURLUtil {
     /**
      * Creates a file from a absolute or relative file or url.

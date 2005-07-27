@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderParameters;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
@@ -75,7 +75,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      * @param loaderNames
      *            loaderNames to pass to ClassloaderBase.addLoaderToReport.
      */
-    public void addReportable(ClassLoaderAdapterContext.Report task,
+    public void addReportable(ClassloaderContext.Report task,
             ClassLoader classloader, ClassloaderReportHandle role,
             Map loaderStack, Map loaderNames) {
     }
@@ -88,7 +88,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      *            the classloader to modify.
      * @return true if executed successful, false on error
      */
-    public boolean appendClasspath(ClassLoaderAdapterContext.CreateModify task,
+    public boolean appendClasspath(ClassloaderContext.CreateModify task,
             ClassLoader classloader) {
         task.handleError("append not supported (Adapter error)");
         return false;
@@ -102,7 +102,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      * @return the newly created classloader or null if an error occurs.
      */
     public final ClassLoader createClassLoader(
-            ClassLoaderAdapterContext.CreateModify task) {
+            ClassloaderContext.CreateModify task) {
         ClassLoader cl = newClassLoader(task);
         if (cl == null) {
             return null;
@@ -121,7 +121,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      *            the leading 'file:/' prefix.
      * @return the path or null if an error occured
      */
-    public String[] getClasspath(ClassLoaderAdapterContext task,
+    public String[] getClasspath(ClassloaderContext task,
             ClassLoader classloader, boolean defaultToFile) {
         task.handleError("getClasspath not supported (Adapter error)");
         return null;
@@ -155,7 +155,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
         return "Bootstrap";
     }
 
-    public Package[] getPackages(ClassLoaderAdapterContext.Report task,
+    public Package[] getPackages(ClassloaderContext.Report task,
             ClassLoader cl, ClassloaderReportHandle name) {
         try {
             Method m = ClassLoader.class.getDeclaredMethod("getPackages", null);
@@ -190,7 +190,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
     }
 
     private boolean handleSetClassAssertionStatus(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String name, String[] classes, boolean onOff) {
         if (classes == null) {
             return true;
@@ -217,7 +217,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
     }
 
     private boolean handleSetDefaultAssertionStatus(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String name, Boolean onOff) {
         if (onOff == null) {
             return true;
@@ -240,7 +240,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
     }
 
     private boolean handleSetPackageAssertionStatus(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader cl,
+            ClassloaderContext.CreateModify task, ClassLoader cl,
             String name, String[] pkgs, boolean onOff) {
         if (pkgs == null) {
             return true;
@@ -277,7 +277,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      * @return the classloader instance or null if an error occurs.
      */
     protected ClassLoader initClassLoader(
-            ClassLoaderAdapterContext.CreateModify task, ClassLoader classloader) {
+            ClassloaderContext.CreateModify task, ClassLoader classloader) {
         ClassLoaderParameters d = task.getParameters().getParameters();
         if (d instanceof Descriptor) {
             Descriptor dd = (Descriptor) d;
@@ -329,7 +329,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      * @return the newly created ClassLoader or null if an error occurs.
      */
     protected ClassLoader newClassLoader(
-            ClassLoaderAdapterContext.CreateModify task) {
+            ClassloaderContext.CreateModify task) {
         task.handleError("new ClassLoader not supported (Adapter error).");
         return null;
     }
@@ -346,7 +346,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      *            the name of the classloader instance.
      */
     public void report(ClassloaderReporter to,
-            ClassLoaderAdapterContext.Report task, ClassLoader classloader,
+            ClassloaderContext.Report task, ClassLoader classloader,
             ClassloaderReportHandle role) {
     }
 

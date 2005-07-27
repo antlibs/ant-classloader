@@ -26,7 +26,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandler;
 import org.apache.tools.ant.taskdefs.classloader.adapter.AntClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.adapter.SimpleClassLoaderAdapter;
@@ -170,7 +170,7 @@ public final class LoaderHandler extends DataType implements ClassLoaderHandler,
      * @param task the calling classloader task
      * @return the newly created adapter or null if an error occured
      */
-    public ClassLoaderAdapter getAdapter(ClassLoaderAdapterContext task) {
+    public ClassLoaderAdapter getAdapter(ClassloaderContext task) {
         check();
         if (isReference()) {
             LoaderHandler r = (LoaderHandler) getCheckedRef(LoaderHandler.class, "LoaderHandler");
@@ -211,7 +211,7 @@ public final class LoaderHandler extends DataType implements ClassLoaderHandler,
      *         and the adapter supports the required action; else null.
      */
     public Class getLoaderClass(
-        ClassLoaderAdapterContext task,
+        ClassloaderContext task,
         ClassLoader assignable,
         ClassLoaderAdapterAction action) {
         check();

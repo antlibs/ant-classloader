@@ -27,8 +27,7 @@ import java.util.TreeSet;
 
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapter;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterAction;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
-import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 
 /**
  * Utility methods for the classloader report.
@@ -87,7 +86,7 @@ public class ClassloaderReportUtil {
      * @return <code>true</code>, if successfully executed,
      *         <code>false</code> otherwise.
      */
-    public boolean addLoaderToReport(ClassLoaderAdapterContext.Report context,
+    public boolean addLoaderToReport(ClassloaderContext.Report context,
             ClassLoader cl, ClassloaderReportHandle role,
             Map/* <ClassLoader,SortedSet<ReportHandle> */handlesByLoader,
             Map/* <ReportHandle,ClassLoader> */loaderByHandle,
@@ -106,7 +105,7 @@ public class ClassloaderReportUtil {
             ((Set) old).add(role);
 
             if (isNew) {
-                ClassLoaderAdapter adapter = ClassloaderUtil.findAdapter(
+                ClassLoaderAdapter adapter = context.getUtil().findAdapter(
                         context, cl, null, to, role + "->parent", role
                                 .getName());
                 boolean adapterFound = (adapter != null);
@@ -123,7 +122,7 @@ public class ClassloaderReportUtil {
                                 loaderByHandle, to);
                     }
                 }
-                adapter = ClassloaderUtil.findAdapter(context, cl,
+                adapter = context.getUtil().findAdapter(context, cl,
                         ClassLoaderAdapterAction.REPORT, to, "report for "
                                 + role, "");
                 if (adapter != null) {
@@ -146,11 +145,11 @@ public class ClassloaderReportUtil {
      *            name of the classloader instance.
      * @param handlesByLoader Handles by loader.
      */
-    public void report(ClassLoaderAdapterContext.Report context,
+    public void report(ClassloaderContext.Report context,
             ClassloaderReporter to, ClassLoader cl,
             ClassloaderReportHandle name, Map handlesByLoader) {
         to.beginClassloader(name);
-        ClassLoaderAdapter baseAdapter = ClassloaderUtil.findAdapter(context,
+        ClassLoaderAdapter baseAdapter = context.getUtil().findAdapter(context,
                 cl, null, to, "parent for " + name, "");
         if (baseAdapter != null) {
             ClassLoader parent = baseAdapter.getParent(cl);
@@ -177,7 +176,7 @@ public class ClassloaderReportUtil {
         for (Iterator iRole = roles.iterator(); iRole.hasNext();) {
             to.reportRole((ClassloaderReportHandle) iRole.next());
         }
-        ClassLoaderAdapter adapter = ClassloaderUtil
+        ClassLoaderAdapter adapter = context.getUtil()
                 .findAdapter(context, cl, ClassLoaderAdapterAction.GETPATH, to,
                         "entries for " + name, "");
         if (adapter != null) {
@@ -195,7 +194,7 @@ public class ClassloaderReportUtil {
         if (context.isReportPackages()) {
             reportPackages(context, to, baseAdapter, cl, name);
         }
-        adapter = ClassloaderUtil.findAdapter(context, cl,
+        adapter = context.getUtil().findAdapter(context, cl,
                 ClassLoaderAdapterAction.REPORT, to,
                 "additional parameters for " + name, "");
         if (adapter != null) {
@@ -217,7 +216,7 @@ public class ClassloaderReportUtil {
      *            a flag indicating whether all handlers for classloaders where
      *            found.
      */
-    public void report(ClassLoaderAdapterContext.Report context,
+    public void report(ClassloaderContext.Report context,
             Map/* <ClassLoader,SortedSet<ReportHandle>> */handlesByLoader,
             Map/* <ReportHandle,ClassLoader> */loaderByHandle,
             ClassloaderReporter to, boolean allHandlersFound) {
@@ -227,7 +226,7 @@ public class ClassloaderReportUtil {
             to.reportError("WARNING: As of missing Loaderhandlers,"
               + " this report might not be complete.");
         }
-        URL[] urls = ClassloaderUtil.getBootstrapClasspathURLs();
+        URL[] urls = context.getUtil().getBootstrapClasspathURLs();
         if (urls == null) {
             to.reportError("WARNING: Unable to determine bootstrap classpath."
               + "\n         Please report this error to Ant's bugtracking "
@@ -261,7 +260,7 @@ public class ClassloaderReportUtil {
         }
         to.endReport();
     }
-    private void reportPackages(ClassLoaderAdapterContext.Report task,
+    private void reportPackages(ClassloaderContext.Report task,
             ClassloaderReporter to, ClassLoaderAdapter adapter,
             ClassLoader classloader, ClassloaderReportHandle role) {
         Package[] pkgs = adapter.getPackages(task, classloader, role);

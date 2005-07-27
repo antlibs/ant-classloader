@@ -21,9 +21,11 @@ import org.apache.tools.ant.Location;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 import org.apache.tools.ant.taskdefs.classloader.ClassLoaderHandlerSet;
 import org.apache.tools.ant.taskdefs.classloader.ClassloaderURLUtil;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderUtil;
+import org.apache.tools.ant.taskdefs.classloader.SimpleClassloaderUtil;
 import org.apache.tools.ant.types.LoaderHandlerSet;
 import org.apache.tools.ant.util.URLUtils;
 
@@ -53,7 +55,7 @@ import org.apache.tools.ant.util.URLUtils;
  *
  * @since Ant 1.7
  */
-public class ClassloaderBase extends Task implements ClassLoaderAdapterContext {
+public class ClassloaderBase extends Task implements ClassloaderContext {
     protected boolean failOnError;
     private ClassLoaderHandlerSet handlerSet = null;
     /**
@@ -154,14 +156,24 @@ public class ClassloaderBase extends Task implements ClassLoaderAdapterContext {
     /**
      * Sets the failonerror attribute.
      *
-     * @param onOff
-     *            Value.
+     * @param onOff Value.
      */
     public void setFailonerror(boolean onOff) {
         this.failOnError = onOff;
     }
+    /**
+     * Gets the url utilities.
+     * @return The url utilities.
+     */
     public ClassloaderURLUtil getURLUtil() {
         return URLUtils.getURLUtils();
+    }
+    /**
+     * Gets the utilities.
+     * @return The utilities.
+     */
+    public ClassloaderUtil getUtil() {
+        return SimpleClassloaderUtil.getClassLoaderUtil();
     }
 
 }

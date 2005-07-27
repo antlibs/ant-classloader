@@ -16,14 +16,18 @@
  */
 package org.apache.tools.ant.taskdefs;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.tools.ant.AntTypeDefinition;
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ComponentHelper;
-import org.apache.tools.ant.taskdefs.classloader.ClassLoaderAdapterContext;
+import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportUtil;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportBuilder;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
@@ -31,11 +35,13 @@ import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportXMLFormatter;
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedAntLoggerReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportTreeBuilder;
+import org.apache.tools.ant.taskdefs.classloader.report.FormattedPrintStreamReporter;
 
 public class ClassloaderReport extends ClassloaderBase implements
-        ClassLoaderAdapterContext.Report {
+        ClassloaderContext.Report {
 
     private boolean reportPackages = false;
+    private File output = null;
     public ClassloaderReport() {
         super();
     }
@@ -120,8 +126,19 @@ public class ClassloaderReport extends ClassloaderBase implements
         rNames = null;
         reportUtil
                 .report(this, handlesByLoader, loaderByHandle, to, addSuccess);
-        ClassloaderReporter destReporter = new FormattedAntLoggerReporter(this,
-                new ClassloaderReportXMLFormatter());
+        ClassloaderReporter destReporter;
+        if (output == null) {
+            try {
+                destReporter = new FormattedPrintStreamReporter(
+                    new ClassloaderReportXMLFormatter(),
+                    new PrintStream(output));
+            } catch (IOException e) {
+                throw new BuildException(e);
+            }
+        } else {
+            destReporter = new FormattedAntLoggerReporter(this,
+                    new ClassloaderReportXMLFormatter());
+        }
         to.execute(destReporter);
 
     }
@@ -133,6 +150,13 @@ public class ClassloaderReport extends ClassloaderBase implements
      */
     public boolean isReportPackages() {
         return reportPackages;
+    }
+    /**
+     * Sets the output file.
+     * @param file Output file.
+     */
+    public void setOutput(File file) {
+        this.output = file;
     }
     /**
      * Sets the reportPackages attribute.
