@@ -33,6 +33,32 @@ import org.apache.tools.ant.types.LoaderRef;
 import org.apache.tools.ant.types.Reference;
 import org.apache.tools.ant.types.URLPath;
 
+/**
+ * Create or modifies ClassLoader.
+ *
+ * The classpath is a regular path.
+ *
+ * Taskdef and typedef can use the loader you create with the loaderRef
+ * attribute.
+ *
+ * This tasks will not modify the core loader, the project loader or the system
+ * loader if "build.sysclasspath=only"
+ *
+ * The typical use is:
+ *
+ * <pre>
+ *   &lt;path id=&quot;ant.deps&quot; &gt;
+ *      &lt;fileset dir=&quot;myDir&quot; &gt;
+ *         &lt;include name=&quot;junit.jar, bsf.jar, js.jar, etc&quot;/&gt;
+ *      &lt;/fileset&gt;
+ *   &lt;/path&gt;
+ *
+ *   &lt;classloader loader=&quot;project&quot; classpathRef=&quot;ant.deps&quot; /&gt;
+ *
+ * </pre>
+ *
+ * @since Ant 1.7
+ */
 public class ClassloaderTask extends ClassloaderBase implements
         ClassloaderContext.CreateModify {
 
@@ -77,7 +103,7 @@ public class ClassloaderTask extends ClassloaderBase implements
          * @return An array of the allowed values for this attribute.
          */
         public String[] getValues() {
-            return new String[] { "ignore", "warn", "omit" };
+            return new String[] {"ignore", "warn", "omit"};
         }
         /**
          * Indicates whether duplicate entries should be omitted.
@@ -110,7 +136,9 @@ public class ClassloaderTask extends ClassloaderBase implements
     private String property = null;
     private boolean reset = false;
     private LoaderRef superLoader = null;
-
+    /**
+     * Default Constructor.
+     */
     public ClassloaderTask() {
     }
     /**
@@ -254,8 +282,6 @@ public class ClassloaderTask extends ClassloaderBase implements
             }
             loader.setClassLoader(classloader);
         } else if (classPath != null) {
-            if (handler == null) {
-            }
             ClassLoaderAdapter adapter;
             try {
                 adapter = getUtil().findAdapter(this, classloader,
@@ -268,9 +294,10 @@ public class ClassloaderTask extends ClassloaderBase implements
                 case ClassloaderAdapterException.NO_ADAPTER:
                     log("NO ADAPTER", Project.MSG_DEBUG);
                     return false;
+                default:
+                    throw new BuildException("unexpected reason " + e.getReason(),
+                            e);
                 }
-                throw new BuildException("unexpected reason " + e.getReason(),
-                        e);
             }
             if (!adapter.appendClasspath(this, classloader)) {
                 log("NO APPEND", Project.MSG_DEBUG);
@@ -302,6 +329,10 @@ public class ClassloaderTask extends ClassloaderBase implements
         getProject().setProperty(property, propValue.toString());
         return true;
     }
+    /**
+     * Gets the Ant project.
+     * @return The Ant project.
+     */
     public Object getAntProject() {
         return getProject();
     }
@@ -313,10 +344,17 @@ public class ClassloaderTask extends ClassloaderBase implements
     public URLPath getClasspath() {
         return classpath;
     }
+    /**
+     * Gets the classpath to create or append as files.
+     * @return The classpath.
+     */
     public String[] getClasspathFiles() {
         return classpath.toPath().list();
     }
-
+    /**
+     * Gets the classpath to create or append as urls.
+     * @return The classpath.
+     */
     public String[] getClasspathURLs() {
         return classpath.list();
     }
@@ -363,7 +401,7 @@ public class ClassloaderTask extends ClassloaderBase implements
         if (parentLoader == null) {
             return null;
         }
-        return parentLoader.getClassLoader(null, failOnError, false);
+        return parentLoader.getClassLoader(null, isFailOnError(), false);
     }
     /**
      * Gets the super classloader to create a new classloader with.
@@ -374,12 +412,12 @@ public class ClassloaderTask extends ClassloaderBase implements
         if (superLoader == null) {
             return getClass().getClassLoader();
         }
-        return superLoader.getClassLoader(null, failOnError, false);
+        return superLoader.getClassLoader(null, isFailOnError(), false);
     }
     /**
      * Handles a classpath entry.
-     *
-     * @param entry
+     * @param cl The classloader.
+     * @param entryUrl
      *            The entry.
      * @return Indicates, whether the adapter should add the duplicate entry to
      *         the existing classloader or not.
@@ -397,6 +435,11 @@ public class ClassloaderTask extends ClassloaderBase implements
         }
         return !duplicateEntry.isOmitDuplicate();
     }
+    /**
+     * This implementation adds the handler set via setHandler to the newly
+     * created handlerset.
+     * @return The newly created handlerset.
+     */
     protected LoaderHandlerSet newHandlerSet() {
         LoaderHandlerSet result = new LoaderHandlerSet(getProject());
         result.addConfiguredHandler(getHandler());

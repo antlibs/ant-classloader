@@ -30,33 +30,11 @@ import org.apache.tools.ant.types.LoaderHandlerSet;
 import org.apache.tools.ant.util.URLUtils;
 
 /**
- * Create or modifies ClassLoader.
- *
- * The classpath is a regular path.
- *
- * Taskdef and typedef can use the loader you create with the loaderRef
- * attribute.
- *
- * This tasks will not modify the core loader, the project loader or the system
- * loader if "build.sysclasspath=only"
- *
- * The typical use is:
- *
- * <pre>
- *   &lt;path id=&quot;ant.deps&quot; &gt;
- *      &lt;fileset dir=&quot;myDir&quot; &gt;
- *         &lt;include name=&quot;junit.jar, bsf.jar, js.jar, etc&quot;/&gt;
- *      &lt;/fileset&gt;
- *   &lt;/path&gt;
- *
- *   &lt;classloader loader=&quot;project&quot; classpathRef=&quot;ant.deps&quot; /&gt;
- *
- * </pre>
- *
+ * Base class for ClassloaderTask and ClassloaderReport.
  * @since Ant 1.7
  */
 public class ClassloaderBase extends Task implements ClassloaderContext {
-    protected boolean failOnError;
+    private boolean failOnError;
     private ClassLoaderHandlerSet handlerSet = null;
     /**
      * Default constructor
@@ -85,9 +63,9 @@ public class ClassloaderBase extends Task implements ClassloaderContext {
     public void setHandlerSet(LoaderHandlerSet handlerSet) {
         this.handlerSet = handlerSet;
     }
-    /*
-     * private String formatIndex(int i) { String x = String.valueOf(i + 1); if
-     * (x.length() == 1) { return " " + x; } return x; }
+    /**
+     * Creates a new handlerset.
+     * @return The newly created handlerset.
      */
     protected LoaderHandlerSet newHandlerSet() {
         return new LoaderHandlerSet(getProject());
@@ -103,9 +81,17 @@ public class ClassloaderBase extends Task implements ClassloaderContext {
         }
         return handlerSet;
     }
+    /**
+     * This implementation logs the msg with MSG_WARN.
+     * @param msg message.
+     */
     public void handleWarning(String msg) {
         log(msg, Project.MSG_WARN);
     }
+    /**
+     * This implementation logs the msg with MSG_DEBUG.
+     * @param msg message.
+     */
     public void handleDebug(String msg) {
         log(msg, Project.MSG_DEBUG);
     }
@@ -152,7 +138,13 @@ public class ClassloaderBase extends Task implements ClassloaderContext {
         }
         log(loc + "Error: " + msg, Project.MSG_ERR);
     }
-
+    /**
+     * Indicates whether build should fail on error.
+     * @return true, if build should fail on error; false otherwise.
+     */
+    public boolean isFailOnError() {
+        return failOnError;
+    }
     /**
      * Sets the failonerror attribute.
      *

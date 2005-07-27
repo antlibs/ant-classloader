@@ -33,7 +33,7 @@ public interface ClassLoaderAdapter {
      *            the calling ClassloaderBase-task.
      * @param classloader
      *            the classloader to analyze.
-     * @param name
+     * @param role
      *            the name of the classloader instance.
      * @param loaderStack
      *            loaderStack to pass to ClassloaderBase.addLoaderToReport.

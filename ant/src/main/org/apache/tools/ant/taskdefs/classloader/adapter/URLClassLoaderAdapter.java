@@ -49,7 +49,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
         Method meth;
         try {
             meth = URLClassLoader.class.getDeclaredMethod("addURL",
-                    new Class[] { URL.class });
+                    new Class[] {URL.class});
             meth.setAccessible(true);
         } catch (SecurityException e1) {
             task.handleError("unable to setAccessible(true) for method addURL",
@@ -67,7 +67,7 @@ public class URLClassLoaderAdapter extends SimpleClassLoaderAdapter {
                 String sUrl = url.toString();
                 if (localEntries.add(sUrl)
                         && task.handleClasspathEntry(ucl, sUrl)) {
-                    meth.invoke(ucl, new Object[] { url });
+                    meth.invoke(ucl, new Object[] {url});
                     task.handleDebug("URLClassLoader " + loaderId
                             + ": adding path " + url);
                 }

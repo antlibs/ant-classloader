@@ -36,12 +36,18 @@ import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportXMLForm
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedAntLoggerReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportTreeBuilder;
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedPrintStreamReporter;
-
+/**
+ * Creates a report for all currently used classloaders.
+ * @since Ant1.7
+ */
 public class ClassloaderReport extends ClassloaderBase implements
         ClassloaderContext.Report {
 
     private boolean reportPackages = false;
     private File output = null;
+    /**
+     * Default constructor.
+     */
     public ClassloaderReport() {
         super();
     }

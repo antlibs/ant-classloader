@@ -97,15 +97,15 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
             ClassLoader classloader, String[] path) {
         try {
             Method m = classloader.getClass().getMethod("addPathElement",
-                    new Class[] { String.class });
+                    new Class[] {String.class});
             for (int i = 0; i < path.length; i++) {
                 File f = new File(path[i]);
                 if (f.exists()) {
                     String sUrl = task.getURLUtil().createURL(
                             f.getAbsolutePath()).toString();
                     if (task.handleClasspathEntry(classloader, sUrl)) {
-                        m.invoke(classloader, new Object[] { f
-                                .getAbsolutePath() });
+                        m.invoke(classloader, new Object[] {
+                                f.getAbsolutePath()});
                         task.handleDebug("AntClassLoader "
                                 + task.getLoaderName() + ": adding path "
                                 + f.getAbsolutePath());
@@ -191,8 +191,9 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
     public ClassLoader getParent(ClassLoader classLoader) {
         try {
             ClassLoader cl = classLoader.getClass().getClassLoader();
-            if (cl == null)
+            if (cl == null) {
                 cl = ClassLoader.getSystemClassLoader();
+            }
             Field field = cl.loadClass(AntClassLoader.class.getName())
                     .getDeclaredField("parent");
             field.setAccessible(true);
@@ -228,13 +229,11 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("addLoaderPackageRoot",
-                    new Class[] { String.class });
+                    new Class[] {String.class});
             for (int i = 0; i < pkgs.length; i++) {
-                m.invoke(cl, new Object[] { pkgs[i] });
-                task
-                        .handleDebug("Loader " + loaderId
-                                + ": calling addLoaderPackageRoot(\"" + pkgs[i]
-                                + "\")");
+                m.invoke(cl, new Object[] {pkgs[i]});
+                task.handleDebug("Loader " + loaderId
+                    + ": calling addLoaderPackageRoot(\"" + pkgs[i] + "\")");
             }
             return true;
         } catch (Exception e) {
@@ -252,19 +251,17 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("addSystemPackageRoot",
-                    new Class[] { String.class });
+                    new Class[] {String.class});
             for (int i = 0; i < pkgs.length; i++) {
-                m.invoke(cl, new Object[] { pkgs[i] });
-                task
-                        .handleDebug("Loader " + loaderId
-                                + ": calling addSystemPackageRoot(\"" + pkgs[i]
-                                + "\")");
+                m.invoke(cl, new Object[] {pkgs[i]});
+                task.handleDebug("Loader " + loaderId
+                    + ": calling addSystemPackageRoot(\"" + pkgs[i] + "\")");
             }
             return true;
         } catch (Exception e) {
             task.handleError(
                     "unable to call addSystemPackageRoot on AntClassLoader "
-                            + loaderId, e);
+                    + loaderId, e);
             return false;
         }
     }
@@ -283,8 +280,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
             Class psl = Class.forName("org.apache.tools.ant.Project", true,
                     task.getAntProject().getClass().getClassLoader());
             if (osl == psl) {
-                loader.getClass().getMethod("setProject", new Class[] { osl })
-                        .invoke(loader, new Object[] { task.getAntProject() });
+                loader.getClass().getMethod("setProject", new Class[] {osl})
+                        .invoke(loader, new Object[] {task.getAntProject()});
             } else {
                 task.handleWarning("can not set project for AntClassLoader "
                         + loaderId + ": Project classes are not compatible");
@@ -307,8 +304,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("setIsolated",
-                    new Class[] { Boolean.TYPE });
-            m.invoke(cl, new Object[] { Boolean.TRUE });
+                    new Class[] {Boolean.TYPE});
+            m.invoke(cl, new Object[] {Boolean.TRUE});
             task.handleDebug("Loader " + loaderId + ": setting isolated=true");
             return true;
         } catch (Exception e) {
@@ -324,8 +321,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("setParent",
-                    new Class[] { ClassLoader.class });
-            m.invoke(cl, new Object[] { parent });
+                    new Class[] {ClassLoader.class});
+            m.invoke(cl, new Object[] {parent});
             task.handleDebug("Loader " + loaderId + ": setting parentLoader");
         } catch (Exception e) {
             throw new BuildException(e);
@@ -339,8 +336,8 @@ public class AntClassLoaderAdapter extends SimpleClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("setParentFirst",
-                    new Class[] { Boolean.TYPE });
-            m.invoke(cl, new Object[] { Boolean.FALSE });
+                    new Class[] {Boolean.TYPE});
+            m.invoke(cl, new Object[] {Boolean.FALSE});
             task.handleDebug("Loader " + loaderId
                     + ": setting parentFirst=false");
             return true;

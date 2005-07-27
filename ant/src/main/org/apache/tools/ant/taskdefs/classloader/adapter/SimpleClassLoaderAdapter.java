@@ -154,6 +154,18 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
     protected String getDefaultParentName() {
         return "Bootstrap";
     }
+    /**
+     * Gets the packages, defined by this classloader or its parents.
+     *
+     * @param task
+     *            The context of this method call.
+     * @param cl
+     *            The classloader to get the packages from.
+     * @param name
+     *            The symbolic name of this classloader.
+     * @return The packages defined by this classloader or null if an error
+     *         occurs.
+     */
 
     public Package[] getPackages(ClassloaderContext.Report task,
             ClassLoader cl, ClassloaderReportHandle name) {
@@ -197,10 +209,10 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("setClassAssertionStatus",
-                    new Class[] { String.class, Boolean.TYPE });
+                    new Class[] {String.class, Boolean.TYPE});
             for (int i = 0; i < classes.length; i++) {
-                m.invoke(cl, new Object[] { classes[i],
-                        onOff ? Boolean.TRUE : Boolean.FALSE });
+                m.invoke(cl, new Object[] {classes[i],
+                        onOff ? Boolean.TRUE : Boolean.FALSE});
                 task.handleDebug("Loader " + name
                         + ": setting ClassAssertionStatus for " + classes[i]
                         + "=" + onOff);
@@ -224,8 +236,8 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("setDefaultAssertionStatus",
-                    new Class[] { Boolean.TYPE });
-            m.invoke(cl, new Object[] { onOff });
+                    new Class[] {Boolean.TYPE});
+            m.invoke(cl, new Object[] {onOff});
             task.handleDebug("Loader " + name
                     + ": setting DefaultAssertionStatus=" + onOff);
             return true;
@@ -247,10 +259,10 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
         }
         try {
             Method m = cl.getClass().getMethod("setPackageAssertionStatus",
-                    new Class[] { String.class, Boolean.TYPE });
+                    new Class[] {String.class, Boolean.TYPE});
             for (int i = 0; i < pkgs.length; i++) {
-                m.invoke(cl, new Object[] { pkgs[i],
-                        onOff ? Boolean.TRUE : Boolean.FALSE });
+                m.invoke(cl, new Object[] {pkgs[i],
+                        onOff ? Boolean.TRUE : Boolean.FALSE});
                 task.handleDebug("Loader " + name
                         + ": setting PackageAssertionStatus for " + pkgs[i]
                         + "=" + onOff);
@@ -342,7 +354,7 @@ public class SimpleClassLoaderAdapter implements ClassLoaderAdapter {
      *            the calling ClassloaderBase-task.
      * @param classloader
      *            the classloader instance to report about.
-     * @param name
+     * @param role
      *            the name of the classloader instance.
      */
     public void report(ClassloaderReporter to,
