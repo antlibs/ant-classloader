@@ -19,7 +19,7 @@ package org.apache.tools.ant.taskdefs.classloader.report;
 import java.net.URL;
 
 public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter {
-    private String TAB = "  ";
+    private String tab = "  ";
     public String beginAttributes(int num, String[] prefix) {
         String result = prefix[0] + "<attributes count=\"" + num + "\">";
         incPrefix(prefix);
@@ -70,7 +70,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
         return result;
     }
     private void decPrefix(String[] prefix) {
-        prefix[0] = prefix[0].substring(0, prefix[0].length() - TAB.length());
+        prefix[0] = prefix[0].substring(0, prefix[0].length() - tab.length());
     }
     public String endAttributes(int num, String[] prefix) {
         decPrefix(prefix);
@@ -161,6 +161,6 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
 
     }
     private void incPrefix(String[] prefix) {
-        prefix[0] += TAB;
+        prefix[0] += tab;
     }
 }

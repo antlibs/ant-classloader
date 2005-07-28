@@ -27,7 +27,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * makes reporting destination transparent for reporting objects.
+ * Builds a tree of reporting elements.
+ * @since Ant1.7
  */
 public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuilder {
     private static class CL {
@@ -64,84 +65,118 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
     private CL currentCL;
     private ArrayList errors = new ArrayList();
     private SortedSet unassigned = new TreeSet();
+    /**
+     * Indicates start of attributes-section.
+     * @param num Number of elements.
+     */
     public void beginAttributes(int num) {
     }
+    /**
+     * Indicates start of child-section.
+     * @param num Number of elements.
+     */
     public void beginChildLoaders(int num) {
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginClassloader(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Indicates start of classloader reporting.
+     * @param name Handle of the classloader.
      */
     public void beginClassloader(ClassloaderReportHandle name) {
         currentCL = new CL(name);
         cLbyHandle.put(name, currentCL);
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginEntries(int)
+    /**
+     * Indicates start of entries-section.
+     * @param num Number of elements.
      */
     public void beginEntries(int num) {
     }
+    /**
+     * Indicates start of error-section.
+     * @param num Number of elements.
+     */
     public void beginErrors(int num) {
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginPackages(int)
+    /**
+     * Indicates start of packages-section.
+     * @param num Number of elements.
      */
     public void beginPackages(int num) {
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#beginReport()
+    /**
+     * Indicates start of report.
      */
     public void beginReport() {
     }
+    /**
+     * Indicates start of role-section.
+     * @param num Number of elements.
+     */
     public void beginRoles(int num) {
     }
+    /**
+     * Indicates start of unassigned-roles-section.
+     * @param num Number of elements.
+     */
     public void beginUnassignedRoles(int num) {
     }
+    /**
+     * Indicates end of attributes-section.
+     * @param num Number of elements.
+     */
     public void endAttributes(int num) {
     }
+    /**
+     * Indicates end of child-section.
+     * @param num Number of elements.
+     */
     public void endChildLoaders(int num) {
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endClassloader(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Indicates end of classloader reporting.
+     * @param name Handle of the classloader.
      */
     public void endClassloader(ClassloaderReportHandle name) {
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endEntries(int)
+    /**
+     * Indicates end of entries-section.
+     * @param num Number of elements.
      */
     public void endEntries(int num) {
     }
+    /**
+     * Indicates end of errors-section.
+     * @param num Number of elements.
+     */
     public void endErrors(int num) {
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endPackages(int)
+    /**
+     * Indicates end of packages-section.
+     * @param num Number of elements.
      */
     public void endPackages(int num) {
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#endReport()
+    /**
+     * Indicates end of report.
      */
     public void endReport() {
     }
+    /**
+     * Indicates end of roles-section.
+     * @param num Number of elements.
+     */
     public void endRoles(int num) {
     }
+    /**
+     * Indicates end of unassigned-roles-section.
+     * @param num Number of elements.
+     */
     public void endUnassignedRoles(int num) {
     }
+    /**
+     * Executes this Builder to another reporter.
+     * @param to Another reporter.
+     */
     public void execute(ClassloaderReporter to) {
         to.beginReport();
         if (errors.size() > 0) {
@@ -181,7 +216,7 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
         }
         to.endReport();
     }
-    public void execute(ClassloaderReporter to, CL cl) {
+    private void execute(ClassloaderReporter to, CL cl) {
         to.beginClassloader(cl.handle);
         if (cl.parent != null) {
             if (cl.expliciteParent) {
@@ -232,86 +267,77 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
         }
         to.endClassloader(cl.handle);
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportAttribute(java.lang.String,
-     *      java.lang.String)
+    /**
+     * Reports a single attribute.
+     * @param name Name of the attribute.
+     * @param value Value of the attribute.
      */
     public void reportAttribute(String name, String value) {
         currentCL.attributes.add(new CL.Attr(name, value));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportClass(java.lang.Class)
+    /**
+     * Reports the classloader's class.
+     * @param s Class of the classloader.
      */
     public void reportClass(Class s) {
         currentCL.clazz = s;
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportEntry(java.lang.String,
-     *      java.lang.String)
+    /**
+     * Reports a single entry.
+     * @param type Type of the entry (f.e. url or file).
+     * @param entry The entry.
      */
     public void reportEntry(String type, String entry) {
         currentCL.entries.add(new CL.Entry(type, entry));
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportEntry(java.net.URL)
+    /**
+     * Reports a single url entry.
+     * Same as reportEntry("url", url.toString());
+     * @param url The url.
      */
     public void reportEntry(URL url) {
         reportEntry("url", url.toString());
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportError(java.lang.String)
+    /**
+     * Reports an error.
+     * @param msg The error message.
      */
     public void reportError(String msg) {
         errors.add(msg);
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportExlicitelyParent(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports an explicit parent classloader.
+     * @param handle The parent's handle.
      */
     public void reportExlicitelyParent(ClassloaderReportHandle handle) {
         currentCL.parent = handle;
         currentCL.expliciteParent = true;
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportImplicitelyParent(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports an implicit parent classloader.
+     * @param handle The parent's handle.
      */
     public void reportImplicitelyParent(ClassloaderReportHandle handle) {
         currentCL.parent = handle;
         currentCL.expliciteParent = false;
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportPackage(java.lang.String)
+    /**
+     * Reports a single defined package.
+     * @param pkg The package name.
      */
     public void reportPackage(String pkg) {
         currentCL.packages.add(pkg);
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportRole(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports a single role.
+     * @param handle The role.
      */
     public void reportRole(ClassloaderReportHandle handle) {
         currentCL.roles.add(handle);
     }
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.tools.ant.taskdefs.ClassLoaderReporter#reportUnassignedPopularLoader(org.apache.tools.ant.taskdefs.ClassloaderBase.ReportHandle)
+    /**
+     * Reports a single unassigned role.
+     * @param handle The unassigned role.
      */
     public void reportUnassignedRole(ClassloaderReportHandle handle) {
         unassigned.add(handle);

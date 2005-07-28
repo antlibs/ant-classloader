@@ -23,7 +23,7 @@ package org.apache.tools.ant.taskdefs.classloader.report;
 public interface ClassloaderReportBuilder extends ClassloaderReporter {
     /**
      * Executes this Builder to another reporter.
-     * @param to Another formatter.
+     * @param to Another reporter.
      */
     void execute(ClassloaderReporter to);
 }
