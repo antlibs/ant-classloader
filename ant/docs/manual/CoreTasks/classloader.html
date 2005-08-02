@@ -64,6 +64,9 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
     URLs that refers to adresses in the internet.
   </li>
   </ul>
+<p>
+See also: <a href="classloaderreport.html">ClassloaderReport Task</a> 
+</p>
 
 
 <h3>Parameters</h3>
@@ -428,9 +431,6 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
   See <a href="#classloader-custom-handlerset">Supporting custom classloaders</a>.
 
 <h3>Examples</h3>
-<p><pre>&lt;classloader report="true"/&gt;</pre>
-  Writes a Classloaderreport for debugging purposes to the log.</p>
-
 <p><pre><font color="#888888">...
 &lt;jar destfile="dist/lib/my.jar" 
       basedir="build/classes" 
@@ -478,7 +478,7 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
 
 <h4>Adapter classes</h4>
   To support your custom classloader, you need to write an adapter class for it.
-  Take a look at the provided adapters in the package <code>org.apache.tools.ant.taskdefs.classloader</code>.
+  Take a look at the provided adapters in the package <code>org.apache.tools.ant.taskdefs.classloader.adapter</code>.
   Your class should derive from <code>SimpleClassLoaderAdapter</code> or - if it fits - one of the derived classes. 
   If the supported classloader is not in Java's bootstrap classpath, 
   you should use reflection for all the object access. (Example: <code>AntClassLoaderAdapter</code>)<br/>

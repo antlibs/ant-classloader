@@ -117,6 +117,11 @@ public interface ClassloaderReporter {
      */
     void reportAttribute(String name, String value);
     /**
+     * Reports a single child.
+     * @param name Role of the child.
+     */
+    void reportChild(ClassloaderReportHandle name);
+    /**
      * Reports the classloader's class.
      * @param s Class of the classloader.
      */

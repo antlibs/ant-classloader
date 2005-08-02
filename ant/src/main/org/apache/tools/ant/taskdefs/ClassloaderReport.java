@@ -28,6 +28,9 @@ import org.apache.tools.ant.AntTypeDefinition;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportFlattenBuilder;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportFormatter;
+import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportTextFormatter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportUtil;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportBuilder;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportHandle;
@@ -36,20 +39,126 @@ import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportXMLForm
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedAntLoggerReporter;
 import org.apache.tools.ant.taskdefs.classloader.report.ClassloaderReportTreeBuilder;
 import org.apache.tools.ant.taskdefs.classloader.report.FormattedPrintStreamReporter;
+import org.apache.tools.ant.types.EnumeratedAttribute;
 /**
  * Creates a report for all currently used classloaders.
  * @since Ant1.7
  */
 public class ClassloaderReport extends ClassloaderBase implements
         ClassloaderContext.Report {
-
-    private boolean reportPackages = false;
+    /**
+     * Enumeration for the values of format attribute.
+     */
+    public static class Format extends EnumeratedAttribute {
+        private static final int XML = 0;
+        private static final int TXT = 1;
+        /**
+         * Default Constructor.
+         */
+        public Format() {
+        }
+        /**
+         * Value'd Constructor.
+         *
+         * @param value
+         *            One of enumerated values.
+         */
+        public Format(String value) {
+            setValue(value);
+        }
+        /**
+         * Get the logging level for reporting duplicate entries.
+         *
+         * @return Logging level for reporting duplicate entries.
+         */
+        public ClassloaderReportFormatter newFormatter() {
+            switch (getIndex()) {
+            case XML:
+                return new ClassloaderReportXMLFormatter();
+            case TXT:
+                return new ClassloaderReportTextFormatter();
+            default:
+                return null;
+            }
+        }
+        /**
+         * Get the logging level for reporting duplicate entries.
+         *
+         * @return Logging level for reporting duplicate entries.
+         */
+        public Hierarchy getDefaultHierarchy() {
+            switch (getIndex()) {
+            case XML:
+                return new Hierarchy("tree");
+            case TXT:
+                return new Hierarchy("flat");
+            default:
+                return null;
+            }
+        }
+        /**
+         * Get the values.
+         *
+         * @return An array of the allowed values for this attribute.
+         */
+        public String[] getValues() {
+            return new String[] {"xml", "txt"};
+        }
+    }
+    /**
+     * Enumeration for the values of format attribute.
+     */
+    public static class Hierarchy extends EnumeratedAttribute {
+        private static final int FLAT = 0;
+        private static final int TREE = 1;
+        /**
+         * Default Constructor.
+         */
+        public Hierarchy() {
+        }
+        /**
+         * Value'd Constructor.
+         *
+         * @param value
+         *            One of enumerated values.
+         */
+        public Hierarchy(String value) {
+            setValue(value);
+        }
+        /**
+         * Get the logging level for reporting duplicate entries.
+         * @param context The context.
+         * @return Logging level for reporting duplicate entries.
+         */
+        public ClassloaderReportBuilder newBuilder(ClassloaderContext.Report context) {
+            switch (getIndex()) {
+            case FLAT:
+                return new ClassloaderReportFlattenBuilder(context);
+            case TREE:
+                return new ClassloaderReportTreeBuilder(context);
+            default:
+                return null;
+            }
+        }
+        /**
+         * Get the values.
+         *
+         * @return An array of the allowed values for this attribute.
+         */
+        public String[] getValues() {
+            return new String[] {"flat", "tree"};
+        }
+    }
+    private Format format = null;
+    private Hierarchy hierarchy = null;
+    private boolean reportPackages = true;
     private File output = null;
     /**
      * Default constructor.
      */
     public ClassloaderReport() {
         super();
+        setFailonerror(false);
     }
     /**
      * handle the report.
@@ -60,8 +169,13 @@ public class ClassloaderReport extends ClassloaderBase implements
         // for 1.4 IdentityHashMap should be used for handlesByLoader
         HashMap handlesByLoader = new HashMap();
         TreeMap loaderByHandle = new TreeMap();
-        // fileoutput and xml-format to be implemented.
-        ClassloaderReportBuilder to = new ClassloaderReportTreeBuilder();
+        if (format == null) {
+            format = (output == null) ? new Format("txt") : new Format("xml");
+        }
+        if (hierarchy == null) {
+            hierarchy = format.getDefaultHierarchy();
+        }
+        ClassloaderReportBuilder to = hierarchy.newBuilder(this);
         boolean addSuccess = true;
         ClassLoader extCl = ClassLoader.getSystemClassLoader().getParent();
         ClassloaderReportUtil reportUtil = ClassloaderReportUtil
@@ -130,20 +244,20 @@ public class ClassloaderReport extends ClassloaderBase implements
             }
         }
         rNames = null;
-        reportUtil
-                .report(this, handlesByLoader, loaderByHandle, to, addSuccess);
+        reportUtil.report(this, handlesByLoader, loaderByHandle, to, addSuccess);
         ClassloaderReporter destReporter;
-        if (output == null) {
+        
+        if (output != null) {
             try {
                 destReporter = new FormattedPrintStreamReporter(
-                    new ClassloaderReportXMLFormatter(),
+                    format.newFormatter(),
                     new PrintStream(output));
             } catch (IOException e) {
                 throw new BuildException(e);
             }
         } else {
             destReporter = new FormattedAntLoggerReporter(this,
-                    new ClassloaderReportXMLFormatter());
+                    format.newFormatter());
         }
         to.execute(destReporter);
 
@@ -161,8 +275,22 @@ public class ClassloaderReport extends ClassloaderBase implements
      * Sets the output file.
      * @param file Output file.
      */
-    public void setOutput(File file) {
+    public void setDestfile(File file) {
         this.output = file;
+    }
+    /**
+     * Sets the format.
+     * @param f The format.
+     */
+    public void setFormat(Format f) {
+        this.format = f;
+    }
+    /**
+     * Sets the hierarchy.
+     * @param h The hierarchy.
+     */
+    public void setHierarchy(Hierarchy h) {
+        this.hierarchy = h;
     }
     /**
      * Sets the reportPackages attribute.

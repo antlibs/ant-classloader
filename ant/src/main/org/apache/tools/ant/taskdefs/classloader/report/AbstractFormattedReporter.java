@@ -170,6 +170,13 @@ public abstract class AbstractFormattedReporter implements ClassloaderReporter {
         report(fmt.formatAttribute(name, value, prefix));
     }
     /**
+     * Reports a single child.
+     * @param name Role of the child.
+     */
+    public void reportChild(ClassloaderReportHandle name) {
+        report(fmt.formatChild(name, prefix));
+    }
+    /**
      * Reports the classloader's class.
      * @param s Class of the classloader.
      */

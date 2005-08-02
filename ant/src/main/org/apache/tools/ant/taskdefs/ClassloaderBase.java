@@ -34,7 +34,7 @@ import org.apache.tools.ant.util.URLUtils;
  * @since Ant 1.7
  */
 public class ClassloaderBase extends Task implements ClassloaderContext {
-    private boolean failOnError;
+    private boolean failOnError = true;
     private ClassLoaderHandlerSet handlerSet = null;
     /**
      * Default constructor

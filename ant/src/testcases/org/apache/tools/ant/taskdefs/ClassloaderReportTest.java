@@ -33,8 +33,7 @@ public class ClassloaderReportTest extends BuildFileTest {
     }
 
     public void testReport() {
-        expectLogContaining("test.report","<classloaderreport>");
-        expectLogContaining("test.report","</classloaderreport>");
+        expectLogContaining("test.report","classloaderreport");
     }
 
     public void tearDown() {

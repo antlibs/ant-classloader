@@ -212,6 +212,16 @@ public interface ClassloaderReportFormatter {
      */
     String formatAttribute(String name, String value, String[] prefix);
     /**
+     * Formats a single child entry.
+     * @param name Role of the child.
+     * @param prefix An array containing exactly one element,
+     *     that is a non-null String. This string is the prefix for every
+     *     new line. The method might replace the string for subsequent calls
+     *     of formatting methods.
+     * @return The formatted String that represents this element.
+     */
+    String formatChild(ClassloaderReportHandle name, String[] prefix);
+    /**
      * Formats the class of a classloader.
      * @param cl The class of the classloader.
      * @param prefix An array containing exactly one element,

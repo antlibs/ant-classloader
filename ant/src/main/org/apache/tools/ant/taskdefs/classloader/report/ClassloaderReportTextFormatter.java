@@ -18,11 +18,19 @@ package org.apache.tools.ant.taskdefs.classloader.report;
 
 import java.net.URL;
 /**
- * Writes a report in xml format.
+ * Writes a report in text format.
  * @since Ant1.7
  */
-public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter {
-    private String tab = "  ";
+public class ClassloaderReportTextFormatter implements ClassloaderReportFormatter {
+    private static final String PREFIX_ATTRIBUTES = "  - ";
+    private static final String PREFIX_CHILDS = "  - ";
+    private static final String PREFIX_CLASSLOADER = "  ";
+    private static final String PREFIX_ENTRIES = "  - ";
+    private static final String PREFIX_ERRORS = "  - ";
+    private static final String PREFIX_PACKAGES = "  - ";
+    private static final String PREFIX_REPORT = "";
+    private static final String PREFIX_ROLES = "  - ";
+    private static final String PREFIX_UNASSIGNED_ROLES = "  - ";
     /**
      * Formats the start of the attributes-section.
      * @param num Number of elements.
@@ -33,8 +41,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginAttributes(int num, String[] prefix) {
-        String result = prefix[0] + "<attributes count=\"" + num + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "attributes: " + num + " entries";
+        incPrefix(prefix, PREFIX_ATTRIBUTES);
         return result;
     }
     /**
@@ -47,8 +55,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginChildLoaders(int num, String[] prefix) {
-        String result = prefix[0] + "<childs count=\"" + num + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "childs:     " + num + " entries";
+        incPrefix(prefix, PREFIX_CHILDS);
         return result;
     }
     /**
@@ -61,12 +69,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginClassloader(ClassloaderReportHandle name, String[] prefix) {
-        String result = prefix[0]
-                + "<classloader type=\""
-                + name.getType()
-                + ((name.getName() != null) ? "\" name=\"" + name.getName()
-                        : "") + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "classloader: " + getRole(name);
+        incPrefix(prefix, PREFIX_CLASSLOADER);
         return result;
     }
     /**
@@ -79,8 +83,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginEntries(int num, String[] prefix) {
-        String result = prefix[0] + "<entries count=\"" + num + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "entries:    " + num + " entries";
+        incPrefix(prefix, PREFIX_ENTRIES);
         return result;
     }
     /**
@@ -93,8 +97,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginErrors(int num, String[] prefix) {
-        String result = prefix[0] + "<errors count=\"" + num + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "errors: " + num + " entries";
+        incPrefix(prefix, PREFIX_ERRORS);
         return result;
     }
     /**
@@ -107,8 +111,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginPackages(int num, String[] prefix) {
-        String result = prefix[0] + "<packages count=\"" + num + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "packages:   " + num + " entries";
+        incPrefix(prefix, PREFIX_PACKAGES);
         return result;
     }
     /**
@@ -120,8 +124,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginReport(String[] prefix) {
-        String result = prefix[0] + "<classloaderreport>";
-        incPrefix(prefix);
+        String result = prefix[0] + "classloaderreport";
+        incPrefix(prefix, PREFIX_REPORT);
         return result;
     }
     /**
@@ -134,8 +138,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginRoles(int num, String[] prefix) {
-        String result = prefix[0] + "<roles count=\"" + num + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "roles:      " + num + " entries";
+        incPrefix(prefix, PREFIX_ROLES);
         return result;
     }
     /**
@@ -148,12 +152,12 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String beginUnassignedRoles(int num, String[] prefix) {
-        String result = prefix[0] + "<unassigned-roles count=\"" + num + "\">";
-        incPrefix(prefix);
+        String result = prefix[0] + "unassigned roles: " + num + " entries";
+        incPrefix(prefix, PREFIX_UNASSIGNED_ROLES);
         return result;
     }
-    private void decPrefix(String[] prefix) {
-        prefix[0] = prefix[0].substring(0, prefix[0].length() - tab.length());
+    private void decPrefix(String[] prefix, String pref) {
+        prefix[0] = prefix[0].substring(0, prefix[0].length() - pref.length());
     }
     /**
      * Formats the end of the attributes-section.
@@ -165,8 +169,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endAttributes(int num, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</attributes>";
+        decPrefix(prefix, PREFIX_ATTRIBUTES);
+        return null;
     }
     /**
      * Formats the end of the childs-section.
@@ -178,8 +182,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endChildLoaders(int num, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</childs>";
+        decPrefix(prefix, PREFIX_CHILDS);
+        return null;
     }
     /**
      * Formats the end of the classloader-section.
@@ -191,8 +195,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endClassloader(ClassloaderReportHandle name, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</classloader>";
+        decPrefix(prefix, PREFIX_CLASSLOADER);
+        return prefix[0] + "----- end of " + getRole(name);
     }
     /**
      * Formats the end of the entries-section.
@@ -204,8 +208,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endEntries(int num, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</entries>";
+        decPrefix(prefix, PREFIX_ENTRIES);
+        return null;
     }
     /**
      * Formats the end of the errors-section.
@@ -217,8 +221,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endErrors(int num, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</errors>";
+        decPrefix(prefix, PREFIX_ERRORS);
+        return null;
     }
     /**
      * Formats the end of the packages-section.
@@ -230,8 +234,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endPackages(int num, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</packages>";
+        decPrefix(prefix, PREFIX_PACKAGES);
+        return null;
     }
     /**
      * Formats the end of the report.
@@ -242,8 +246,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endReport(String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</classloaderreport>";
+        decPrefix(prefix, PREFIX_REPORT);
+        return prefix[0] + "end of classloaderreport";
     }
     /**
      * Formats the end of the roles-section.
@@ -255,8 +259,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endRoles(int num, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</roles>";
+        decPrefix(prefix, PREFIX_ROLES);
+        return null;
     }
     /**
      * Formats the end of the unassigned-roles-section.
@@ -268,8 +272,8 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String endUnassignedRoles(int num, String[] prefix) {
-        decPrefix(prefix);
-        return prefix[0] + "</unassigned-roles>";
+        decPrefix(prefix, PREFIX_UNASSIGNED_ROLES);
+        return null;
     }
     /**
      * Formats a single attribute.
@@ -282,8 +286,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatAttribute(String name, String value, String[] prefix) {
-        return prefix[0] + "<attribute name=\"" + name + "\" value=\"" + value
-                + "\"/>";
+        return prefix[0] + name + " = " + value;
     }
     /**
      * Formats a single child entry.
@@ -295,11 +298,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatChild(ClassloaderReportHandle name, String[] prefix) {
-        return prefix[0]
-                      + "<child type=\""
-                      + name.getType()
-                      + ((name.getName() != null) ? "\" name=\"" + name.getName()
-                              : "") + "\"/>";
+        return prefix[0] + getRole(name);
     }
     /**
      * Formats the class of a classloader.
@@ -311,7 +310,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatClass(Class cl, String[] prefix) {
-        return prefix[0] + "<class name=\"" + cl.getName() + "\"/>";
+        return prefix[0] + "class:      " + cl.getName();
     }
     /**
      * Formats a single entry.
@@ -324,7 +323,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatEntry(String type, String entry, String[] prefix) {
-        return prefix[0] + "<entry " + type + "=\"" + entry + "\"/>";
+        return prefix[0] + type + "=" + entry;
     }
     /**
      * Formats a single url-entry.
@@ -337,7 +336,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatEntry(URL url, String[] prefix) {
-        return prefix[0] + "<entry url=\"" + url + "\"/>";
+        return formatEntry("url", String.valueOf(url), prefix);
     }
     /**
      * Formats a single error message.
@@ -349,7 +348,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatError(String msg, String[] prefix) {
-        return prefix[0] + "<error msg=\"" + msg + "\"/>";
+        return prefix[0] + msg;
     }
     /**
      * Formats a classloader's explicite parent classloader.
@@ -362,11 +361,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      */
     public String formatExpliciteParent(ClassloaderReportHandle name,
             String[] prefix) {
-        return prefix[0]
-                + "<parent definition=\"explicitely\" type=\""
-                + name.getType()
-                + ((name.getName() != null) ? "\" name=\"" + name.getName()
-                        : "") + "\"/>";
+        return prefix[0] + "parent:     " + getRole(name);
     }
     /**
      * Formats a classloader's implicite parent classloader.
@@ -379,11 +374,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      */
     public String formatImpliciteParent(ClassloaderReportHandle name,
             String[] prefix) {
-        return prefix[0]
-                + "<parent definition=\"default\" type=\""
-                + name.getType()
-                + ((name.getName() != null) ? "\" name=\"" + name.getName()
-                        : "") + "\"/>";
+        return prefix[0] + "parent:     NULL (Default: " + getRole(name) + ")";
     }
     /**
      * Formats a single defined package.
@@ -395,7 +386,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatPackage(String pkg, String[] prefix) {
-        return prefix[0] + "<package name=\"" + pkg + "\"/>";
+        return prefix[0] + pkg;
     }
     /**
      * Formats a role.
@@ -407,11 +398,7 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      * @return The formatted String that represents this element.
      */
     public String formatRole(ClassloaderReportHandle name, String[] prefix) {
-        return prefix[0]
-                + "<role type=\""
-                + name.getType()
-                + ((name.getName() != null) ? "\" name=\"" + name.getName()
-                        : "") + "\"/>";
+        return prefix[0] + getRole(name);
     }
     /**
      * Formats an unassigned role.
@@ -424,14 +411,13 @@ public class ClassloaderReportXMLFormatter implements ClassloaderReportFormatter
      */
     public String formatUnassignedRole(ClassloaderReportHandle name,
             String[] prefix) {
-        return prefix[0]
-                + "<role type=\""
-                + name.getType()
-                + ((name.getName() != null) ? "\" name=\"" + name.getName()
-                        : "") + "\"/>";
-
+        return prefix[0] + getRole(name);
     }
-    private void incPrefix(String[] prefix) {
-        prefix[0] += tab;
+    private String getRole(ClassloaderReportHandle name) {
+        return name.getType()
+            + ((name.getName() != null) ? " " + name.getName() : "");
+    }
+    private void incPrefix(String[] prefix, String inc) {
+        prefix[0] += inc ;
     }
 }

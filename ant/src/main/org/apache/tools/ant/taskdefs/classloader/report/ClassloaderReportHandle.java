@@ -89,9 +89,9 @@ public final class ClassloaderReportHandle implements Comparable {
         "CoreLoader",
         "ThreadContextClassloader",
         "Current ClassloaderBase",
-        "Referenced",
-        "Defined TaskLoader",
-        "Parent of ",
+        "Referenced as",
+        "Loader for defined Task/Type",
+        "Parent of",
         "other"};
     private String name;
     private int type;
@@ -190,6 +190,6 @@ public final class ClassloaderReportHandle implements Comparable {
         if (name == null) {
             return getType();
         }
-        return getType() + "=" + getName();
+        return getType() + " " + getName();
     }
 }

@@ -40,6 +40,8 @@ public class FormattedPrintStreamReporter extends AbstractFormattedReporter {
      *            the message line to report.
      */
     protected void report(String s) {
-        stream.println(s);
+        if (s != null) {
+            stream.println(s);
+        }
     }
 }

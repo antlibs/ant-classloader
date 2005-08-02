@@ -2,18 +2,20 @@
 <html>
 <head>
 <meta http-equiv="Content-Language" content="en-us">
-<title>Classloader Task</title>
+<title>ClassloaderReport Task</title>
 </head>
 
 <body>
-<h2><a name="classloader">Classloader</a></h2>
+<h2><a name="classloader">ClassloaderReport</a></h2>
 <h3><a name="classloader-description">Description</a></h3>
   <p>
-    This task writes a classloader <b>report</b> for debugging purposes into the log or a file.</li>
+    This task writes a classloader report for debugging purposes into the log or a file.</li>
+  </p>
+  <p>
     <i>NOTE: The report format is subject to change in future releases.</i>
   </p>
 <p>
-See also: <a href="#classloader-custom">Supporting custom classloaders</a> 
+See also: <a href="classloader.html">Classloader Task</a> 
 </p>
 
 <h3>Parameters</h3>
@@ -24,34 +26,54 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
     <td align="center" valign="top"><b>Required</b></td>
   </tr>
   <tr>
+    <td valign="top">destfile</td>
+    <td valign="top">If specified, the value indicates the name of the file to send the output of the statement to. If not specified, then the output will go to the Ant log.
+    </td>
+    <td valign="top" align="center">No.</td>
+  </tr>
+  <tr>
+    <td valign="top">format</td>
+    <td valign="top">Outputformat. One of <code>"xml"</code> (for XML format) or <code>"txt"</code> (for plain text format).
+    </td>
+    <td valign="top" align="center">No, defaults to <code>"txt"</code> if <i>destfile</i> is empty and <code>"xml"</code> if <i>destfile</i> is set.</td>
+  </tr>
+  <tr>
+    <td valign="top">hierarchy</td>
+    <td valign="top">Representation of delegation hierarchy. One of <code>"flat"</code> (for flatten representation) or <code>"tree"</code> (for tree representation).
+    </td>
+    <td valign="top" align="center">No, defaults to <code>"flat"</code> if <i>format</i> is <code>"txt"</code> and <code>"tree"</code> if <i>destfile</i> is <code>"xml"</code>.</td>
+  </tr>
+  <tr>
     <td valign="top">reportpackages</td>
-    <td valign="top">If <code>"true"</code>, report also the defined packages as get from <code>ClassLoader.getPackages()</code>.
-    Ignored if <i>report</i> is <code>"false"</code>.</td>
-    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
+    <td valign="top">If <code>"true"</code>, report the defined packages as get from <code>ClassLoader.getPackages()</code>.</td>
+    <td valign="top" align="center">No, defaults to <code>"true"</code>.</td>
   </tr>
   <tr>
     <td valign="top">handlerSet</td>
-    <td valign="top">Id of the <code>LoaderhandlerSet</code> to use when modifying an existing classloader or getting it's classpath.
-      See <a href="#classloader-custom-handlerset">"Supporting custom classloaders"</a> for further information.
+    <td valign="top">Id of the <code>LoaderhandlerSet</code> to use when getting information about a classloader.
+      See <a href="classloader.html#classloader-custom-handlerset">"Supporting custom classloaders"</a> for further information.
     </td>
     <td valign="top" align="center">No, defaults to a generic <code>LoaderhandlerSet</code> 
-    containing the <a href="#classloader-custom-handler-predefined">predefined Loaderhandlers</a> and <i>handler</i>.</td>
+    containing the <a href="classloader.html#classloader-custom-handler-predefined">predefined Loaderhandlers</a>.</td>
   </tr>
   <tr>
     <td valign="top">failonerror</td>
     <td valign="top">Stop the build process if an error occurs.</td>
-    <td valign="top" align="center">No, defaults to <code>"true"</code>.</td>
+    <td valign="top" align="center">No, defaults to <code>"false"</code>.</td>
   </tr>
 </table>
   <h3><a name="classloader-nested">Parameters specified as nested elements</a></h3>
   <h4><a name="classloader-nested-handlerset">&lt;handlerSet&gt;</a></h4>
-  See <a href="#classloader-custom-handlerset">Supporting custom classloaders</a>.
+  See <a href="classloader.html#classloader-custom-handlerset">Supporting custom classloaders</a>.
 
 <h3>Examples</h3>
-<p><pre>&lt;classloader report="true"/&gt;</pre>
+<p><pre>&lt;classloaderreport/&gt;</pre>
   Writes a Classloaderreport for debugging purposes to the log.</p>
+<p><pre>&lt;classloaderreport outfile="classloaderreport.xml" /&gt;</pre>
+  Writes a Classloaderreport for debugging purposes to the file classloaderreport.xml in the
+  Ant working directory.</p>
 <hr>
-<p align="center">&copy; Copyright 2004-2005 The Apache Software Foundation. All rights Reserved.</p>
+<p align="center">&copy; Copyright 2005 The Apache Software Foundation. All rights Reserved.</p>
 
 </body>
 </html>

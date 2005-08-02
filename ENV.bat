@@ -10,7 +10,7 @@ if NOT DEFINED JAVA_PATH set JAVA_PATH=%JAVA_HOME%\bin
 if NOT DEFINED ANT_PATH set ANT_PATH=%ANT_HOME%\bin
 
 
-set CLASSPATH=%CHECKSTYLE_HOME%\checkstyle-all-3.5.jar
+set CLASSPATH=%CHECKSTYLE_HOME%\checkstyle-all-3.5.jar;%SIMIAN_JAR%
 set PATH=%JAVA_PATH%;%ANT_PATH%;%PATH%
 
 set ANT_OPTS=-Dconfig.dir=%ANT_CHECKSTYLE_CFG_DIR% -Djava.dir=ant/src/main

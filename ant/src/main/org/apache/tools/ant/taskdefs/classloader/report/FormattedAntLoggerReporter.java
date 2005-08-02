@@ -39,6 +39,8 @@ public class FormattedAntLoggerReporter extends AbstractFormattedReporter {
      * @param s the message line to report.
      */
     protected void report(String s) {
-        task.log(s, Project.MSG_INFO);
+        if (s != null) {
+            task.log(s, Project.MSG_INFO);
+        }
     }
 }

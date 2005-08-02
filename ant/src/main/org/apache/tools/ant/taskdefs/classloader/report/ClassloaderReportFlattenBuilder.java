@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -29,10 +28,10 @@ import java.util.TreeSet;
 import org.apache.tools.ant.taskdefs.classloader.ClassloaderContext;
 
 /**
- * Builds a tree of reporting elements.
+ * Builds a flatten representation of reporting elements.
  * @since Ant1.7
  */
-public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuilder {
+public final class ClassloaderReportFlattenBuilder implements ClassloaderReportBuilder {
     private static class CL {
         private static class Attr {
             private final String name;
@@ -51,7 +50,7 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
             }
         }
         private ArrayList attributes = new ArrayList();
-        private SortedMap childs;
+        private SortedSet childs;
         private Class clazz = null;
         private ArrayList entries = new ArrayList();
         private boolean expliciteParent;
@@ -68,7 +67,7 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
     private ArrayList errors = new ArrayList();
     private SortedSet unassigned = new TreeSet();
     private final ClassloaderContext.Report context;
-    public ClassloaderReportTreeBuilder(ClassloaderContext.Report context) {
+    public ClassloaderReportFlattenBuilder(ClassloaderContext.Report context) {
         this.context = context;
     }
     /**
@@ -201,20 +200,19 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
         }
         // (re-)initialize childmaps
         for (Iterator i = cLbyHandle.values().iterator(); i.hasNext();) {
-            ((CL) i.next()).childs = new TreeMap();
+            ((CL) i.next()).childs = new TreeSet();
         }
         TreeMap roots = new TreeMap();
         for (Iterator i = cLbyHandle.values().iterator(); i.hasNext();) {
             CL cl = (CL) i.next();
-            if (cl.parent == null) {
-                roots.put(cl.handle, cl);
-            } else {
+            roots.put(cl.handle, cl);
+            if (cl.parent != null) {
                 CL parent = (CL) cLbyHandle.get(cl.parent);
                 if (parent == null) {
                     throw new RuntimeException("internal error: " + cl.parent
                             + " not found");
                 }
-                parent.childs.put(cl.handle, cl);
+                parent.childs.add(cl.handle);
             }
         }
         for (Iterator i = roots.values().iterator(); i.hasNext();) {
@@ -266,8 +264,8 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
         }
         if (cl.childs.size() > 0) {
             to.beginChildLoaders(cl.childs.size());
-            for (Iterator iC = cl.childs.values().iterator(); iC.hasNext();) {
-                execute(to, (CL) iC.next());
+            for (Iterator iC = cl.childs.iterator(); iC.hasNext();) {
+                to.reportChild((ClassloaderReportHandle)iC.next());
             }
             to.endChildLoaders(cl.childs.size());
         }
