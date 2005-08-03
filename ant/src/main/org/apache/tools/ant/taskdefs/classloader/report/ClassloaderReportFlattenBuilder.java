@@ -67,6 +67,10 @@ public final class ClassloaderReportFlattenBuilder implements ClassloaderReportB
     private ArrayList errors = new ArrayList();
     private SortedSet unassigned = new TreeSet();
     private final ClassloaderContext.Report context;
+    /**
+     * Constructor.
+     * @param context The context.
+     */
     public ClassloaderReportFlattenBuilder(ClassloaderContext.Report context) {
         this.context = context;
     }
@@ -265,7 +269,7 @@ public final class ClassloaderReportFlattenBuilder implements ClassloaderReportB
         if (cl.childs.size() > 0) {
             to.beginChildLoaders(cl.childs.size());
             for (Iterator iC = cl.childs.iterator(); iC.hasNext();) {
-                to.reportChild((ClassloaderReportHandle)iC.next());
+                to.reportChild((ClassloaderReportHandle) iC.next());
             }
             to.endChildLoaders(cl.childs.size());
         }

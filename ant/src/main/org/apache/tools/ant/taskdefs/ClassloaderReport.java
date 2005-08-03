@@ -246,7 +246,6 @@ public class ClassloaderReport extends ClassloaderBase implements
         rNames = null;
         reportUtil.report(this, handlesByLoader, loaderByHandle, to, addSuccess);
         ClassloaderReporter destReporter;
-        
         if (output != null) {
             try {
                 destReporter = new FormattedPrintStreamReporter(

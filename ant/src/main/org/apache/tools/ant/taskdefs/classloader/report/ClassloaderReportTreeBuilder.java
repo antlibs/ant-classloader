@@ -68,6 +68,10 @@ public final class ClassloaderReportTreeBuilder implements ClassloaderReportBuil
     private ArrayList errors = new ArrayList();
     private SortedSet unassigned = new TreeSet();
     private final ClassloaderContext.Report context;
+    /**
+     * Constructor.
+     * @param context The context.
+     */
     public ClassloaderReportTreeBuilder(ClassloaderContext.Report context) {
         this.context = context;
     }

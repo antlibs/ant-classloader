@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>What I know about Java&trade; Classloaders</title>
+<link rel="stylesheet" type="text/css" href="classloaders.css">
+<meta name="Author" content="Rainer Noack">
+<meta name="Keywords" content="classloader java ant">
+<meta name="Description" content="Some brief information about Java classloaders">
+</head>
+
+<body>
+<h1>What I know about Java&trade; Classloaders</h1>
+Contents:
+<ol>
+<li><a href="#c_1">Classloading Delegation</a></li>
+<li><a href="#c_2">The Standard Classloaders</a></li>
+</ol>
+<table>
+<tr>
+	<td><h2><a name="c_1">1. Classloading Delegation</a></h2></td>
+	<td></td>
+</tr>
+<tr>
+	<td colspan="2">
+	</td>
+</tr>
+<tr>
+	<td><h2><a name="c_2">2. The Standard Classloaders</a></h2></td>
+	<td></td>
+</tr>
+<tr>
+	<td colspan="2">
+<ol>
+<li><a href="#c_2_1">The System Classloader</a></li>
+<li><a href="#c_2_2">The Extension Classloader</a></li>
+<li><a href="#c_2_3">The Bootstrap Classloader</a></li>
+</ol>
+	</td>
+</tr>
+<tr>
+	<td><h3><a name="c_2_1">2.1. The System Classloader</h3></td>
+	<td></td>
+</tr>
+<tr>
+	<td id="code">
+<pre>
+import java.net.URL;
+import java.net.URLClassLoader;
+public class TestCommonClassloaders {
+    private static void analyze(URLClassLoader classloader) {
+        boolean isParentAssigned 
+            = classloader.getParent() != null;
+        System.out.println("  -  parent "
+            + (isParentAssigned ? "is" : "IS NOT") 
+            + " assigned");
+        URL[] urls = classloader.getURLs();
+        if (urls == null)
+            System.out.println("  -  urls: null");
+        else {
+            System.out.println("  -  urls: " 
+                + urls.length + " entries");
+            for (int i = 0; i < urls.length; i++)
+                System.out.println("        -> " + urls[i]);
+        }
+    }
+    public static void main(String[] args) {
+        URLClassLoader systemClassloader 
+            = (URLClassLoader) ClassLoader
+            .getSystemClassLoader();
+        boolean isSystemClassloader 
+            = TestCommonClassloaders.class
+            .getClassLoader() == systemClassloader;
+        System.out.println("Current ClassLoader "
+                + (isSystemClassloader ? "is" : "IS NOT")
+                + " System Classloader");
+        System.out.println("------------------");
+        System.out.println("java.class.path: "
+                + System.getProperty("java.class.path"));
+        System.out.println("System Classloader");
+        analyze(systemClassloader);
+    }
+}</pre></td>
+	<td id="console">
+<pre>
+Current ClassLoader is System Classloader
+------------------
+java.class.path: C:\classloadertest\classes
+System Classloader
+  -  parent is assigned
+  -  urls: 2 entries
+        -> file:/C:/classloadertest/classes/
+</pre>
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+<img src="systemClassloader.gif" border="0" alt="System Classloader"/>
+	</td>
+</tr>
+<tr>
+	<td><h3><a name="c_2_2">2.2. The Extension Classloader</h3></td>
+	<td></td>
+</tr>
+<tr>
+	<td id="code">
+<pre>
+<i>... see above ...</i>
+    public static void main(String[] args) {
+        <i>... see above ...</i>
+        System.out.println("------------------");
+        URLClassLoader extensionClassloader = 
+           (URLClassLoader) systemClassloader.getParent();
+        System.out.println("java.ext.dirs: "
+            + System.getProperty("java.ext.dirs"));
+        System.out.println("Extension ClassLoader");
+        analyze(extensionClassloader);
+    }
+}</pre></td>
+	<td id="console">
+<pre>
+<i>... see above ...</i>
+------------------
+java.ext.dirs: C:\Programme\Java\jre1.5.0_02\lib\ext
+Extension ClassLoader
+  -  parent IS NOT assigned
+  -  urls: 4 entries
+        -> file:/C:/Programme/Java/jre1.5.0_02/lib/ext/dnsns.jar
+        -> file:/C:/Programme/Java/jre1.5.0_02/lib/ext/localedata.jar
+        -> file:/C:/Programme/Java/jre1.5.0_02/lib/ext/sunjce_provider.jar
+        -> file:/C:/Programme/Java/jre1.5.0_02/lib/ext/sunpkcs11.jar
+</pre>
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+<img src="extensionClassloader.gif" border="0" alt="Extension Classloader"/>
+	</td>
+</tr>
+<tr>
+	<td><h3><a name="c_2_3">2.3. The Bootstrap Classloader</h3></td>
+	<td></td>
+</tr>
+<tr>
+	<td id="code">
+<pre>
+<i>... see above ...</i>
+    public static void main(String[] args) {
+        <i>... see above ...</i>
+        System.out.println("------------------");
+        System.out.println("sun.boot.class.path: "
+                + System.getProperty("sun.boot.class.path"));
+    }
+}</pre></td>
+	<td id="console">
+<pre>
+<i>... see above ...</i>
+------------------
+sun.boot.class.path: C:\Programme\Java\jre1.5.0_02\lib\rt.jar;&#8629;
+                     C:\Programme\Java\jre1.5.0_02\lib\i18n.jar;&#8629;
+                     C:\Programme\Java\jre1.5.0_02\lib\sunrsasign.jar;&#8629;
+                     C:\Programme\Java\jre1.5.0_02\lib\jsse.jar;&#8629;
+                     C:\Programme\Java\jre1.5.0_02\lib\jce.jar;&#8629;
+                     C:\Programme\Java\jre1.5.0_02\lib\charsets.jar;&#8629;
+                     C:\Programme\Java\jre1.5.0_02\classes
+</pre>
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+<img src="bootstrapClassloader.gif" border="0" alt="System Classloader"/>
+	</td>
+</tr>
+</table>
+</body>
+</html>

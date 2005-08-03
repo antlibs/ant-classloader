@@ -10,19 +10,26 @@
 <h3><a name="classloader-description">Description</a></h3>
   <p>
     This task is designed to <ul>
-    <li><b>create</b> a new classloader,</li>
+    <li>explicitely <b>create</b> a new classloader,</li>
     <li><b>append</b> a classpath to an existing classloader and </li>
     <li>extract the path of a classloader into a <b>property</b>.</li>
   </ul>
-    The classloader to create, modify and/or get the path from, is referred by the <i>loader</i> attribute.<br/>
+    The classloader to create, modify and/or get the path from, is referred by the <i>loader</i> attribute.
+    <br/>
 	If the referenced object does not exist (or <i>reset</i> is <code>"true"</code>),
 	a new classloader will be created and the reference will be set. Otherwise the classpath 
     will appended to the referenced classloader. In this case, the classloader remains untouched 
-    if no classpath is set. If the property <code>build.sysclasspath</code> is set to <code>"only"</code>,
-    create/append actions on the System-, Project- or CoreLoader are omitted with a warning.<br/>
+    if no classpath is set.
+  </p><p>
+    If the property <code>build.sysclasspath</code> is set to <code>"only"</code>,
+    create/append actions on the System-, Project- or CoreLoader are omitted with a warning.
+  </p></p>
     If <i>property</i> is set, the classpath of <i>loader</i> is set as value of the specified property.
     Create/append and property can be executed in one task.<br/>
   </p>
+<p>
+See also: <a href="classloaderreport.html">ClassloaderReport Task</a> 
+</p>
 <h4><a name="classloader-description-create">Creating classloaders</a></h4>
   <ul>
     <li><i>classpath</i> or <i>classpathRef</i> defines the classpath. (typical use)</li>
@@ -64,9 +71,6 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
     URLs that refers to adresses in the internet.
   </li>
   </ul>
-<p>
-See also: <a href="classloaderreport.html">ClassloaderReport Task</a> 
-</p>
 
 
 <h3>Parameters</h3>
@@ -81,8 +85,7 @@ See also: <a href="classloaderreport.html">ClassloaderReport Task</a>
     <td valign="top">Id or <a href="#classloader-nested-loader-symbolic">symbolic name</a> of the classloader to create, manipulate or get the path from.
       See <a href="#classloader-nested-loader">nested element's description</a> for further information.
       </td>
-    <td valign="top" align="center">Yes, unless nested <i>loader</i>
-    element is specified or <i>report</i> is <code>"true"</code>.</td>
+    <td valign="top" align="center">Yes, unless nested <i>loader</i> element is specified.</td>
   </tr>
   <tr>
     <td valign="top">classpath</td>
@@ -99,8 +102,8 @@ See also: <a href="classloaderreport.html">ClassloaderReport Task</a>
   <tr>
     <td valign="top">duplicateEntry</td>
     <td valign="top">Handling of duplicate entries in the classpath. 
-	One of "ignore" (don't check), "warn" (log warning but add entry)
-	or "omit" (omit entry and log in verbose mode). 
+	One of <code>"ignore"</code> (don't check), <code>"warn"</code> (log warning but add entry)
+	or <code>"omit"</code> (omit entry and log in verbose mode). 
     </td>
     <td valign="top" align="center">No, defaults to "omit".</td>
   </tr>
@@ -635,7 +638,7 @@ be dispensable if your adapter supports the correct default handler.
 </p>
 
 <hr>
-<p align="center">&copy; Copyright 2004 The Apache Software Foundation. All rights Reserved.</p>
+<p align="center">&copy; Copyright 2004-2005 The Apache Software Foundation. All rights Reserved.</p>
 
 </body>
 </html>

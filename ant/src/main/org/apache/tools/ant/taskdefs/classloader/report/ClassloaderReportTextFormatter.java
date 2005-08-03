@@ -418,6 +418,6 @@ public class ClassloaderReportTextFormatter implements ClassloaderReportFormatte
             + ((name.getName() != null) ? " " + name.getName() : "");
     }
     private void incPrefix(String[] prefix, String inc) {
-        prefix[0] += inc ;
+        prefix[0] += inc;
     }
 }
