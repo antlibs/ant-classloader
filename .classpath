@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="ant/src/main"/>
+	<classpathentry kind="src" path="src/main"/>
 	<classpathentry kind="src" path="src/examples"/>
 	<classpathentry kind="src" path="antsrc/ant/src/main"/>
 	<classpathentry kind="src" path="antsrc/ant/src/testcases"/>

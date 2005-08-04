@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<antlib>
+   <typedef name="classloader" 
+            classname="org.apache.tools.ant.taskdefs.ClassloaderTask"/>
+   <typedef name="classloaderreport" 
+            classname="org.apache.tools.ant.taskdefs.ClassloaderReport"/>
+   <typedef name="antloaderparameters"
+            classname="org.apache.tools.ant.types.AntLoaderParameters"/>
+   <typedef name="loaderparameters"
+            classname="org.apache.tools.ant.types.LoaderParameters"/>
+   <typedef name="loaderhandler" 
+            classname="org.apache.tools.ant.types.LoaderHandler"/>
+   <typedef name="loaderhandlerset" 
+            classname="org.apache.tools.ant.types.LoaderHandlerSet"/>
+   <typedef name="loaderref" 
+            classname="org.apache.tools.ant.types.LoaderRef"/>
+   <typedef name="urlpath" 
+            classname="org.apache.tools.ant.types.URLPath"/>
+</antlib>

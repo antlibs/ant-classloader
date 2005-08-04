@@ -82,13 +82,13 @@ public final class ClassloaderReportHandle implements Comparable {
     public static final ClassloaderReportHandle CURRENTHANDLE = new ClassloaderReportHandle(
             CURRENT, null);
     private static final String[] NAMES = {
-        "BootstrapClassloader",
-        "ExtensionClassloader",
-        "SystemClassloader",
-        "ProjectClassloader",
-        "CoreLoader",
-        "ThreadContextClassloader",
-        "Current ClassloaderBase",
+        "Bootstrap Classloader",
+        "Extension Classloader",
+        "System Classloader",
+        "Ant's Project Classloader",
+        "Ant's CoreLoader",
+        "ThreadContextClassloader of current thread",
+        "Current Classloader",
         "Referenced as",
         "Loader for defined Task/Type",
         "Parent of",
