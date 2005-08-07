@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Usage of the Ant Classloader Tasks</title>
+<link rel="stylesheet" type="text/css" href="classloaders.css">
+<meta name="Author" content="Rainer Noack">
+<meta name="Keywords" content="classloader report task ant">
+<meta name="Description" content="Proposed classloader task for Ant.">
+</head>
+<h2>How to use</h2>
+There are many ways to make a task usable in ant.
+This manual covers:
+<ol>
+<li><a href="#installation">Installation</a>:<br/>Jars are copied into <code><i>$ANT_HOME</i>/lib</code></li>
+<li><a href="#static">Static Configuration</a>:<br/>Jars are included in <code>CLASSPATH</code></li>
+<li><a href="#absolute">Absolute (Dynamic) Configuration</a>:<br/>Locations are defined external (typically via an Environment variable) and resolved in the script.</li>
+<li><a href="#relative">Relative (Dynamic) Configuration</a>:<br/>Jars are located relative to the project directory.</li>
+</ol>
+<h3><a name="installation">Installation</a></h3>
+This alternative is the easiest one, recommended in Ant's manual. 
+<p>
+Preparation:
+<ul>
+<li>Copy <code>ant-classloadertask.jar</code> into <code><i>$ANT_HOME</i>/lib</code>.
+</ul>
+Definition:
+<ul>
+<li>
+conventional: <code>&lt;taskdef resource="net/jtools/classloadertask/antlib.xml"/&gt;</code>
+</li>
+</ul>
+</p>
+<h3><a name="static">Static Configuration</a></h3>
+This alternative is used, if one dont't want to "install" tools whenever he updates Ant. 
+<h3><a name="absolute">Absolute (Dynamic) Configuration</a></h3>
+This alternative is used in projects, that use local tool installations.
+<h3><a name="relative">Relative (Dynamic) Configuration</a></h3>
+This alternative is typically used in projects, that use tool installations in a versioning system (f.e. CVS).
+<body>
+</body>
+</html>
