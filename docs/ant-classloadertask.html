@@ -1,18 +1,25 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<title>What I know about Java&trade; Classloaders</title>
+<title>Ant Classloader Task</title>
 <link rel="stylesheet" type="text/css" href="classloaders.css">
 <meta name="Author" content="Rainer Noack">
 <meta name="Keywords" content="classloader report task java ant">
 <meta name="Description" content="Proposed classloader task for Ant.">
 </head>
+<body>
 <p>
 Welcome on the site for the proposed <b>Ant Tasks <i>Classloader</i></b> and <b><i>ClassloaderReport</i></b>.
 </p><p>
-Some people have asked me in the last months to provide the tasks for a trial. Here they are in the proposed version for Ant 1.7 as provided in the last patch of the Feature Request.
-</p><p>
-
-<body>
+Some people have asked me in the last months to provide the tasks for a trial. Here they are in the proposed version for Ant 1.7. I will provide this version in the next weeks as a updated patch of the Feature Request.
+</p>
+<h2>Motivation</h2>
+If one has no problems with classpathes resp. classloaders he has not to read on.<br/> 
+However, there are some situations, where previous Ant classloading requires annoying workarounds. One of the more serious is dealing with Ant in environments where all tools (including Ant) are controlled by a versioning system; it is not easy to "install" jars for optional tasks.<br/>
+&lt;classloaderreport&gt; will most likely be used for debugging or evaluation reasons.
+<h2>Help</h2>
+Please help us to make the tasks more useful.<br/>
+As long as this tasks are not commited to Ant's repository, please report bugs or requests for enhancements to <b>info</b>@<b>jtools</b>.<b>org</b>.<br/>
+If you find the tasks useful, vote for the <a target="_blank" href="http://issues.apache.org/bugzilla/show_bug.cgi?id=28228">feature request</a> in Ant's bugzilla.
 </body>
 </html>

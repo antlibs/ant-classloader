@@ -13,11 +13,12 @@ This manual covers:
 <ol>
 <li><a href="#installation">Installation</a>:<br/>Jars are copied into <code><i>$ANT_HOME</i>/lib</code></li>
 <li><a href="#static">Static Configuration</a>:<br/>Jars are included in <code>CLASSPATH</code></li>
-<li><a href="#absolute">Absolute (Dynamic) Configuration</a>:<br/>Locations are defined external (typically via an Environment variable) and resolved in the script.</li>
+<li><a href="#absolute">Absolute (Dynamic) Configuration</a>:<br/>Locations are defined external (typically via an Environment variable or a properties file) and resolved in the script.</li>
 <li><a href="#relative">Relative (Dynamic) Configuration</a>:<br/>Jars are located relative to the project directory.</li>
 </ol>
+NOTE: We don't use abstraction in the examples to make them easier and straight forward. A good design guide is <a href="http://wiki.apache.org/ant/TheElementsOfAntStyle">The Elements Of Ant Style</a>.
 <h3><a name="installation">Installation</a></h3>
-This alternative is the easiest one, recommended in Ant's manual. 
+This alternative is the easiest one and recommended in Ant's manual. 
 <p>
 Preparation:
 <ul>
@@ -26,16 +27,88 @@ Preparation:
 Definition:
 <ul>
 <li>
-conventional: <code>&lt;taskdef resource="net/jtools/classloadertask/antlib.xml"/&gt;</code>
+conventional: <pre>&lt;taskdef resource="net/jtools/classloadertask/antlib.xml"/&gt;</pre>
+</li>
+<li>
+namespaced: Just declare it as an Xml namespace with antlib protocol.
+<pre>&lt;project xmlns:cltask="antlib:net.jtools.classloadertask"
+         .../&gt;</pre>
 </li>
 </ul>
 </p>
 <h3><a name="static">Static Configuration</a></h3>
-This alternative is used, if one dont't want to "install" tools whenever he updates Ant. 
+This alternative can be useful, if one dont't want to "install" tools whenever he updates Ant. It is a pragmatically solution to solve some issues but using <code>CLASSPATH</code> is NOT RECOMMENDED by Ant's manual.
+<p>
+Preparation:
+<ul>
+<li>Add <code>ant-classloadertask.jar</code> to the <code>CLASSPATH</code>.
+</ul>
+Definition:
+<ul>
+<li>
+conventional: <pre>&lt;taskdef resource="net/jtools/classloadertask/antlib.xml"/&gt;</pre>
+</li>
+<li>
+namespaced: Declare an Xml namespace with an uri and define this uri in a conventional taskdef.
+<pre>&lt;project xmlns:cltask="anttask:/net.jtools/antclassloadertask"
+         .../&gt;
+    &lt;taskdef resource="net/jtools/classloadertask/antlib.xml"
+             url="anttask:/net.jtools/antclassloadertask"/&gt;</pre>
+</li>
+</ul>
+</p>
 <h3><a name="absolute">Absolute (Dynamic) Configuration</a></h3>
-This alternative is used in projects, that use local tool installations.
+This alternative is often used in distributed projects, that use local tool installations. The build is based on a expected set of tools on the user's machine. The information where this tools are located is passed to Ant. There are different ways to pass information to Ant. I'm normally using OS Environment variables.
+<p>
+Preparation: 
+<ul>
+<li>Write the directory, in which <code>ant-classloadertask.jar</code> resides into a Environment variable. 
+Assume, the jar is located in the directory "C:\tools\ant-classloadertask" you would set a variable
+<pre>set ANT_CLTASK_HOME=C:\tools\ant-classloadertask</code>.
+</ul>
+Definition:
+<ul>
+<li>
+conventional: 
+<pre>&lt;property environment="env."/&gt;
+&lt;taskdef resource="net/jtools/classloadertask/antlib.xml"
+        classpath="${env.ANT_CLTASK_HOME}/ant-classloadertask.jar"/&gt;</pre>
+</li>
+<li>
+namespaced: Declare an Xml namespace with an uri and define this uri in a conventional taskdef.
+<pre>&lt;project xmlns:cltask="anttask:/net.jtools/antclassloadertask"
+         .../&gt;
+    &lt;property environment="env."/&gt;
+    &lt;taskdef resource="net/jtools/classloadertask/antlib.xml"
+             classpath="${env.ANT_CLTASK_HOME}/ant-classloadertask.jar"
+             url="anttask:/net.jtools/antclassloadertask"/&gt;</pre>
+</li>
+</ul>
+</p>
 <h3><a name="relative">Relative (Dynamic) Configuration</a></h3>
 This alternative is typically used in projects, that use tool installations in a versioning system (f.e. CVS).
+<p>
+Preparation:
+<ul>
+<li>Put <code>ant-classloadertask.jar</code> in a directory with a predefined relative location to your build directory. 
+</ul>
+Definition:
+<ul>
+<li>
+conventional: 
+<pre>&lt;taskdef resource="net/jtools/classloadertask/antlib.xml"
+        classpath="<i>myrelativePath</i>/ant-classloadertask.jar"/&gt;</pre>
+</li>
+<li>
+namespaced: Declare an Xml namespace with an uri and define this uri in a conventional taskdef.
+<pre>&lt;project xmlns:cltask="anttask:/net.jtools/antclassloadertask"
+         .../&gt;
+    &lt;taskdef resource="net/jtools/classloadertask/antlib.xml"
+             classpath="<i>myrelativePath</i>/ant-classloadertask.jar"
+             url="anttask:/net.jtools/antclassloadertask"/&gt;</pre>
+</li>
+</ul>
+</p>
 <body>
 </body>
 </html>
