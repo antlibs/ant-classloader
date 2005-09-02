@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<project name="anttools" default="release" basedir="./..">
+ <property name="product.name" value="ant-classloadertask"/>
+
+ <property name="release.version" value="1.0-RC1"/>
+ <property name="release.name" value="${product.name}-${release.version}"/>
+   
+ <property name="release.dir" value="release/${product.name}/${release.version}"/>
+ <property name="release.jar" value="${product.name}.jar"/>
+ <property name="release.zip" value="${release.name}.zip"/>
+
+ <target name="release">
+    <mkdir dir="${release.dir}"/>  
+    <zip destfile="${release.dir}/src.zip">
+        <zipfileset dir="ant/src/main"/>
+        <zipfileset dir="src/main"/>
+    </zip>
+    
+    <zip destfile="${release.dir}/${release.zip}">
+     <zipfileset dir="docs" prefix="${release.name}/docs" excludes="whitepaper/**"/>
+     <zipfileset dir="ant/docs/manual/CoreTasks" prefix="${release.name}/docs"/>
+     <zipfileset dir="lib" prefix="${release.name}" includes="${release.jar}"/>
+     <zipfileset dir="${release.dir}" prefix="${release.name}" includes="src.zip"/>
+    </zip>
+ </target>   
+</project>
