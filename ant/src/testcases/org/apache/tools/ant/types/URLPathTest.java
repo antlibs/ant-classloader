@@ -35,7 +35,6 @@ public class URLPathTest extends TestCase {
 
     public static boolean isUnixStyle = File.pathSeparatorChar == ':';
     public static boolean isNetWare = Os.isFamily("netware");
-    private String current;
     private String root;
 
     private Project project;
@@ -47,7 +46,6 @@ public class URLPathTest extends TestCase {
     public void setUp() {
         project = new Project();
         project.setBasedir(".");
-        current = new File(".").getAbsolutePath();
         root = new File(File.separator).getAbsolutePath().toUpperCase();
     }
 
@@ -64,7 +62,6 @@ public class URLPathTest extends TestCase {
 
     public void testSetLocation() throws MalformedURLException {
         String rootUrl = URLUtils.getURLUtils().createURL(root).toString();
-        String currentUrl = URLUtils.getURLUtils().createURL(current).toString();
         URLPath p = new URLPath(project);
         p.setLocation(new File(File.separatorChar+"a").toString());
         String[] l = p.list();

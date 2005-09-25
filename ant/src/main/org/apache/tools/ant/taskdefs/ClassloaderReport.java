@@ -17,6 +17,7 @@
 package org.apache.tools.ant.taskdefs;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -246,11 +247,12 @@ public class ClassloaderReport extends ClassloaderBase implements
         rNames = null;
         reportUtil.report(this, handlesByLoader, loaderByHandle, to, addSuccess);
         ClassloaderReporter destReporter;
+        PrintStream printStream = null;
         if (output != null) {
             try {
+                printStream = new PrintStream(new FileOutputStream(output));
                 destReporter = new FormattedPrintStreamReporter(
-                    format.newFormatter(),
-                    new PrintStream(output));
+                    format.newFormatter(), printStream);
             } catch (IOException e) {
                 throw new BuildException(e);
             }
@@ -259,7 +261,9 @@ public class ClassloaderReport extends ClassloaderBase implements
                     format.newFormatter());
         }
         to.execute(destReporter);
-
+        if (printStream != null) {
+            printStream.close();
+        }
     }
     /**
      * Indicates whether packages should been reported

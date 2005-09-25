@@ -73,20 +73,16 @@ public final class URLUtils implements ClassloaderURLUtil {
      * @return true if <code>fileOrURL</code> denotes a absolute file or url
      *         , false if it is relative
      */
-    public boolean isAbsolute(String fileOrURL) {
-        try {
-            if (isURL(fileOrURL)) {
-                URL url = new URL(transformFileSep(fileOrURL));
-                String urlStr = url.toString();
-                if (url.getProtocol() != null) {
-                    urlStr = urlStr.substring(url.getProtocol().length() + 1);
-                }
-                return urlStr.startsWith("/");
+    public boolean isAbsolute(String fileOrURL)throws MalformedURLException {
+        if (isURL(fileOrURL)) {
+            URL url = new URL(transformFileSep(fileOrURL));
+            String urlStr = url.toString();
+            if (url.getProtocol() != null) {
+                urlStr = urlStr.substring(url.getProtocol().length() + 1);
             }
-            return new File(fileOrURL).isAbsolute();
-        } catch (MalformedURLException murlex) {
-            throw new RuntimeException("oops", murlex);
+            return urlStr.startsWith("/");
         }
+        return new File(fileOrURL).isAbsolute();
     }
     /**
      * indicates whether the denoted fileOrURL is a file or a <code>file:</code> URL.
@@ -123,17 +119,13 @@ public final class URLUtils implements ClassloaderURLUtil {
      * @param fileOrURL absolute or relative file or url
      * @return normalized file or url
      */
-    public String normalize(String fileOrURL) {
+    public String normalize(String fileOrURL) throws MalformedURLException{
         if (!isURL(fileOrURL)) {
             return FILEUTILS.normalize(fileOrURL).toString();
         }
         String orig = fileOrURL;
         fileOrURL = transformFileSep(fileOrURL);
-        try {
-            fileOrURL = new URL(fileOrURL).toString();
-        } catch (MalformedURLException murlex) {
-            throw new RuntimeException("oops", murlex);
-        }
+        fileOrURL = new URL(fileOrURL).toString();
         String root = fileOrURL.substring(0, fileOrURL.indexOf(':') + 1);
         fileOrURL = fileOrURL.substring(root.length());
         while (fileOrURL.startsWith("/")) {

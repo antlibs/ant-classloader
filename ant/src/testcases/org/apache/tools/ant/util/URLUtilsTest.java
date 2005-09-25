@@ -1,5 +1,5 @@
 /*
- * Copyright  2001-2004 The Apache Software Foundation
+ * Copyright  2001-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.apache.tools.ant.taskdefs.condition.Os;
  */
 public class URLUtilsTest extends TestCase {
 
-    private FileUtils fu;
     private File removeThis;
     private String current;
     private String root;
@@ -42,7 +41,6 @@ public class URLUtilsTest extends TestCase {
     }
 
     public void setUp() {
-        fu = FileUtils.getFileUtils();
         // Windows adds the drive letter in uppercase, unless you run Cygwin
         current = new File(".").getAbsolutePath();
         root = new File(File.separator).getAbsolutePath().toUpperCase();
@@ -57,7 +55,7 @@ public class URLUtilsTest extends TestCase {
     public void testCreateURL(String test,String expected,String fileOrURL) throws MalformedURLException {
         assertEquals(test,expected,URLUtils.getURLUtils().createURL(fileOrURL).toString());
     }
-    public void testNormalize(String test,String expected,String fileOrURL) {
+    public void testNormalize(String test,String expected,String fileOrURL) throws MalformedURLException {
         assertEquals(test,expected,URLUtils.getURLUtils().normalize(fileOrURL));
     }
     public void testResolve(String test,String expected,String fileOrURL,File dir) throws MalformedURLException {
@@ -98,7 +96,7 @@ public class URLUtilsTest extends TestCase {
         assertEquals(true,utils.isFileOrFileURL("///a/b"));
         assertEquals(true,utils.isFileOrFileURL("."));
     }
-    public void testIsAbsolute() {
+    public void testIsAbsolute() throws MalformedURLException {
         URLUtils utils=URLUtils.getURLUtils();
         assertEquals("2",true,utils.isAbsolute("file:/a/b"));
         assertEquals("3",true,utils.isAbsolute("file://a/b"));
@@ -168,9 +166,6 @@ public class URLUtilsTest extends TestCase {
         return x.replace('/', File.separatorChar);
     }
     public void testNormalize() throws MalformedURLException{
-        String rootUrl = URLUtils.getURLUtils().createURL(root).toString();
-        String currentUrl = URLUtils.getURLUtils().createURL(current).toString();
-
         testNormalize("http"
                      , "http://ant.apache.org"
                      , "http://ant.apache.org");
@@ -243,9 +238,6 @@ public class URLUtilsTest extends TestCase {
         }
     }
     public void testResolve() throws MalformedURLException{
-        String rootUrl = URLUtils.getURLUtils().createURL(root).toString();
-        String currentUrl = URLUtils.getURLUtils().createURL(current).toString();
-
         File dir = new File("C:/a");
         String dirUrl = URLUtils.getURLUtils().createURL(dir.getAbsolutePath()).toString();
          
