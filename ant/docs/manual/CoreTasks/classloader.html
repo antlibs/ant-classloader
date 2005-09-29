@@ -125,7 +125,7 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
     <td valign="top">Id of the <code>Loaderparameters</code> to use when creating a new classloader.
       See <a href="#classloader-nested-parameters">nested element's description</a> for further information.
     </td>
-    <td valign="top" align="center">No, defaults to an empty <a href="#classloader-nested-parameters"><code>Loaderparameters</code></a>.</td>
+    <td valign="top" align="center">No, defaults to an empty <a href="#classloader-nested-antparameters"><code>Antloaderparameters</code></a>.</td>
   </tr>
   <tr>
     <td valign="top">handler</td>
@@ -218,7 +218,7 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
       </tr>
       <tr>
         <td valign="top">core</td>
-        <td valign="top">The result of <code>getProject().getCoreLoader()</code>.</td>
+        <td valign="top">The result of <code>getProject().getCoreLoader()</code>. If used as <i>parentLoader</i> or <i>superLoader</i> and <code>getProject().getCoreLoader()</code> returns <code>null</null>, "project" is used as delegation parent resp. superloader.</td>
         <td valign="top">Calls <code>getProject().setCoreLoader</code> and updates the current Project reference id "ant.coreLoader".</td>
       </tr>
       <tr>
@@ -228,7 +228,7 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
       </tr>
       <tr>
         <td valign="top">none</td>
-        <td valign="top">Explicitely no classloader. Can not be used as <code>Classloader</code>'s <i>loader</i>.</td>
+        <td valign="top">Explicitely no classloader. Can not be used as <code>Classloader</code>'s <i>loader</i>.  <i>(Typically used to specify the bootstrap classloader.)</i></td>
         <td valign="top">Error</td>
       </tr>
       <tr>
@@ -304,7 +304,8 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
     <code>Loaderparameters</code> default <code>Loaderhandler</code> is 
     <a href="#classloader-custom-handler-predefined"><code>"ant.clhandler.URLClassLoader"</code></a>.<br/>
     Ant ships with the following compatible types:<br/>
-    - <a href="#classloader-nested-antparameters"><code>Antloaderparameters</code></a>
+    - <a href="#classloader-nested-antparameters"><code>Antloaderparameters</code></a><br/>
+    <i>NOTE: In Ant versions 1.6.5 (and prior) &lt;taskdef&gt; and &lt;typedef&gt; requires instances of <code>AntClassloader</code> to define tasks or types.</i>.
     </p>
   <p>Instead of referring to existing <code>Loaderparameters</code>,
     you can can define them via a nested <i>parameters</i> element.</p>
@@ -445,11 +446,26 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
   following taskdef can load the new task in the same classloader as Ant's Core Tasks.
   </p>
 
+<p><pre>&lt;classloader loader="my-new-antloader" parentloader="project"&gt;
+    &lt;classpath&gt;
+        &lt;pathelement path="dist/lib/my2nd.jar:${junit.dir}/junit.jar"/&gt;
+        &lt;urlpathelement path="dist/lib/my3rd.jar"/&gt;
+    &lt;/classpath&gt;
+&lt;/classloader&gt;</pre>
+  Creates a new <code>AntClassLoader</code> with the ProjectClassLoader as delegating
+  parent and a classpath consisting of ${basedir}/dist/lib/my2nd.jar followed by
+  ${junit.dir}/junit.jar followed by
+  ${basedir}/dist/lib/my3rd.jar
+  and adds it to the reference table with id my-new-loader.
+  Ant Tasks in this classloader can be loaded by the current project as it is a childloader of the project classloader.
+  </p>
+
 <p><pre>&lt;classloader loader="my-new-loader" parentloader="system"&gt;
     &lt;classpath&gt;
         &lt;pathelement path="dist/lib/my2nd.jar:${junit.dir}/junit.jar"/&gt;
         &lt;urlpathelement path="http://some.domain.com/lib/remote.jar;dist/lib/my3rd.jar"/&gt;
     &lt;/classpath&gt;
+    &lt;parameters/&gt;
 &lt;/classloader&gt;</pre>
   Creates a new <code>java.net.URLClassLoader</code> with the SystemClassLoader as delegating
   parent and a classpath consisting of ${basedir}/dist/lib/my2nd.jar followed by
@@ -458,21 +474,6 @@ See also: <a href="#classloader-custom">Supporting custom classloaders</a>
   ${basedir}/dist/lib/my3rd.jar
   and adds it to the reference table with id my-new-loader.
   Ant Tasks in this classloader can not be loaded by the current project as it is not a childloader of the project classloader.
-  </p>
-
-<p><pre>&lt;classloader loader="my-new-antloader" parentloader="project"&gt;
-    &lt;classpath&gt;
-        &lt;pathelement path="dist/lib/my2nd.jar:${junit.dir}/junit.jar"/&gt;
-        &lt;urlpathelement path="dist/lib/my3rd.jar"/&gt;
-    &lt;/classpath&gt;
-    &lt;antparameters/&gt;
-&lt;/classloader&gt;</pre>
-  Creates a new <code>AntClassLoader</code> with the ProjectClassLoader as delegating
-  parent and a classpath consisting of ${basedir}/dist/lib/my2nd.jar followed by
-  ${junit.dir}/junit.jar followed by
-  ${basedir}/dist/lib/my3rd.jar
-  and adds it to the reference table with id my-new-loader.
-  Ant Tasks in this classloader can be loaded by the current project as it is a childloader of the project classloader.
   </p>
 
 <hr/>

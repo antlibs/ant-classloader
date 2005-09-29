@@ -201,7 +201,7 @@ public class ClassloaderTask extends ClassloaderBase implements
      *            The superLoader.
      */
     public void addSuperLoader(LoaderRef loader) {
-        this.parentLoader = loader;
+        this.superLoader = loader;
     }
     /**
      * creates a nested classpath element.
@@ -388,7 +388,7 @@ public class ClassloaderTask extends ClassloaderBase implements
      */
     public ClassLoaderParameters getParameters() {
         if (parameters == null) {
-            parameters = new LoaderParameters(getProject());
+            parameters = new AntLoaderParameters(getProject());
         }
         return parameters;
     }
@@ -399,9 +399,10 @@ public class ClassloaderTask extends ClassloaderBase implements
      */
     public ClassLoader getParentLoader() {
         if (parentLoader == null) {
+            parentLoader = new LoaderRef(getProject(),"CORE");
             return null;
         }
-        return parentLoader.getClassLoader(null, isFailOnError(), false);
+        return parentLoader.getClassLoaderOrFallback(null, isFailOnError(), false);
     }
     /**
      * Gets the super classloader to create a new classloader with.
@@ -412,7 +413,7 @@ public class ClassloaderTask extends ClassloaderBase implements
         if (superLoader == null) {
             return getClass().getClassLoader();
         }
-        return superLoader.getClassLoader(null, isFailOnError(), false);
+        return superLoader.getClassLoaderOrFallback(null, isFailOnError(), false);
     }
     /**
      * Handles a classpath entry.

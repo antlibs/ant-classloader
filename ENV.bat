@@ -1,8 +1,13 @@
 rem  @echo off
 set jdk=%1%
+set antversion=%2%
 if NOT DEFINED jdk set jdk=1.5
+if NOT DEFINED antversion set antversion=-
+set PATH=
 set PROJECT=jtools
-call HOME.bat %jdk%
+set JAVA_PATH=
+set ANT_PATH=
+call HOME.bat %jdk% %antversion%
 
 set DIR_BUILD=
 set DIR_RELEASE=

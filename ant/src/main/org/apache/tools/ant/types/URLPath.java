@@ -18,6 +18,8 @@
 package org.apache.tools.ant.types;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -63,7 +65,7 @@ public class URLPath extends DataType implements Cloneable {
      */
     public class URLPathElement {
         private String[] parts = null;
-        private void addToPath(Path result) {
+        protected void addToPath(Path result) {
             if (parts == null) {
                 return;
             }
@@ -478,42 +480,83 @@ public class URLPath extends DataType implements Cloneable {
      * @param p the project
      * @throws BuildException on circular reference
      */
-    public void dieOnCircularReference(final Stack stk, final Project p)
+    public void dieOnCircularReference(Stack stk, Project p)
         throws BuildException {
 
         if (isChecked()) {
             return;
         }
-        Iterator e = elements.iterator();
-        while (e.hasNext()) {
-            Object o = e.next();
-            if (o instanceof Reference) {
+        Method docrMethod;
+        try {
+            docrMethod=DataType.class.getDeclaredMethod("dieOnCircularReference",new Class[]{Stack.class, Project.class});
+        } catch (SecurityException e) {
+            throw new BuildException(e);
+        } catch (NoSuchMethodException e) {
+            throw new BuildException("Possible Version Conflict, oata.types.DataType has no dieOnCircularReferenceMethod",e);
+        }
+        docrMethod.setAccessible(true);
+        Iterator i = elements.iterator();
+        while (i.hasNext()) {
+            Object o = i.next();
+            while (o instanceof Reference) {
                 o = ((Reference) o).getReferencedObject(p);
             }
-
-            if (o instanceof DataType) {
+            if (o instanceof DataType ) {
                 if (stk.contains(o)) {
                     throw circularReference();
                 }
                 stk.push(o);
-                ((DataType) o).dieOnCircularReference(stk, p);
+                try {
+                    docrMethod.invoke(o, new Object[]{stk,p});
+                } catch (BuildException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new BuildException(e);
+                }
                 stk.pop();
             }
         }
         setChecked(true);
     }
+    
+    /*
+    public void dieOnCircularReference(Stack stk, Project p)
+    throws BuildException {
+
+    if (isChecked()) {
+        return;
+    }
+    Iterator e = elements.iterator();
+    while (e.hasNext()) {
+        Object o = e.next();
+        if (o instanceof Reference) {
+            o = ((Reference) o).getReferencedObject(p);
+        }
+
+        if (o instanceof DataType) {
+            if (stk.contains(o)) {
+                throw circularReference();
+            }
+            stk.push(o);
+            ((DataType) o).dieOnCircularReference(stk, p);
+            stk.pop();
+        }
+    }
+    setChecked(true);
+}
+    */
     /**
      * Returns all path elements defined by this and nested path objects.
      * @return list of path elements.
      */
     public String[] list() {
-
+        /*
         if (!isChecked()) {
             // make sure we don't have a circular reference here
             Stack stk = new Stack();
             stk.push(this);
             dieOnCircularReference(stk, getProject());
-        }
+        }*/
 
         ArrayList result = new ArrayList(2 * elements.size());
         HashSet set = new HashSet();
@@ -714,7 +757,7 @@ public class URLPath extends DataType implements Cloneable {
         return (String[]) result.toArray(new String[result.size()]);
     }
     */
-    private String[] translateUrlPath(String source) {
+    protected String[] translateUrlPath(String source) {
         ArrayList result = new ArrayList();
         if (source == null) {
             return new String[0];

@@ -34,7 +34,7 @@ import org.apache.tools.ant.taskdefs.condition.Os;
  */
 
 public final class URLUtils implements ClassloaderURLUtil {
-    private static final FileUtils FILEUTILS = FileUtils.getFileUtils();
+    private static final FileUtils FILEUTILS = FileUtils.newFileUtils();
     private static final boolean ON_NETWARE = Os.isFamily("netware");
     private static URLUtils singleton = new URLUtils();
     /**

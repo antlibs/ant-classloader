@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="ant/src/main"/>
-	<classpathentry kind="src" path="src/main"/>
-	<classpathentry kind="src" path="src/examples"/>
 	<classpathentry kind="src" path="antsrc/ant/src/main"/>
 	<classpathentry kind="src" path="antsrc/ant/src/testcases"/>
+	<classpathentry kind="src" path="src/main"/>
+	<classpathentry kind="src" path="src/examples"/>
 	<classpathentry kind="src" path="ant/src/testcases"/>
 	<classpathentry sourcepath="/eclipse-resources/junit/src.jar" kind="lib" path="/eclipse-resources/junit/junit.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JRE_1.2"/>

@@ -1,5 +1,5 @@
 /*
- * Copyright  2004 The Apache Software Foundation
+ * Copyright  2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
 
 /**
- * Specifies a ClassloaderBase.
+ * Specifies a classloader.
  * @since Ant 1.7
  */
 public class LoaderRef extends DataType {
@@ -77,6 +77,24 @@ public class LoaderRef extends DataType {
                     return type.getProject().getClass().getClassLoader();
                 default : //NONE and unknown values
                     return null;
+            }
+        }
+        /**
+         * get the defined ClassLoader.
+         * @param type the calling loaderRef instance
+         * @return the defined ClassLoader.
+         */
+        public ClassLoader getClassloaderOrFallback(LoaderRef type) {
+            switch (this.getIndex()) {
+                case CORE : {
+                    ClassLoader result=type.getProject().getCoreLoader();
+                    if (result != null) {
+                        return result;
+                    }
+                    return new LoaderSpec("PROJECT").getClassloaderOrFallback(type);
+                }                        
+                default :
+                    return getClassLoader(type);
             }
         }
         /**
@@ -179,7 +197,7 @@ public class LoaderRef extends DataType {
                 loaderRef = ref;
             }
         } else if (r instanceof LoaderRef) {
-            setRefid(new Reference(getProject(), ref));
+            setRefid(new Reference(ref));
         } else if (r instanceof ClassLoader) {
             loaderRef = ref;
         } else {
@@ -244,6 +262,55 @@ public class LoaderRef extends DataType {
         }
         if (defaultLoader != null) {
             return defaultLoader.getClassLoader(this);
+        }
+        return null;
+    }
+    /**
+     * gets the specified ClassLoader or its fallback classloader.
+     * @param defaultLoader a Loader to return if the classLoader
+     *        specified by reference is not found.
+     * @param failOnError overrides the failOnError attribute
+     * @param allowNullRef if true, a not found reference is not an error.
+     * @return the specified ClassLoader
+     */
+    public ClassLoader getClassLoaderOrFallback(
+        LoaderSpec defaultLoader,
+        boolean failOnError,
+        boolean allowNullRef) {
+        Object obj = null;
+        if (this.isReference()) {
+            return getRef().getClassLoaderOrFallback(
+                    defaultLoader,
+                    failOnError,
+                    allowNullRef);
+        }
+        if (loaderRef != null) {
+            obj = getProject().getReference(loaderRef);
+            if (obj == null) {
+                if (allowNullRef) {
+                    return null;
+                }
+                handleError(
+                    "Referenced object " + loaderRef + " not found",
+                    failOnError);
+                return null;
+            }
+            if (!(obj instanceof ClassLoader)) {
+                handleError(
+                    "Referenced object "
+                        + loaderRef
+                        + " is not a ClassLoader: "
+                        + obj.getClass().getName(),
+                    failOnError);
+                return null;
+            }
+            return (ClassLoader) obj;
+        }
+        if (loader != null) {
+            return loader.getClassloaderOrFallback(this);
+        }
+        if (defaultLoader != null) {
+            return defaultLoader.getClassloaderOrFallback(this);
         }
         return null;
     }
